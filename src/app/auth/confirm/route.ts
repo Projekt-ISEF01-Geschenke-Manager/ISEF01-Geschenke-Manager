@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.redirect(
     new URL(
-      `/login?error=${encodeURIComponent("Bestätigungslink ungültig oder abgelaufen")}`,
+      `/?error=${encodeURIComponent("Bestätigungslink ungültig oder abgelaufen")}`,
       request.url,
     ),
   );

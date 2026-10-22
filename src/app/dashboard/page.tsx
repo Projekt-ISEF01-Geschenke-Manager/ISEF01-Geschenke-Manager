@@ -1,14 +1,15 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { signout } from "./actions";
+import { signout } from "@/app/actions/auth";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
-// Liest die Session (cookies()) und kann deshalb nicht statisch vorgerendert
-// werden (Next.js 16 "Cache Components"). Einfachster zulässiger Weg laut
-// Next.js-Doku für session-abhängige Seiten: als blockierend markieren.
+// Übersicht (Kernansicht nach dem Login). Es gibt dafür noch kein
+// detailliertes Wireframe, daher bewusst ein einfacher Platzhalter –
+// wird durch die Personenliste etc. ersetzt, sobald das Wireframe
+// vorliegt.
 export const instant = false;
 
-// Dient aktuell als Nachweis, dass Login/Session funktionieren.
-// Wird später durch die Personenliste ersetzt bzw. verlinkt diese.
 export default async function DashboardPage() {
   const supabase = await createClient();
   const {
@@ -16,19 +17,29 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/");
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-xl flex-col gap-6 px-4 py-12">
-      <h1 className="text-2xl font-semibold">Eingeloggt</h1>
-      <p className="text-gray-600">Angemeldet als {user.email}</p>
+    <>
+      <SiteHeader />
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
+        <h1 className="text-2xl font-semibold">Übersicht</h1>
+        <p className="text-neutral-600 dark:text-neutral-400">
+          Angemeldet als {user.email}. Hier entsteht als Nächstes die
+          Personenliste.
+        </p>
 
-      <form action={signout}>
-        <button type="submit" className="rounded-md border px-4 py-2">
-          Abmelden
-        </button>
-      </form>
-    </main>
+        <form action={signout}>
+          <button
+            type="submit"
+            className="rounded-full border border-neutral-300 px-4 py-2 text-sm dark:border-neutral-600"
+          >
+            Abmelden
+          </button>
+        </form>
+      </main>
+      <SiteFooter />
+    </>
   );
 }
