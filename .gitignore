@@ -30,11 +30,15 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files (.env.example ist bewusst KEIN Secret und wird getrackt)
 .env*
+!.env.example
 
 # vercel
 .vercel
+
+# claude code (lokale Tooling-Konfiguration, nicht projektrelevant)
+.claude
 
 # typescript
 *.tsbuildinfo
