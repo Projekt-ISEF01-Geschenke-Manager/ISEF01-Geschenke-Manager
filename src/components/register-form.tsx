@@ -90,7 +90,7 @@ export function RegisterForm() {
 
         <button
           type="submit"
-          className="rounded-full bg-neutral-900 px-5 py-3 text-sm font-medium text-white dark:bg-white dark:text-neutral-900"
+          className="cursor-pointer transition active:scale-95 rounded-full bg-neutral-900 px-5 py-3 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
         >
           Konto erstellen
         </button>

@@ -22,7 +22,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label="Hell-/Dunkelmodus umschalten"
-      className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-neutral-700 text-neutral-200 transition-colors hover:bg-neutral-800"
+      className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-neutral-700 text-neutral-200 cursor-pointer transition hover:bg-neutral-800 active:scale-95"
     >
       <Sun className="h-4 w-4 opacity-100 transition-opacity duration-200 dark:opacity-0" />
       <Moon className="absolute h-4 w-4 opacity-0 transition-opacity duration-200 dark:opacity-100" />

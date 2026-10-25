@@ -75,7 +75,7 @@ export default async function Home({
             </p>
             <Link
               href="/register"
-              className="w-fit rounded-full border border-neutral-900 px-5 py-3 text-sm font-medium dark:border-white"
+              className="cursor-pointer transition active:scale-95 w-fit rounded-full border border-neutral-900 px-5 py-3 text-sm font-medium hover:bg-neutral-100 dark:border-white dark:hover:bg-neutral-800"
             >
               Kostenlos Konto erstellen
             </Link>
