@@ -40,6 +40,9 @@ yarn-error.log*
 # claude code (lokale Tooling-Konfiguration, nicht projektrelevant)
 .claude
 
+# IDE (lokale Tooling-Konfiguration, nicht projektrelevant)
+.idea
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
