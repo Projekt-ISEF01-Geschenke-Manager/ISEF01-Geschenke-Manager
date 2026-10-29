@@ -36,6 +36,22 @@ alter table public.people
   add constraint birthday_day_month_together
   check ((birthday_day is null) = (birthday_month is null));
 
+-- Kalender-gültiger Tag je Monat (z. B. kein 31. Februar). 29. Februar bleibt
+-- immer erlaubt, da das Jahr optional ist und ein Schaltjahr sein kann.
+alter table public.people
+  add constraint birthday_valid_day_for_month
+  check (
+    birthday_day is null or birthday_month is null or
+    birthday_day <= case birthday_month
+      when 2 then 29
+      when 4 then 30
+      when 6 then 30
+      when 9 then 30
+      when 11 then 30
+      else 31
+    end
+  );
+
 -- ============================================================================
 -- gifts: Aufgaben-Freitextfeld entfernen (A4 Stufe 3 braucht eine strukturierte
 -- abhakbare Liste, kein Freitext -> eigene Tabelle folgt mit Stufe 3)
@@ -92,11 +108,18 @@ create policy "shared_link_people_select_own" on public.shared_link_people
       where sl.id = shared_link_people.shared_link_id and sl.user_id = auth.uid()
     )
   );
+-- Beide Seiten prüfen: der Link muss der eigene sein UND die verknüpfte
+-- Person muss der eigenen gehören - sonst könnte man fremde Personen über
+-- den eigenen Link öffentlich sichtbar machen (Codacy-Review-Hinweis).
 create policy "shared_link_people_insert_own" on public.shared_link_people
   for insert with check (
     exists (
       select 1 from public.shared_links sl
       where sl.id = shared_link_people.shared_link_id and sl.user_id = auth.uid()
+    )
+    and exists (
+      select 1 from public.people p
+      where p.id = shared_link_people.person_id and p.user_id = auth.uid()
     )
   );
 create policy "shared_link_people_delete_own" on public.shared_link_people
