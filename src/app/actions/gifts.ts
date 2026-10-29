@@ -11,9 +11,21 @@ function formString(value: FormDataEntryValue | null): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+// Nur http(s)-Links erlauben, bevor der Wert gespeichert und spaeter als
+// <a href> gerendert wird - sonst waeren z. B. javascript:-URLs moeglich.
+function isValidHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export type GiftFormState =
   | {
       error?: string;
+      success?: boolean;
       values?: {
         personId: string;
         title: string;
@@ -42,6 +54,12 @@ export async function createGift(
   if (!title) {
     return { error: "Bitte gib einen Titel für die Idee ein.", values };
   }
+  if (link && !isValidHttpUrl(link)) {
+    return {
+      error: "Bitte gib einen gültigen Link an (beginnend mit http:// oder https://).",
+      values,
+    };
+  }
 
   const supabase = await createClient();
   const {
@@ -64,6 +82,7 @@ export async function createGift(
   }
 
   revalidatePath("/dashboard");
+  return { success: true };
 }
 
 const GIFT_STATUSES = ["idea", "purchased"] as const;

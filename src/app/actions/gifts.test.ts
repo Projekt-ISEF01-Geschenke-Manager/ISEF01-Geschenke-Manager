@@ -64,24 +64,35 @@ describe("createGift", () => {
     expect(insertMock).not.toHaveBeenCalled();
   });
 
+  it("lehnt einen unsicheren Link ab (z. B. javascript:)", async () => {
+    const result = await createGift(
+      undefined,
+      formData({ ...validFields, link: "javascript:alert(1)" }),
+    );
+    expect(result?.error).toBe(
+      "Bitte gib einen gültigen Link an (beginnend mit http:// oder https://).",
+    );
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+
   it("erlaubt eine Idee nur mit Person und Titel (A8: höchstens 2 Pflichtfelder)", async () => {
     insertMock.mockResolvedValue({ error: null });
     const result = await createGift(
       undefined,
       formData({ personId: "person-1", title: "Gutschein", link: "", occasionId: "" }),
     );
-    expect(result).toBeUndefined();
+    expect(result).toEqual({ success: true });
     expect(insertMock).toHaveBeenCalledWith(
       "gifts",
       expect.objectContaining({ link: null, occasion_id: null }),
     );
   });
 
-  it("legt die Idee für die eingeloggte Nutzer:in an", async () => {
+  it("legt die Idee für die eingeloggte Nutzer:in an und gibt einen vom Ausgangszustand unterscheidbaren Erfolg zurück", async () => {
     insertMock.mockResolvedValue({ error: null });
     const result = await createGift(undefined, formData(validFields));
 
-    expect(result).toBeUndefined();
+    expect(result).toEqual({ success: true });
     expect(insertMock).toHaveBeenCalledWith("gifts", {
       user_id: "user-1",
       person_id: "person-1",

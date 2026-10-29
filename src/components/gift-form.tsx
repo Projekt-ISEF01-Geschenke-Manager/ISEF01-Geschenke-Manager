@@ -19,12 +19,15 @@ export function GiftForm({
     undefined,
   );
   const titleRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  // Nach erfolgreichem Speichern bleibt die Person stehen, Fokus geht
-  // zurueck aufs Titel-Feld - mehrere Ideen hintereinander erfassen (A8).
+  // Nach erfolgreichem Speichern wird das Formular geleert (Titel/Link),
+  // Fokus geht zurueck aufs Titel-Feld - mehrere Ideen hintereinander
+  // erfassen (A8). state.success ist vom Ausgangszustand (undefined)
+  // unterscheidbar, anders als ein blosses "kein Fehler".
   useEffect(() => {
-    if (state === undefined) return;
-    if (!state.error) {
+    if (state?.success) {
+      formRef.current?.reset();
       titleRef.current?.focus();
     }
   }, [state]);
@@ -37,7 +40,7 @@ export function GiftForm({
         </p>
       )}
 
-      <form action={formAction} className="flex flex-col gap-3">
+      <form ref={formRef} action={formAction} className="flex flex-col gap-3">
         <label className="flex flex-col gap-1 text-sm">
           Für wen? *
           <select
