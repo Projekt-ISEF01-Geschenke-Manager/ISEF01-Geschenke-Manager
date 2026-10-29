@@ -3,6 +3,14 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+// Server Actions sind als Endpunkte aufrufbar, nicht nur über das eigene
+// Formular - formData.get() kann daher null oder eine File liefern statt
+// des erwarteten Strings. Gibt in dem Fall "" zurück statt mit .trim() auf
+// null/File zu crashen, sodass die bestehende Validierung greift.
+function formString(value: FormDataEntryValue | null): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 export type LoginState = { error?: string; email?: string } | undefined;
 
 // Fehlermeldung bewusst neutral (verrät nicht, ob die E-Mail existiert),
@@ -11,7 +19,7 @@ export async function login(
   _prevState: LoginState,
   formData: FormData,
 ): Promise<LoginState> {
-  const email = (formData.get("email") as string).trim();
+  const email = formString(formData.get("email"));
   const password = formData.get("password") as string;
 
   const supabase = await createClient();
@@ -32,8 +40,8 @@ export async function signup(
   _prevState: RegisterState,
   formData: FormData,
 ): Promise<RegisterState> {
-  const name = (formData.get("name") as string).trim();
-  const email = (formData.get("email") as string).trim();
+  const name = formString(formData.get("name"));
+  const email = formString(formData.get("email"));
   const password = formData.get("password") as string;
   const passwordRepeat = formData.get("passwordRepeat") as string;
   const privacyAccepted = formData.get("privacyAccepted") === "on";
