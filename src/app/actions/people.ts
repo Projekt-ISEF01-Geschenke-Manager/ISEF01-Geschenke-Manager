@@ -112,6 +112,19 @@ function parsePersonFields(formData: FormData):
   };
 }
 
+// Gemeinsame Spalten-Zuordnung fuer insert/update, damit sich die beiden
+// Pfade nicht auseinanderentwickeln koennen (Codacy-Review-Hinweis).
+function toPersonRecord(data: ParsedPerson) {
+  return {
+    name: data.name,
+    birthday_day: data.birthdayDay,
+    birthday_month: data.birthdayMonth,
+    birthday_year: data.birthdayYear,
+    interests: data.interests,
+    notes: data.notes,
+  };
+}
+
 export async function createPerson(
   _prevState: PersonFormState,
   formData: FormData,
@@ -129,15 +142,9 @@ export async function createPerson(
     return { error: "Bitte melde dich erneut an.", values: parsed.values };
   }
 
-  const { error } = await supabase.from("people").insert({
-    user_id: user.id,
-    name: parsed.data.name,
-    birthday_day: parsed.data.birthdayDay,
-    birthday_month: parsed.data.birthdayMonth,
-    birthday_year: parsed.data.birthdayYear,
-    interests: parsed.data.interests,
-    notes: parsed.data.notes,
-  });
+  const { error } = await supabase
+    .from("people")
+    .insert({ user_id: user.id, ...toPersonRecord(parsed.data) });
 
   if (error) {
     return { error: error.message, values: parsed.values };
@@ -159,14 +166,7 @@ export async function updatePerson(
   const supabase = await createClient();
   const { error } = await supabase
     .from("people")
-    .update({
-      name: parsed.data.name,
-      birthday_day: parsed.data.birthdayDay,
-      birthday_month: parsed.data.birthdayMonth,
-      birthday_year: parsed.data.birthdayYear,
-      interests: parsed.data.interests,
-      notes: parsed.data.notes,
-    })
+    .update(toPersonRecord(parsed.data))
     .eq("id", personId);
 
   if (error) {
@@ -176,10 +176,23 @@ export async function updatePerson(
   revalidatePath("/dashboard");
 }
 
-export async function deletePerson(personId: string) {
+export type DeletePersonState = { error?: string } | undefined;
+
+// Zweiter Parameter (prevState von useActionState) wird nicht ausgewertet,
+// muss aber fuer die Bindung an useActionState in der Signatur stehen.
+export async function deletePerson(
+  personId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  prevState?: DeletePersonState,
+): Promise<DeletePersonState> {
   const supabase = await createClient();
   // RLS stellt sicher, dass nur die eigene Person geloescht werden kann,
   // auch falls personId manipuliert wird.
-  await supabase.from("people").delete().eq("id", personId);
+  const { error } = await supabase.from("people").delete().eq("id", personId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
   revalidatePath("/dashboard");
 }

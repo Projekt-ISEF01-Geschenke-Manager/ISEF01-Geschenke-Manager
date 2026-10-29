@@ -169,10 +169,12 @@ describe("createPerson", () => {
     expect(insertMock).not.toHaveBeenCalled();
   });
 
-  it("gibt einen Supabase-Fehler weiter", async () => {
+  it("gibt einen Supabase-Fehler weiter, statt die Übersicht zu aktualisieren", async () => {
+    revalidatePathMock.mockClear();
     insertMock.mockResolvedValue({ error: { message: "db down" } });
     const result = await createPerson(undefined, formData(validFields));
     expect(result?.error).toBe("db down");
+    expect(revalidatePathMock).not.toHaveBeenCalled();
   });
 });
 
@@ -205,6 +207,14 @@ describe("updatePerson", () => {
     expect(result?.error).toBe("Bitte gib einen Namen ein.");
     expect(updateMock).not.toHaveBeenCalled();
   });
+
+  it("gibt einen Supabase-Fehler weiter, statt die Übersicht zu aktualisieren", async () => {
+    revalidatePathMock.mockClear();
+    updateMock.mockResolvedValue({ error: { message: "db down" } });
+    const result = await updatePerson("person-42", undefined, formData(validFields));
+    expect(result?.error).toBe("db down");
+    expect(revalidatePathMock).not.toHaveBeenCalled();
+  });
 });
 
 describe("deletePerson", () => {
@@ -212,9 +222,20 @@ describe("deletePerson", () => {
     revalidatePathMock.mockClear();
     deleteMock.mockReset().mockResolvedValue({ error: null });
 
-    await deletePerson("person-42");
+    const result = await deletePerson("person-42");
 
+    expect(result).toBeUndefined();
     expect(deleteMock).toHaveBeenCalledWith("people", "id", "person-42");
     expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard");
+  });
+
+  it("gibt einen Fehler zurück und aktualisiert die Übersicht NICHT, wenn das Löschen fehlschlägt", async () => {
+    revalidatePathMock.mockClear();
+    deleteMock.mockReset().mockResolvedValue({ error: { message: "db down" } });
+
+    const result = await deletePerson("person-42");
+
+    expect(result).toEqual({ error: "db down" });
+    expect(revalidatePathMock).not.toHaveBeenCalled();
   });
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import { useActionState } from "react";
 import { deletePerson } from "@/app/actions/people";
 
 export function DeletePersonButton({
@@ -9,9 +10,14 @@ export function DeletePersonButton({
   personId: string;
   personName: string;
 }) {
+  const [state, formAction] = useActionState(
+    deletePerson.bind(null, personId),
+    undefined,
+  );
+
   return (
     <form
-      action={deletePerson.bind(null, personId)}
+      action={formAction}
       onSubmit={(event) => {
         if (
           !confirm(
@@ -22,6 +28,11 @@ export function DeletePersonButton({
         }
       }}
     >
+      {state?.error && (
+        <p className="mb-1 text-xs text-red-700 dark:text-red-400">
+          {state.error}
+        </p>
+      )}
       <button
         type="submit"
         className="cursor-pointer text-sm text-red-700 underline transition hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
