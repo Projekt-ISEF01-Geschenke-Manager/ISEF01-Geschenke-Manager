@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# supabase (lokale CLI-Verknuepfung, enthaelt Verbindungsdaten)
+supabase/.temp
+
 # claude code (lokale Tooling-Konfiguration, nicht projektrelevant)
 .claude
 
