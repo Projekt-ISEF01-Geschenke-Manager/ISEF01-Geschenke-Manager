@@ -11,7 +11,7 @@ export async function login(
   _prevState: LoginState,
   formData: FormData,
 ): Promise<LoginState> {
-  const email = (formData.get("email") as string)?.trim();
+  const email = (formData.get("email") as string).trim();
   const password = formData.get("password") as string;
 
   const supabase = await createClient();
@@ -32,8 +32,8 @@ export async function signup(
   _prevState: RegisterState,
   formData: FormData,
 ): Promise<RegisterState> {
-  const name = (formData.get("name") as string)?.trim();
-  const email = (formData.get("email") as string)?.trim();
+  const name = (formData.get("name") as string).trim();
+  const email = (formData.get("email") as string).trim();
   const password = formData.get("password") as string;
   const passwordRepeat = formData.get("passwordRepeat") as string;
   const privacyAccepted = formData.get("privacyAccepted") === "on";
