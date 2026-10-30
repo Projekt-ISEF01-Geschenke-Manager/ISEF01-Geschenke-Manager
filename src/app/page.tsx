@@ -96,7 +96,7 @@ export default async function Home({
           <LoginForm />
         </section>
 
-        <div className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-[#FAF7F5] p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900">
           <span className="font-medium">Hinweis</span>
           <span className="text-neutral-600 dark:text-neutral-400">
             Dein Konto ist privat. Personen, Ideen und Geschenke siehst nur du.
