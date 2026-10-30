@@ -69,72 +69,72 @@ export default async function Home({
     <>
       <SiteHeader />
 
-      {/* Verlauf unter dem Header, siehe DESIGN-DARKMODE.md. Laenge skaliert
-          mit der Viewport-Hoehe statt eines festen Pixelwerts, damit es auf
-          grossen Desktop-Bildschirmen kein harter Block bleibt. */}
-      <main
-        className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-4 py-10"
+      {/* Verlauf unter dem Header, siehe DESIGN-DARKMODE.md. Liegt auf einem
+          eigenen, vollbreiten Wrapper (nicht auf <main>, das durch
+          max-w-5xl auf eine schmale, zentrierte Box begrenzt ist) und laeuft
+          ueber die volle Hoehe des Inhalts aus, nicht nur ueber den Hero. */}
+      <div
+        className="flex flex-1 flex-col"
         style={{
           background:
-            "linear-gradient(180deg, var(--bg-fade-top) 0, var(--bg) clamp(220px, 35vh, 520px))",
+            "linear-gradient(180deg, var(--bg-fade-top) 0%, var(--bg) 100%)",
         }}
       >
-        {error && (
-          <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
-            {error}
-          </p>
-        )}
-
-        <div className="grid gap-10 md:grid-cols-2 md:items-center">
-          <div className="flex flex-col gap-4">
-            <h1 className="text-[38px] leading-tight font-semibold text-h1">
-              Nie wieder Last-Minute-Geschenke
-            </h1>
-            <p className="text-base text-lead">
-              Halte Geschenkideen fest, sobald sie dir einfallen, und lass dich
-              rechtzeitig vor Geburtstagen und Weihnachten erinnern.
+        <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-4 py-10">
+          {error && (
+            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+              {error}
             </p>
-            <Link
-              href="/register"
-              className="w-fit cursor-pointer rounded-full border border-accent px-5 py-3 text-sm font-medium text-accent transition hover:bg-accent/10 active:scale-95"
-            >
-              Kostenlos Konto erstellen
-            </Link>
-          </div>
+          )}
 
-          <LoginForm />
-        </div>
-
-        <div className="flex items-start gap-3 rounded-[12px] bg-tile p-5 text-sm">
-          <span className="font-medium text-accent">Hinweis</span>
-          <span className="text-muted">
-            Dein Konto ist privat. Personen, Ideen und Geschenke siehst nur du.
-            Geteilt wird nur, was du selbst per Link freigibst.
-          </span>
-        </div>
-
-        <section>
-          <h2 className="mb-4 text-xl font-semibold text-heading">
-            So funktioniert der Geschenke-Manager
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="rounded-[14px] bg-tile p-5"
+          <div className="grid gap-10 md:grid-cols-2 md:items-center">
+            <div className="flex flex-col gap-4">
+              <h1 className="text-[38px] leading-tight font-semibold text-h1">
+                Nie wieder Last-Minute-Geschenke
+              </h1>
+              <p className="text-base text-lead">
+                Halte Geschenkideen fest, sobald sie dir einfallen, und lass
+                dich rechtzeitig vor Geburtstagen und Weihnachten erinnern.
+              </p>
+              <Link
+                href="/register"
+                className="w-fit cursor-pointer rounded-full border border-accent px-5 py-3 text-sm font-medium text-accent transition hover:bg-accent/10 active:scale-95"
               >
-                <h3 className="font-medium text-heading">{feature.title}</h3>
-                <p className="mt-2 text-sm text-muted">
-                  {feature.description}
-                </p>
-                <span className="mt-3 inline-block rounded-full border border-tag-border px-2.5 py-1 text-xs text-tag-text">
-                  {feature.tag}
-                </span>
-              </div>
-            ))}
+                Kostenlos Konto erstellen
+              </Link>
+            </div>
+
+            <LoginForm />
           </div>
-        </section>
-      </main>
+
+          <div className="flex items-start gap-3 rounded-[12px] bg-tile p-5 text-sm">
+            <span className="font-medium text-accent">Hinweis</span>
+            <span className="text-muted">
+              Dein Konto ist privat. Personen, Ideen und Geschenke siehst nur
+              du. Geteilt wird nur, was du selbst per Link freigibst.
+            </span>
+          </div>
+
+          <section>
+            <h2 className="mb-4 text-xl font-semibold text-heading">
+              So funktioniert der Geschenke-Manager
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {features.map((feature) => (
+                <div key={feature.title} className="rounded-[14px] bg-tile p-5">
+                  <h3 className="font-medium text-heading">{feature.title}</h3>
+                  <p className="mt-2 text-sm text-muted">
+                    {feature.description}
+                  </p>
+                  <span className="mt-3 inline-block rounded-full border border-tag-border px-2.5 py-1 text-xs text-tag-text">
+                    {feature.tag}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        </main>
+      </div>
 
       <SiteFooter />
     </>
