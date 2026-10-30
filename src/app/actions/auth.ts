@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { checkAndRecordAttempt, releaseAttempt, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 
 // Server Actions sind als Endpunkte aufrufbar, nicht nur über das eigene
 // Formular - formData.get() kann daher null oder eine File liefern statt
@@ -22,11 +23,29 @@ export async function login(
   const email = formString(formData.get("email"));
   const password = formData.get("password") as string;
 
+  // QA5: begrenzte Versuche gegen Passwort-Raten. Pruefen UND reservieren
+  // passiert atomar (siehe check_and_record_rate_limit) - ein erfolgreicher
+  // Login gibt die Reservierung wieder frei, damit er nie selbst dazu
+  // beitraegt, ausgesperrt zu werden; ein fehlgeschlagener laesst sie
+  // stehen und zaehlt damit gegen das Limit.
+  let attemptId: string | null = null;
+  if (email) {
+    const rateLimit = await checkAndRecordAttempt("login", email);
+    if (rateLimit.limited) {
+      return { error: RATE_LIMIT_MESSAGE, email };
+    }
+    attemptId = rateLimit.attemptId;
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     return { error: "E-Mail oder Passwort ist falsch.", email };
+  }
+
+  if (attemptId) {
+    await releaseAttempt(attemptId);
   }
 
   redirect("/dashboard");
@@ -64,6 +83,19 @@ export async function signup(
       error: "Bitte bestätige, dass du die Datenschutzerklärung gelesen hast.",
       values,
     };
+  }
+
+  // QA5: begrenzte Registrierungsversuche je E-Mail - verhindert, dass
+  // wiederholte Versuche fuer dieselbe Adresse Supabases Mail-Ratenlimit
+  // fuer Bestaetigungsmails ausloesen (jeder Versuch zaehlt, nicht nur
+  // fehlgeschlagene - Supabase verschickt bei jedem signUp eine Mail).
+  // Die Reservierung bleibt bewusst stehen (kein release), anders als beim
+  // Login.
+  if (email) {
+    const rateLimit = await checkAndRecordAttempt("register", email);
+    if (rateLimit.limited) {
+      return { error: RATE_LIMIT_MESSAGE, values };
+    }
   }
 
   const supabase = await createClient();

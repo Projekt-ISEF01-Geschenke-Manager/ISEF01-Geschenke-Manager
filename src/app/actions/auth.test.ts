@@ -19,6 +19,16 @@ vi.mock("@/lib/supabase/server", () => ({
   }),
 }));
 
+const checkAndRecordAttemptMock = vi.fn();
+const releaseAttemptMock = vi.fn();
+
+vi.mock("@/lib/rate-limit", () => ({
+  checkAndRecordAttempt: (...args: unknown[]) =>
+    checkAndRecordAttemptMock(...args),
+  releaseAttempt: (...args: unknown[]) => releaseAttemptMock(...args),
+  RATE_LIMIT_MESSAGE: "Zu viele Versuche. Bitte warte 15 Minuten und versuche es erneut.",
+}));
+
 const { login, signup, signout } = await import("./auth");
 
 function formData(fields: Record<string, string>) {
@@ -31,9 +41,13 @@ describe("login", () => {
   beforeEach(() => {
     redirectMock.mockClear();
     signInWithPasswordMock.mockReset();
+    checkAndRecordAttemptMock
+      .mockReset()
+      .mockResolvedValue({ limited: false, attemptId: "attempt-1" });
+    releaseAttemptMock.mockReset();
   });
 
-  it("leitet bei erfolgreichem Login auf /dashboard weiter", async () => {
+  it("leitet bei erfolgreichem Login auf /dashboard weiter und gibt die Reservierung wieder frei", async () => {
     signInWithPasswordMock.mockResolvedValue({ error: null });
 
     const result = await login(
@@ -47,9 +61,12 @@ describe("login", () => {
     });
     expect(redirectMock).toHaveBeenCalledWith("/dashboard");
     expect(result).toBeUndefined();
+    // Erfolgreicher Login soll nie selbst dazu beitragen, ausgesperrt zu
+    // werden - die Reservierung wird wieder freigegeben.
+    expect(releaseAttemptMock).toHaveBeenCalledWith("attempt-1");
   });
 
-  it("gibt bei falschen Zugangsdaten eine neutrale Fehlermeldung zurück (verrät nicht, ob der Account existiert)", async () => {
+  it("gibt bei falschen Zugangsdaten eine neutrale Fehlermeldung zurück (verrät nicht, ob der Account existiert) und lässt die Reservierung stehen", async () => {
     signInWithPasswordMock.mockResolvedValue({
       error: { message: "Invalid login credentials" },
     });
@@ -63,6 +80,36 @@ describe("login", () => {
       error: "E-Mail oder Passwort ist falsch.",
       email: "jakob@example.de",
     });
+    expect(redirectMock).not.toHaveBeenCalled();
+    expect(checkAndRecordAttemptMock).toHaveBeenCalledWith(
+      "login",
+      "jakob@example.de",
+    );
+    // Fehlgeschlagener Versuch zaehlt gegen das Limit - keine Freigabe.
+    expect(releaseAttemptMock).not.toHaveBeenCalled();
+  });
+
+  it("blockiert bei zu vielen Versuchen (QA5), ohne Supabase überhaupt aufzurufen", async () => {
+    checkAndRecordAttemptMock.mockResolvedValue({
+      limited: true,
+      attemptId: null,
+    });
+
+    const result = await login(
+      undefined,
+      // Kein echtes Passwort noetig - der Rate-Limit-Check blockiert
+      // schon davor, bevor Supabase ueberhaupt gefragt wird.
+      formData({
+        email: "jakob@example.de",
+        password: "wird-durch-rate-limit-blockiert",
+      }),
+    );
+
+    expect(result).toEqual({
+      error: "Zu viele Versuche. Bitte warte 15 Minuten und versuche es erneut.",
+      email: "jakob@example.de",
+    });
+    expect(signInWithPasswordMock).not.toHaveBeenCalled();
     expect(redirectMock).not.toHaveBeenCalled();
   });
 });
@@ -79,6 +126,10 @@ describe("signup", () => {
   beforeEach(() => {
     redirectMock.mockClear();
     signUpMock.mockReset();
+    checkAndRecordAttemptMock
+      .mockReset()
+      .mockResolvedValue({ limited: false, attemptId: "attempt-1" });
+    releaseAttemptMock.mockReset();
   });
 
   it("lehnt einen fehlenden Vornamen ab", async () => {
@@ -154,6 +205,28 @@ describe("signup", () => {
     );
     expect(redirectMock).toHaveBeenCalledWith("/register/check-email");
     expect(result).toBeUndefined();
+    expect(checkAndRecordAttemptMock).toHaveBeenCalledWith(
+      "register",
+      "jakob@example.de",
+    );
+    // Anders als beim Login: jeder Registrierungsversuch zaehlt, auch ein
+    // erfolgreicher - keine Freigabe.
+    expect(releaseAttemptMock).not.toHaveBeenCalled();
+  });
+
+  it("blockiert bei zu vielen Registrierungsversuchen für dieselbe E-Mail (QA5)", async () => {
+    checkAndRecordAttemptMock.mockResolvedValue({
+      limited: true,
+      attemptId: null,
+    });
+
+    const result = await signup(undefined, formData(validFields));
+
+    expect(result?.error).toBe(
+      "Zu viele Versuche. Bitte warte 15 Minuten und versuche es erneut.",
+    );
+    expect(signUpMock).not.toHaveBeenCalled();
+    expect(redirectMock).not.toHaveBeenCalled();
   });
 
   it("gibt einen Supabase-Fehler weiter, z. B. bei bereits registrierter E-Mail", async () => {
