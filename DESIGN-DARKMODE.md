@@ -59,7 +59,10 @@ bleibt unverändert.
 ## Struktur (Startseite/Login)
 
 - **Hintergrund:** Unter dem Header läuft die Seite per
-  `linear-gradient(180deg, var(--bg-fade-top) 0, var(--bg) 300px)` aus.
+  `linear-gradient(180deg, var(--bg-fade-top) 0, var(--bg) clamp(220px, 35vh, 520px))`
+  aus. Skaliert mit der Viewport-Höhe statt eines festen Pixelwerts (Feedback
+  nach erster Umsetzung: fester 300px-Wert wirkte auf großen
+  Desktop-Bildschirmen wie ein harter Block statt eines Verlaufs).
 - **Hero:** Keine Box mehr um "Nie wieder Last-Minute-Geschenke" - Überschrift
   38px, Fließtext 16px, direkt auf dem Seitenhintergrund.
 - **Karten:** Feature-Karten und die "Hinweis"-Box **ohne Rahmen**, Radius
@@ -68,11 +71,14 @@ bleibt unverändert.
   Radius 16px, Hintergrund `--card`.
 - **Buttons & Inputs:** Buttons pill-förmig (Radius 999px, min. 44px hoch).
   Inputs 44px hoch, Radius 8px.
-- **Schalter (ersetzt den bisherigen Mond-Icon-Button):** 68×36px, Pill mit
+- **Schalter (ersetzt den bisherigen Mond-Icon-Button):** 56×32px, Pill mit
   weißem 1px-Rahmen und `rgba(255,255,255,0.2)` Hintergrund. Weiße Kugel
-  (28px) steht im Dunkelmodus rechts, im Hellmodus links. `role="switch"` +
-  `aria-label`. Speichert die Wahl in `localStorage` (Standard:
-  `prefers-color-scheme`, bestehendes Verhalten bleibt).
+  (24px) steht im Dunkelmodus rechts, im Hellmodus links, mit Sonne/Mond-Icon
+  je nach aktivem Modus darin; ein schwaches Sonnen-Icon links und
+  Mond-Icon rechts im Track dahinter (Feedback nach erster Umsetzung: reine
+  Kugel ohne Icons wirkte zu groß/leer). `role="switch"` + `aria-label`.
+  Speichert die Wahl in `localStorage` (Standard: `prefers-color-scheme`,
+  bestehendes Verhalten bleibt).
 
 ## Umsetzungs-Hinweis
 
