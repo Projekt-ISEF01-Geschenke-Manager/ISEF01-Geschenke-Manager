@@ -39,7 +39,9 @@ export function ShareLinkForm({
           </code>
           <button
             type="button"
-            onClick={() => copyLink(token)}
+            onClick={() => {
+              copyLink(token);
+            }}
             className="cursor-pointer rounded-full border border-neutral-300 px-4 py-2 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
           >
             {copied ? "Kopiert ✓" : "Kopieren"}
