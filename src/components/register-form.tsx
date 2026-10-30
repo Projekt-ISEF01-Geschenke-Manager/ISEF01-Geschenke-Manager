@@ -90,7 +90,7 @@ export function RegisterForm() {
 
         <button
           type="submit"
-          className="cursor-pointer transition active:scale-95 rounded-full bg-neutral-900 px-5 py-3 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+          className="cursor-pointer transition active:scale-95 rounded-full bg-neutral-900 px-5 py-3 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-accent dark:text-accent-ink dark:hover:bg-accent/90"
         >
           Konto erstellen
         </button>
@@ -98,7 +98,7 @@ export function RegisterForm() {
 
       <p className="mt-4 border-t border-neutral-200 pt-4 text-center text-sm text-neutral-600 dark:border-neutral-700 dark:text-neutral-400">
         Bereits registriert?{" "}
-        <Link href="/" className="underline">
+        <Link href="/" className="underline dark:text-accent-link">
           Anmelden
         </Link>
       </p>

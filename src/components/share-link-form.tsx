@@ -87,7 +87,7 @@ export function ShareLinkForm({
       </div>
       <button
         type="submit"
-        className="cursor-pointer self-start rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-700 active:scale-95 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+        className="cursor-pointer self-start rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-700 active:scale-95 dark:bg-accent dark:text-accent-ink dark:hover:bg-accent/90"
       >
         Link erstellen
       </button>

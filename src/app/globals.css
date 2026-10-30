@@ -12,6 +12,13 @@
   /* Farbe fuer "Fenster"/Karten (Formulare, Hinweis-Boxen, Feature-Karten) -
      im Hellmodus reines Weiss, hebt sich vom cremefarbenen --background ab. */
   --surface: #ffffff;
+  /* Akzentfarbe nur fuer den Dark Mode gedacht (siehe unten) - hier als
+     Basiswert hinterlegt, damit Tailwind das Token in @theme inline
+     aufloesen kann; im Hellmodus ungenutzt (keine Klasse ohne dark:-Praefix
+     verwendet sie). */
+  --accent: #c99991;
+  --accent-ink: #1b1113;
+  --accent-link: #d9b9ad;
 }
 
 [data-theme="dark"] {
@@ -23,12 +30,24 @@
   /* GitHubs "canvas.subtle" - ein Schritt heller als --background, damit
      Karten sich sichtbar vom Hintergrund abheben statt flach zu wirken. */
   --surface: #161b22;
+  /* Akzentfarbe aus dem Giftwise-Header (liegt zwischen dessen Toenen
+     #A57878 und #D9B9AD), bewusst nur fuer Haupt-Buttons und klickbare
+     Links im Dark Mode - Design-Feedback nach Farbkonzept-Vorschlag. */
+  --accent: #c99991;
+  /* Textfarbe AUF der Akzentflaeche (Button-Beschriftung). */
+  --accent-ink: #1b1113;
+  /* Akzentfarbe ALS Text, fuer Links auf dunklem Hintergrund (heller als
+     --accent, damit sie auf --background/--surface gut lesbar bleibt). */
+  --accent-link: #d9b9ad;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-link: var(--accent-link);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

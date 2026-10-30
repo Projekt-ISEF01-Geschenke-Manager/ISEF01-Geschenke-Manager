@@ -41,12 +41,15 @@ export function LoginForm() {
         </label>
 
         <div className="flex items-center justify-between gap-4">
-          <Link href="/passwort-vergessen" className="text-sm underline">
+          <Link
+            href="/passwort-vergessen"
+            className="text-sm underline dark:text-accent-link"
+          >
             Passwort vergessen?
           </Link>
           <button
             type="submit"
-            className="cursor-pointer transition active:scale-95 rounded-full bg-neutral-900 px-5 py-2 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+            className="cursor-pointer transition active:scale-95 rounded-full bg-neutral-900 px-5 py-2 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-accent dark:text-accent-ink dark:hover:bg-accent/90"
           >
             Anmelden
           </button>
@@ -55,7 +58,7 @@ export function LoginForm() {
 
       <p className="mt-4 border-t border-neutral-200 pt-4 text-sm text-neutral-600 dark:border-neutral-700 dark:text-neutral-400">
         Noch kein Konto?{" "}
-        <Link href="/register" className="underline">
+        <Link href="/register" className="underline dark:text-accent-link">
           Jetzt registrieren
         </Link>
       </p>
