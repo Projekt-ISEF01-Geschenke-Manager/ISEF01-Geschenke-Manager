@@ -71,6 +71,25 @@ describe("GET /auth/confirm", () => {
     );
   });
 
+  it(
+    "ignoriert einen next-Link mit Backslash (manche Parser behandeln " +
+      "\\ wie /, Review-Feedback)",
+    async () => {
+      verifyOtpMock.mockResolvedValue({ error: null });
+
+      const response = await GET(
+        confirmRequest(
+          "?token_hash=abc&type=signup&next=" +
+            encodeURIComponent("/\\evil.example"),
+        ),
+      );
+
+      expect(response.headers.get("location")).toBe(
+        "https://gift-wise.de/dashboard",
+      );
+    },
+  );
+
   it("leitet bei ungültigem/abgelaufenem Token neutral zur Startseite mit Fehlermeldung weiter", async () => {
     verifyOtpMock.mockResolvedValue({ error: { message: "expired" } });
 

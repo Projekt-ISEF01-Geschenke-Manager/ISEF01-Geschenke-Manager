@@ -1,102 +1,88 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const selectMock = vi.fn();
-const eqActionMock = vi.fn();
-const eqIdentifierMock = vi.fn();
-const gteMock = vi.fn();
-const insertMock = vi.fn();
-const deleteMock = vi.fn();
-const ltMock = vi.fn();
+const rpcMock = vi.fn();
+const singleMock = vi.fn();
 
 vi.mock("@/lib/supabase/service", () => ({
   createServiceClient: () => ({
-    from: (table: string) => {
-      if (table !== "rate_limit_attempts") {
-        throw new Error(`Unerwartete Tabelle in Test: ${table}`);
-      }
-      return {
-        select: (...args: unknown[]) => {
-          selectMock(...args);
-          return {
-            eq: (...eqArgs: unknown[]) => {
-              eqActionMock(...eqArgs);
-              return {
-                eq: (...eqArgs2: unknown[]) => {
-                  eqIdentifierMock(...eqArgs2);
-                  return { gte: gteMock };
-                },
-              };
-            },
-          };
-        },
-        insert: (...args: unknown[]) => insertMock(...args),
-        delete: () => ({
-          lt: (...args: unknown[]) => {
-            ltMock(...args);
-            return deleteMock(...args);
-          },
-        }),
-      };
+    rpc: (...args: unknown[]) => {
+      rpcMock(...args);
+      return { single: singleMock };
     },
   }),
 }));
 
-const { isRateLimited, recordAttempt } = await import("./rate-limit");
+const { checkAndRecordAttempt, releaseAttempt } = await import("./rate-limit");
 
-describe("isRateLimited", () => {
+describe("checkAndRecordAttempt", () => {
   beforeEach(() => {
-    selectMock.mockClear();
-    eqActionMock.mockClear();
-    eqIdentifierMock.mockClear();
-    gteMock.mockReset();
+    rpcMock.mockClear();
+    singleMock.mockReset();
   });
 
-  it("ist nicht limitiert, solange weniger als 5 Versuche im Zeitfenster liegen", async () => {
-    gteMock.mockResolvedValue({ count: 4 });
+  it("ruft die atomare Postgres-Funktion mit Aktion, E-Mail, Fenster und Limit auf", async () => {
+    singleMock.mockResolvedValue({
+      data: { attempt_id: "attempt-1", limited: false },
+      error: null,
+    });
 
-    const result = await isRateLimited("login", "Jakob@Example.de");
+    await checkAndRecordAttempt("login", "Jakob@Example.de");
 
-    expect(result).toBe(false);
-    expect(eqActionMock).toHaveBeenCalledWith("action", "login");
-    // E-Mail wird klein geschrieben verglichen - Groß-/Kleinschreibung
-    // darf das Limit nicht umgehen.
-    expect(eqIdentifierMock).toHaveBeenCalledWith(
-      "identifier",
-      "jakob@example.de",
-    );
+    expect(rpcMock).toHaveBeenCalledWith("check_and_record_rate_limit", {
+      p_action: "login",
+      p_identifier: "Jakob@Example.de",
+      p_window_minutes: 15,
+      p_max_attempts: 5,
+    });
   });
 
-  it("ist limitiert ab 5 Versuchen im Zeitfenster", async () => {
-    gteMock.mockResolvedValue({ count: 5 });
+  it("gibt die reservierte attemptId zurück, wenn nicht limitiert", async () => {
+    singleMock.mockResolvedValue({
+      data: { attempt_id: "attempt-1", limited: false },
+      error: null,
+    });
 
-    const result = await isRateLimited("login", "jakob@example.de");
+    const result = await checkAndRecordAttempt("login", "jakob@example.de");
 
-    expect(result).toBe(true);
+    expect(result).toEqual({ limited: false, attemptId: "attempt-1" });
   });
 
-  it("ist nicht limitiert, wenn count null ist (keine Treffer)", async () => {
-    gteMock.mockResolvedValue({ count: null });
+  it("ist limitiert, wenn die Funktion limited=true zurückgibt", async () => {
+    singleMock.mockResolvedValue({
+      data: { attempt_id: null, limited: true },
+      error: null,
+    });
 
-    const result = await isRateLimited("register", "jakob@example.de");
+    const result = await checkAndRecordAttempt("register", "jakob@example.de");
 
-    expect(result).toBe(false);
+    expect(result).toEqual({ limited: true, attemptId: null });
   });
+
+  it(
+    "blockiert (fail closed), wenn die Datenbank einen Fehler zurückgibt - " +
+      "ein Rate-Limit soll bei einem DB-Fehler nicht stillschweigend wirkungslos werden",
+    async () => {
+      singleMock.mockResolvedValue({
+        data: null,
+        error: { message: "relation does not exist" },
+      });
+
+      const result = await checkAndRecordAttempt("login", "jakob@example.de");
+
+      expect(result).toEqual({ limited: true, attemptId: null });
+    },
+  );
 });
 
-describe("recordAttempt", () => {
-  beforeEach(() => {
-    insertMock.mockClear();
-    ltMock.mockClear();
-    deleteMock.mockClear().mockResolvedValue({ error: null });
-  });
+describe("releaseAttempt", () => {
+  it("ruft die Freigabe-Funktion mit der attemptId auf", async () => {
+    rpcMock.mockClear();
+    singleMock.mockReset().mockResolvedValue({ data: null, error: null });
 
-  it("speichert den Versuch klein geschrieben und räumt alte Zeilen auf", async () => {
-    await recordAttempt("register", "Jakob@Example.de");
+    await releaseAttempt("attempt-1");
 
-    expect(insertMock).toHaveBeenCalledWith({
-      action: "register",
-      identifier: "jakob@example.de",
+    expect(rpcMock).toHaveBeenCalledWith("release_rate_limit_attempt", {
+      p_attempt_id: "attempt-1",
     });
-    expect(ltMock).toHaveBeenCalledWith("created_at", expect.any(String));
   });
 });
