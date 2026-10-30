@@ -96,7 +96,7 @@ export default async function Home({
           <LoginForm />
         </section>
 
-        <div className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-surface">
           <span className="font-medium">Hinweis</span>
           <span className="text-neutral-600 dark:text-neutral-400">
             Dein Konto ist privat. Personen, Ideen und Geschenke siehst nur du.
@@ -112,7 +112,7 @@ export default async function Home({
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="rounded-xl border border-neutral-200 p-4 dark:border-neutral-800"
+                className="rounded-xl border border-neutral-200 bg-surface p-4 dark:border-neutral-800"
               >
                 <h3 className="font-medium">{feature.title}</h3>
                 <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">

@@ -10,7 +10,7 @@ export function LoginForm() {
   const [state, formAction] = useActionState(login, initialState);
 
   return (
-    <div className="rounded-2xl border border-neutral-300 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
+    <div className="rounded-2xl border border-neutral-300 bg-surface p-6 dark:border-neutral-700">
       <h2 className="text-xl font-semibold">Anmelden</h2>
 
       {state?.error && (

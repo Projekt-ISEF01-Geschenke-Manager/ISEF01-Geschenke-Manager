@@ -6,9 +6,12 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 :root {
- 
+
   --background: #FAF7F5;
   --foreground: #171717;
+  /* Farbe fuer "Fenster"/Karten (Formulare, Hinweis-Boxen, Feature-Karten) -
+     im Hellmodus reines Weiss, hebt sich vom cremefarbenen --background ab. */
+  --surface: #ffffff;
 }
 
 [data-theme="dark"] {
@@ -17,11 +20,15 @@
      ruhiger und moderner. */
   --background: #0d1117;
   --foreground: #e6edf3;
+  /* GitHubs "canvas.subtle" - ein Schritt heller als --background, damit
+     Karten sich sichtbar vom Hintergrund abheben statt flach zu wirken. */
+  --surface: #161b22;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
