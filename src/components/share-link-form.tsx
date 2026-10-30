@@ -20,21 +20,26 @@ export function ShareLinkForm({
     const url = `${window.location.origin}/teilen/${token}`;
     navigator.clipboard
       .writeText(url)
-      .then(() => setCopied(true))
-      .catch(() => setCopied(false));
+      .then(() => {
+        setCopied(true);
+      })
+      .catch(() => {
+        setCopied(false);
+      });
   }
 
   if (state?.token) {
+    const token = state.token;
     return (
       <div className="flex flex-col gap-2">
         <p className="text-sm">Dein Link:</p>
         <div className="flex flex-wrap items-center gap-2">
           <code className="rounded-md bg-neutral-100 px-3 py-2 text-sm dark:bg-neutral-800">
-            /teilen/{state.token}
+            /teilen/{token}
           </code>
           <button
             type="button"
-            onClick={() => copyLink(state.token!)}
+            onClick={() => copyLink(token)}
             className="cursor-pointer rounded-full border border-neutral-300 px-4 py-2 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
           >
             {copied ? "Kopiert ✓" : "Kopieren"}

@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SharedGiftItem, type SharedGift } from "@/components/shared-gift-item";
 import { formatBirthday, initials, joinWithUnd } from "@/lib/format";
+import { GIFT_STATUSES } from "@/lib/gift-status";
 
 export const instant = false;
 
@@ -53,10 +54,15 @@ export default async function SharedViewPage({
 
   const personIds = people.map((person) => person.id);
 
+  // Nur aktuelle Ideen/besorgte Geschenke - "given" (ueberreicht, Stufe 2/A9)
+  // existiert im Schema noch nicht, aber sobald es dazukommt, soll die
+  // oeffentliche Ansicht das nicht automatisch mitzeigen, ohne dass das
+  // bewusst entschieden wird (Codacy-Review-Hinweis).
   const { data: giftsData } = await supabase
     .from("gifts")
     .select("id, title, link, status, person_id, occasions(name)")
     .in("person_id", personIds)
+    .in("status", GIFT_STATUSES)
     .order("created_at", { ascending: false });
 
   const giftsByPerson = new Map<string, SharedGift[]>();

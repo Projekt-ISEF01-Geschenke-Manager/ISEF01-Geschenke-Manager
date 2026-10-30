@@ -7,7 +7,11 @@ vi.mock("next/navigation", () => ({
   notFound: notFoundMock,
 }));
 
+const linkSelectMock = vi.fn();
 const linkSingleMock = vi.fn();
+const giftsSelectMock = vi.fn();
+const giftsInPersonMock = vi.fn();
+const giftsInStatusMock = vi.fn();
 const giftsOrderMock = vi.fn();
 const getUserByIdMock = vi.fn();
 
@@ -16,10 +20,30 @@ vi.mock("@/lib/supabase/service", () => ({
     auth: { admin: { getUserById: getUserByIdMock } },
     from: (table: string) => {
       if (table === "shared_links") {
-        return { select: () => ({ eq: () => ({ single: linkSingleMock }) }) };
+        return {
+          select: (columns: string) => {
+            linkSelectMock(columns);
+            return { eq: () => ({ single: linkSingleMock }) };
+          },
+        };
       }
       if (table === "gifts") {
-        return { select: () => ({ in: () => ({ order: giftsOrderMock }) }) };
+        return {
+          select: (columns: string) => {
+            giftsSelectMock(columns);
+            return {
+              in: (column: string, value: unknown) => {
+                giftsInPersonMock(column, value);
+                return {
+                  in: (statusColumn: string, statusValue: unknown) => {
+                    giftsInStatusMock(statusColumn, statusValue);
+                    return { order: giftsOrderMock };
+                  },
+                };
+              },
+            };
+          },
+        };
       }
       throw new Error(`Unerwartete Tabelle in Test: ${table}`);
     },
@@ -34,7 +58,11 @@ function params(token: string) {
 
 describe("SharedViewPage", () => {
   beforeEach(() => {
+    linkSelectMock.mockClear();
     linkSingleMock.mockReset();
+    giftsSelectMock.mockClear();
+    giftsInPersonMock.mockClear();
+    giftsInStatusMock.mockClear();
     giftsOrderMock.mockReset();
     getUserByIdMock.mockReset();
     notFoundMock.mockClear();
@@ -62,6 +90,59 @@ describe("SharedViewPage", () => {
     );
 
     expect(notFoundMock).toHaveBeenCalled();
+  });
+
+  it("fragt nur Name und Geburtstag ab - kein Jahr, keine Notizen, keine Interessen", async () => {
+    linkSingleMock.mockResolvedValue({
+      data: {
+        id: "link-1",
+        user_id: "user-1",
+        shared_link_people: [
+          {
+            people: {
+              id: "person-1",
+              name: "Oma Erna",
+              birthday_day: 14,
+              birthday_month: 11,
+            },
+          },
+        ],
+      },
+      error: null,
+    });
+    giftsOrderMock.mockResolvedValue({ data: [] });
+    getUserByIdMock.mockResolvedValue({ data: { user: { user_metadata: {} } } });
+
+    await SharedViewPage({ params: params("gueltig") });
+
+    const selectedColumns = linkSelectMock.mock.calls[0][0] as string;
+    expect(selectedColumns).not.toMatch(/birthday_year|notes|interests/);
+  });
+
+  it("fragt die Ideen nur für aktuelle Status ab (idea/purchased, kein 'given')", async () => {
+    linkSingleMock.mockResolvedValue({
+      data: {
+        id: "link-1",
+        user_id: "user-1",
+        shared_link_people: [
+          {
+            people: {
+              id: "person-1",
+              name: "Oma Erna",
+              birthday_day: 14,
+              birthday_month: 11,
+            },
+          },
+        ],
+      },
+      error: null,
+    });
+    giftsOrderMock.mockResolvedValue({ data: [] });
+    getUserByIdMock.mockResolvedValue({ data: { user: { user_metadata: {} } } });
+
+    await SharedViewPage({ params: params("gueltig") });
+
+    expect(giftsInStatusMock).toHaveBeenCalledWith("status", ["idea", "purchased"]);
   });
 
   it("rendert die freigegebenen Personen mit ihren Ideen, Jahr bleibt verborgen", async () => {

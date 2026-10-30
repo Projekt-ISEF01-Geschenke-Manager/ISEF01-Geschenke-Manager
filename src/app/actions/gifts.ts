@@ -2,6 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { isValidHttpUrl } from "@/lib/url";
+import { GIFT_STATUSES, type GiftStatus } from "@/lib/gift-status";
+
+export type { GiftStatus };
 
 // Server Actions sind als Endpunkte aufrufbar, nicht nur ueber das eigene
 // Formular - formData.get() kann daher null oder eine File liefern statt
@@ -9,17 +13,6 @@ import { createClient } from "@/lib/supabase/server";
 // null/File zu crashen, siehe auth.ts.
 function formString(value: FormDataEntryValue | null): string {
   return typeof value === "string" ? value.trim() : "";
-}
-
-// Nur http(s)-Links erlauben, bevor der Wert gespeichert und spaeter als
-// <a href> gerendert wird - sonst waeren z. B. javascript:-URLs moeglich.
-function isValidHttpUrl(value: string): boolean {
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
 }
 
 export type GiftFormState =
@@ -84,9 +77,6 @@ export async function createGift(
   revalidatePath("/dashboard", "layout");
   return { success: true };
 }
-
-const GIFT_STATUSES = ["idea", "purchased"] as const;
-export type GiftStatus = (typeof GIFT_STATUSES)[number];
 
 export async function setGiftStatus(giftId: string, status: GiftStatus) {
   if (!GIFT_STATUSES.includes(status)) {

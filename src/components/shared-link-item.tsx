@@ -24,8 +24,12 @@ export function SharedLinkItem({
     const url = `${window.location.origin}/teilen/${token}`;
     navigator.clipboard
       .writeText(url)
-      .then(() => setCopied(true))
-      .catch(() => setCopied(false));
+      .then(() => {
+        setCopied(true);
+      })
+      .catch(() => {
+        setCopied(false);
+      });
   }
 
   return (

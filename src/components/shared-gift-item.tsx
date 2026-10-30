@@ -1,3 +1,5 @@
+import { isValidHttpUrl } from "@/lib/url";
+
 export type SharedGift = {
   id: string;
   title: string;
@@ -9,6 +11,10 @@ export type SharedGift = {
 // Rein lesend, keine Bearbeiten-Buttons - oeffentliche Teilen-Route (A10).
 export function SharedGiftItem({ gift }: { gift: SharedGift }) {
   const isPurchased = gift.status === "purchased";
+  // Wird zwar schon beim Speichern geprueft (createGift), hier zusaetzlich
+  // nochmal validiert, bevor der Wert als <a href> gerendert wird (defense
+  // in depth, Codacy-Review-Hinweis).
+  const safeLink = gift.link && isValidHttpUrl(gift.link) ? gift.link : null;
 
   return (
     <li className="flex items-center justify-between gap-3 py-2">
@@ -16,11 +22,11 @@ export function SharedGiftItem({ gift }: { gift: SharedGift }) {
         <p className="truncate text-sm">{gift.title}</p>
         <p className="text-xs text-neutral-500 dark:text-neutral-400">
           {gift.occasion_name ?? "Ohne Anlass"}
-          {gift.link && (
+          {safeLink && (
             <>
               {" · "}
               <a
-                href={gift.link}
+                href={safeLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline"
