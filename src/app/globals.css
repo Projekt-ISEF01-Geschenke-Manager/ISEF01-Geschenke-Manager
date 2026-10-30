@@ -6,7 +6,8 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 :root {
-  --background: #ffffff;
+ 
+  --background: #FAF7F5;
   --foreground: #171717;
 }
 
