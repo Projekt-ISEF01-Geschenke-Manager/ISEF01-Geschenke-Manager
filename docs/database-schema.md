@@ -128,6 +128,8 @@ Alle fünf Tabellen haben RLS aktiviert, mit Policies der Form `auth.uid() = use
 
 Zugriff über den **Publishable Key** (clientseitig) ist damit sicher, weil RLS greift. Der **Secret Key** (umgeht RLS vollständig) wird ausschließlich serverseitig für die öffentliche Teilen-Route verwendet (siehe `shared_links` oben) – RLS kann "gehört dieser Token zu dieser Zeile" für anonyme, nicht eingeloggte Zugriffe nicht sauber abbilden, ohne den Token clientseitig als Session-Variable zu übergeben. Der Token selbst ist dabei das Zugriffsrecht (nicht erratbar, 122 Bit Zufall), die Route prüft ihn explizit und gibt gezielt nur die zugeordneten Personen/Ideen zurück.
 
+**Setup:** Der Secret Key muss als `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` (lokal) und in den Vercel-Umgebungsvariablen (alle drei Umgebungen) hinterlegt werden – zu finden im Supabase-Dashboard unter Project Settings → API → `service_role`-Key. Ohne diese Variable schlägt nur die Teilen-Route (`/teilen/<token>`) fehl, alles andere funktioniert weiter normal über den Publishable Key.
+
 ## 4. Automatisierung (Trigger)
 
 Zwei Datenbank-Trigger:
@@ -155,7 +157,6 @@ Zwei Datenbank-Trigger:
 ## 6. Bewusst nicht umgesetzt (für später)
 
 - **Automatische Ideen-Generierung (A12, Stufe 3):** Keine eigene Tabelle/Logik im MVP. Erste sinnvolle Umsetzung: regelbasierter Vorschlag (z. B. "gleiche Tags wie bei früheren Geschenken dieser Person"), bewusst ohne KI-Anbindung (RB7).
-- **Teilen per Link – öffentlicher Lesezugriff (A10):** Schema (`shared_links`, `shared_link_people`) steht, die öffentliche Next.js-Route (`/teilen/<token>`) mit Service-Role-Zugriff folgt mit der UI-Umsetzung.
 - **Bild-Uploads (A8, Stufe 3):** `gifts.image_url` ist vorbereitet, der Supabase-Storage-Bucket dafür muss noch angelegt werden.
 - **Abhakbare Aufgaben je Idee (A4, Stufe 3):** Eigene Tabelle (z. B. `gift_tasks`) noch zu entwerfen.
 

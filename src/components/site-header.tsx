@@ -2,7 +2,10 @@ import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
 
 // Gleiche Kopfzeile auf allen Seiten (Wireframe-Annotation "Allgemein").
-export function SiteHeader() {
+// badge: zusaetzliche Kennzeichnung, z. B. "Geteilte Ansicht · nur lesen"
+// auf der oeffentlichen Teilen-Route (A10) - dort gibt es bewusst keine
+// Navigation und kein Login, nur Logo (-> Landingpage) und Theme-Umschalter.
+export function SiteHeader({ badge }: { badge?: string }) {
   return (
     <header className="border-b border-neutral-200 bg-neutral-900 text-white dark:border-neutral-800">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-5">
@@ -13,7 +16,7 @@ export function SiteHeader() {
           <span>
             <span className="block text-xl font-semibold">Geschenke-Manager</span>
             <span className="block text-sm text-neutral-300">
-              Ideen, Anlässe und Geschenke an einem Ort
+              {badge ?? "Ideen, Anlässe und Geschenke an einem Ort"}
             </span>
           </span>
         </Link>
