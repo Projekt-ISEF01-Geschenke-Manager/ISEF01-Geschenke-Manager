@@ -26,6 +26,16 @@ export async function createClient() {
           }
         },
       },
+      // QA5: Sitzungs-Cookie mit HttpOnly + Secure. @supabase/ssr setzt
+      // standardmaessig httpOnly:false (fuer den Browser-Client gedacht,
+      // der hier nirgends verwendet wird - jede Auth-Aktion laeuft ueber
+      // Server Actions). SameSite "lax" ist bereits der Default und bleibt
+      // dabei, damit E-Mail-Bestaetigungslinks (externe Navigation) weiter
+      // funktionieren.
+      cookieOptions: {
+        httpOnly: true,
+        secure: true,
+      },
     },
   );
 }

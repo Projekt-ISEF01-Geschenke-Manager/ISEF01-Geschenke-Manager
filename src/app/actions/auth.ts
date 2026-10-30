@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isRateLimited, recordAttempt, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 
 // Server Actions sind als Endpunkte aufrufbar, nicht nur über das eigene
 // Formular - formData.get() kann daher null oder eine File liefern statt
@@ -22,10 +23,19 @@ export async function login(
   const email = formString(formData.get("email"));
   const password = formData.get("password") as string;
 
+  // QA5: begrenzte Versuche gegen Passwort-Raten - zaehlt nur fehlgeschlagene
+  // Versuche, damit ein erfolgreicher Login nie selbst dazu beitraegt.
+  if (email && (await isRateLimited("login", email))) {
+    return { error: RATE_LIMIT_MESSAGE, email };
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
+    if (email) {
+      await recordAttempt("login", email);
+    }
     return { error: "E-Mail oder Passwort ist falsch.", email };
   }
 
@@ -64,6 +74,17 @@ export async function signup(
       error: "Bitte bestätige, dass du die Datenschutzerklärung gelesen hast.",
       values,
     };
+  }
+
+  // QA5: begrenzte Registrierungsversuche je E-Mail - verhindert, dass
+  // wiederholte Versuche fuer dieselbe Adresse Supabases Mail-Ratenlimit
+  // fuer Bestaetigungsmails ausloesen (jeder Versuch zaehlt, nicht nur
+  // fehlgeschlagene - Supabase verschickt bei jedem signUp eine Mail).
+  if (email && (await isRateLimited("register", email))) {
+    return { error: RATE_LIMIT_MESSAGE, values };
+  }
+  if (email) {
+    await recordAttempt("register", email);
   }
 
   const supabase = await createClient();
