@@ -5,6 +5,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 const peopleOrderMock = vi.fn();
 const occasionsOrderMock = vi.fn();
 const giftsSelectMock = vi.fn();
+let fullName: string | undefined = "Adrian";
 
 vi.mock("@/lib/supabase/server", () => ({
   requireUser: async () => ({
@@ -22,7 +23,7 @@ vi.mock("@/lib/supabase/server", () => ({
         throw new Error(`Unerwartete Tabelle in Test: ${table}`);
       },
     },
-    user: { user_metadata: { full_name: "Adrian" } },
+    user: { user_metadata: { full_name: fullName } },
   }),
 }));
 
@@ -40,6 +41,7 @@ beforeEach(() => {
   peopleOrderMock.mockReset();
   occasionsOrderMock.mockReset();
   giftsSelectMock.mockReset();
+  fullName = "Adrian";
 });
 
 afterEach(() => {
@@ -57,6 +59,31 @@ describe("DashboardPage", () => {
     render(element);
 
     expect(screen.getByText("Adrian")).not.toBeNull();
+  });
+
+  it("zeigt nur den ersten Namen, auch wenn full_name mehrere Wörter enthält", async () => {
+    fullName = "Jakob Höynck";
+    peopleOrderMock.mockResolvedValue({ data: [] });
+    occasionsOrderMock.mockResolvedValue({ data: [] });
+    giftsSelectMock.mockResolvedValue({ data: [] });
+
+    const element = await DashboardPage();
+    render(element);
+
+    expect(screen.getByText("Jakob")).not.toBeNull();
+    expect(screen.queryByText("Jakob Höynck")).toBeNull();
+  });
+
+  it("zeigt die Zeile gar nicht, wenn kein Name hinterlegt ist", async () => {
+    fullName = undefined;
+    peopleOrderMock.mockResolvedValue({ data: [] });
+    occasionsOrderMock.mockResolvedValue({ data: [] });
+    giftsSelectMock.mockResolvedValue({ data: [] });
+
+    const element = await DashboardPage();
+    render(element);
+
+    expect(screen.queryByText(/Angemeldet als/)).toBeNull();
   });
 
   it(

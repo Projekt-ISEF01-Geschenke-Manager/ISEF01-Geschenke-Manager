@@ -70,4 +70,24 @@ describe("PersonSearchList", () => {
     const addLink = screen.getByText("+ Person anlegen");
     expect(addLink.getAttribute("href")).toBe("#person-anlegen");
   });
+
+  it(
+    "öffnet das Formular explizit beim Klick, statt sich auf das " +
+      "automatische Aufklappen beim Anker-Sprung zu verlassen",
+    () => {
+      document.body.innerHTML += '<details id="person-anlegen"></details>';
+      render(<PersonSearchList people={people} />);
+
+      const details = document.getElementById(
+        "person-anlegen",
+      ) as HTMLDetailsElement;
+      expect(details.open).toBe(false);
+
+      fireEvent.click(screen.getByText("+ Person anlegen"));
+
+      expect(details.open).toBe(true);
+
+      details.remove();
+    },
+  );
 });

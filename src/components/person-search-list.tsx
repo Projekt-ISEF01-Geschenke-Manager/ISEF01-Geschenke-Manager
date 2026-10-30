@@ -82,9 +82,20 @@ export function PersonSearchList({ people }: { people: PersonCard[] }) {
       )}
 
       {/* Zweiter Weg, eine Person anzulegen (Wireframe-Annotation 8) -
-          #person-anlegen oeffnet/springt zum Formular oben auf der Seite. */}
+          #person-anlegen springt zum Formular oben auf der Seite. Oeffnet
+          das <details> explizit, statt sich auf das (nicht in jedem
+          Browser garantierte) automatische Aufklappen beim Anker-Sprung zu
+          verlassen - und zwar VOR dem Sprung, damit die Seite nicht erst
+          an die falsche Stelle scrollt und danach durch das Aufklappen
+          verspringt. */}
       <a
         href="#person-anlegen"
+        onClick={() => {
+          const details = document.getElementById("person-anlegen");
+          if (details instanceof HTMLDetailsElement) {
+            details.open = true;
+          }
+        }}
         className="flex items-center justify-center rounded-2xl border border-dashed border-neutral-300 p-4 text-sm text-neutral-600 transition hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-900"
       >
         + Person anlegen
