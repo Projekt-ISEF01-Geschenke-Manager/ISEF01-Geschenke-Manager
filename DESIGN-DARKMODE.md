@@ -59,10 +59,13 @@ bleibt unverändert.
 ## Struktur (Startseite/Login)
 
 - **Hintergrund:** Unter dem Header läuft die Seite per
-  `linear-gradient(180deg, var(--bg-fade-top) 0, var(--bg) clamp(220px, 35vh, 520px))`
-  aus. Skaliert mit der Viewport-Höhe statt eines festen Pixelwerts (Feedback
-  nach erster Umsetzung: fester 300px-Wert wirkte auf großen
-  Desktop-Bildschirmen wie ein harter Block statt eines Verlaufs).
+  `linear-gradient(180deg, var(--bg-fade-top) 0%, var(--bg) 100%)` aus, auf
+  einem vollbreiten Wrapper um `<main>` (nicht auf `<main>` selbst, das durch
+  `max-w-5xl` nur eine schmale, zentrierte Box ist) und über die volle Höhe
+  des Seiteninhalts bis zum Seitenende vor dem Footer - nicht nur über den
+  Hero-Bereich. (Feedback nach zwei Zwischenständen: erst ein fester
+  300px-Wert, dann `clamp(220px, 35vh, 520px)` - beide wirkten wie ein
+  harter Block statt eines durchgehenden Verlaufs über die ganze Seite.)
 - **Hero:** Keine Box mehr um "Nie wieder Last-Minute-Geschenke" - Überschrift
   38px, Fließtext 16px, direkt auf dem Seitenhintergrund.
 - **Karten:** Feature-Karten und die "Hinweis"-Box **ohne Rahmen**, Radius
