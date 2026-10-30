@@ -10,9 +10,9 @@ export function RegisterForm() {
   const [state, formAction] = useActionState(signup, initialState);
 
   return (
-    <div className="rounded-2xl border border-neutral-300 bg-surface p-6 dark:border-neutral-700">
-      <h2 className="text-xl font-semibold">Konto erstellen</h2>
-      <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+    <div className="rounded-2xl border border-card-border bg-card p-6">
+      <h2 className="text-xl font-semibold text-heading">Konto erstellen</h2>
+      <p className="mt-1 text-sm text-muted">
         Mit * markierte Felder sind Pflichtfelder.
       </p>
 
@@ -23,7 +23,7 @@ export function RegisterForm() {
       )}
 
       <form action={formAction} className="mt-4 flex flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm text-text">
           Vorname *
           <input
             type="text"
@@ -31,11 +31,11 @@ export function RegisterForm() {
             required
             placeholder="Dein Vorname"
             defaultValue={state?.values?.name}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none"
           />
         </label>
 
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm text-text">
           E-Mail *
           <input
             type="email"
@@ -43,36 +43,34 @@ export function RegisterForm() {
             required
             placeholder="name@beispiel.de"
             defaultValue={state?.values?.email}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none"
           />
         </label>
 
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm text-text">
           Passwort *
           <input
             type="password"
             name="password"
             required
             minLength={8}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none"
           />
-          <span className="text-xs text-neutral-500 dark:text-neutral-400">
-            Mindestens 8 Zeichen
-          </span>
+          <span className="text-xs text-muted">Mindestens 8 Zeichen</span>
         </label>
 
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm text-text">
           Passwort wiederholen *
           <input
             type="password"
             name="passwordRepeat"
             required
             minLength={8}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none"
           />
         </label>
 
-        <label className="flex items-start gap-2 text-sm">
+        <label className="flex items-start gap-2 text-sm text-text">
           <input type="checkbox" name="privacyAccepted" required className="mt-1" />
           <span>
             Ich habe die{" "}
@@ -90,15 +88,15 @@ export function RegisterForm() {
 
         <button
           type="submit"
-          className="cursor-pointer transition active:scale-95 rounded-full bg-neutral-900 px-5 py-3 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-accent dark:text-accent-ink dark:hover:bg-accent/90"
+          className="h-11 cursor-pointer rounded-full bg-btn-bg px-5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95"
         >
           Konto erstellen
         </button>
       </form>
 
-      <p className="mt-4 border-t border-neutral-200 pt-4 text-center text-sm text-neutral-600 dark:border-neutral-700 dark:text-neutral-400">
+      <p className="mt-4 border-t border-rule pt-4 text-center text-sm text-muted">
         Bereits registriert?{" "}
-        <Link href="/" className="underline dark:text-accent-link">
+        <Link href="/" className="text-accent underline">
           Anmelden
         </Link>
       </p>

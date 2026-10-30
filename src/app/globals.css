@@ -5,55 +5,80 @@
    konsistent funktioniert und es keinen Hell/Dunkel-Flackereffekt gibt. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+/* Siehe DESIGN-DARKMODE.md - abgestimmte Design-Spezifikation fuer
+   Startseite/Login/Registrierung (Hell- und Dunkelmodus). Der Header
+   (SiteHeader) ist bewusst nicht Teil dieses Farbsystems. */
 :root {
-
-  --background: #FAF7F5;
-  --foreground: #171717;
-  /* Farbe fuer "Fenster"/Karten (Formulare, Hinweis-Boxen, Feature-Karten) -
-     im Hellmodus reines Weiss, hebt sich vom cremefarbenen --background ab. */
-  --surface: #ffffff;
-  /* Akzentfarbe nur fuer den Dark Mode gedacht (siehe unten) - hier als
-     Basiswert hinterlegt, damit Tailwind das Token in @theme inline
-     aufloesen kann; im Hellmodus ungenutzt (keine Klasse ohne dark:-Praefix
-     verwendet sie). */
-  --accent: #c99991;
-  --accent-ink: #1b1113;
-  --accent-link: #d9b9ad;
+  /* Hellmodus (Standard) */
+  --bg: #faf6f4;
+  --bg-fade-top: #eddfda;
+  --tile: #f1e8e4;
+  --card: #ffffff;
+  --card-border: #dccfca;
+  --input-bg: #ffffff;
+  --input-border: #a8979a;
+  --text: #2a2123;
+  --heading: #241b1d;
+  --h1: #1f1719;
+  --lead: #4f4244;
+  --muted: #5f5254;
+  --accent: #8a5a66;
+  --btn-bg: #6f4a55;
+  --btn-text: #ffffff;
+  --tag-text: #6b4d55;
+  --tag-border: #cdbab5;
+  --rule: #e3d6d2;
+  --focus-ring: #c08a9a;
 }
 
 [data-theme="dark"] {
-  /* Dasselbe dunkle Grau wie GitHubs Dark Mode (Primer "canvas.default")
-     statt reinem Schwarz - wirkt neben dem warmen Giftwise-Header
-     ruhiger und moderner. */
-  --background: #0d1117;
-  --foreground: #e6edf3;
-  /* GitHubs "canvas.subtle" - ein Schritt heller als --background, damit
-     Karten sich sichtbar vom Hintergrund abheben statt flach zu wirken. */
-  --surface: #161b22;
-  /* Akzentfarbe aus dem Giftwise-Header (liegt zwischen dessen Toenen
-     #A57878 und #D9B9AD), bewusst nur fuer Haupt-Buttons und klickbare
-     Links im Dark Mode - Design-Feedback nach Farbkonzept-Vorschlag. */
-  --accent: #c99991;
-  /* Textfarbe AUF der Akzentflaeche (Button-Beschriftung). */
-  --accent-ink: #1b1113;
-  /* Akzentfarbe ALS Text, fuer Links auf dunklem Hintergrund (heller als
-     --accent, damit sie auf --background/--surface gut lesbar bleibt). */
-  --accent-link: #d9b9ad;
+  --bg: #121113;
+  --bg-fade-top: #261f21;
+  --tile: #1a1819;
+  --card: #221e1f;
+  --card-border: #4a4244;
+  --input-bg: #121113;
+  --input-border: #6a6063;
+  --text: #f3eeed;
+  --heading: #f8f3f1;
+  --h1: #fbf7f5;
+  --lead: #d0c4c1;
+  --muted: #c2b8b6;
+  --accent: #d5b9ac;
+  --btn-bg: #d5b9ac;
+  --btn-text: #231a1c;
+  --tag-text: #dcc6bc;
+  --tag-border: #5c5255;
+  --rule: #4a4244;
+  --focus-ring: #c08a9a;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
+  --color-bg: var(--bg);
+  --color-bg-fade-top: var(--bg-fade-top);
+  --color-tile: var(--tile);
+  --color-card: var(--card);
+  --color-card-border: var(--card-border);
+  --color-input-bg: var(--input-bg);
+  --color-input-border: var(--input-border);
+  --color-text: var(--text);
+  --color-heading: var(--heading);
+  --color-h1: var(--h1);
+  --color-lead: var(--lead);
+  --color-muted: var(--muted);
   --color-accent: var(--accent);
-  --color-accent-ink: var(--accent-ink);
-  --color-accent-link: var(--accent-link);
+  --color-btn-bg: var(--btn-bg);
+  --color-btn-text: var(--btn-text);
+  --color-tag-text: var(--tag-text);
+  --color-tag-border: var(--tag-border);
+  --color-rule: var(--rule);
+  --color-focus-ring: var(--focus-ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
 }
