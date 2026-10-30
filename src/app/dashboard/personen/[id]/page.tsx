@@ -95,19 +95,27 @@ export default async function PersonPage({
             </p>
           )}
 
-          <details className="mt-3">
-            <summary className="cursor-pointer text-sm text-neutral-600 underline dark:text-neutral-400">
-              Bearbeiten
-            </summary>
-            <div className="mt-3 flex flex-col gap-3">
-              <PersonForm person={person} />
-              <DeletePersonButton
-                personId={person.id}
-                personName={person.name}
-                redirectTo="/dashboard"
-              />
-            </div>
-          </details>
+          <div className="mt-3 flex items-center gap-4">
+            <details>
+              <summary className="cursor-pointer text-sm text-neutral-600 underline dark:text-neutral-400">
+                Bearbeiten
+              </summary>
+              <div className="mt-3 flex flex-col gap-3">
+                <PersonForm person={person} />
+                <DeletePersonButton
+                  personId={person.id}
+                  personName={person.name}
+                  redirectTo="/dashboard"
+                />
+              </div>
+            </details>
+            <Link
+              href={`/dashboard/teilen?person=${person.id}`}
+              className="text-sm text-neutral-600 underline dark:text-neutral-400"
+            >
+              Ideen teilen
+            </Link>
+          </div>
         </div>
 
         <div className="rounded-2xl border-2 border-neutral-900 p-4 dark:border-white">

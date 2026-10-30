@@ -40,14 +40,22 @@ export default async function DashboardPage() {
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">Übersicht</h1>
-          <form action={signout}>
-            <button
-              type="submit"
-              className="cursor-pointer rounded-full border border-neutral-300 px-4 py-2 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+          <div className="flex items-center gap-4">
+            <Link
+              href="/dashboard/teilen"
+              className="text-sm text-neutral-600 hover:underline dark:text-neutral-400"
             >
-              Abmelden
-            </button>
-          </form>
+              Geteilte Links
+            </Link>
+            <form action={signout}>
+              <button
+                type="submit"
+                className="cursor-pointer rounded-full border border-neutral-300 px-4 py-2 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+              >
+                Abmelden
+              </button>
+            </form>
+          </div>
         </div>
 
         <details className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700">
