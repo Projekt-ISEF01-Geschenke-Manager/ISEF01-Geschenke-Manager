@@ -12,8 +12,11 @@
 }
 
 [data-theme="dark"] {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  /* Dasselbe dunkle Grau wie GitHubs Dark Mode (Primer "canvas.default")
+     statt reinem Schwarz - wirkt neben dem warmen Giftwise-Header
+     ruhiger und moderner. */
+  --background: #0d1117;
+  --foreground: #e6edf3;
 }
 
 @theme inline {
