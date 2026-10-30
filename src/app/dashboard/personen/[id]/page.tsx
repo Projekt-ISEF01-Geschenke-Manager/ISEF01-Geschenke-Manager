@@ -1,6 +1,6 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/supabase/server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { PersonForm } from "@/components/person-form";
@@ -17,14 +17,7 @@ export default async function PersonPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/");
-  }
+  const { supabase } = await requireUser();
 
   const { data: person } = await supabase
     .from("people")

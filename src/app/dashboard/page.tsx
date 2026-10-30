@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/supabase/server";
 import { signout } from "@/app/actions/auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -11,14 +10,7 @@ import { formatBirthday } from "@/lib/format";
 export const instant = false;
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/");
-  }
+  const { supabase } = await requireUser();
 
   const { data: people } = await supabase
     .from("people")
