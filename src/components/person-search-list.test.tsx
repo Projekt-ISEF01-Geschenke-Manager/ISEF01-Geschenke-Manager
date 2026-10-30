@@ -75,12 +75,11 @@ describe("PersonSearchList", () => {
     "öffnet das Formular explizit beim Klick, statt sich auf das " +
       "automatische Aufklappen beim Anker-Sprung zu verlassen",
     () => {
-      document.body.innerHTML += '<details id="person-anlegen"></details>';
+      const details = document.createElement("details");
+      details.id = "person-anlegen";
+      document.body.appendChild(details);
       render(<PersonSearchList people={people} />);
 
-      const details = document.getElementById(
-        "person-anlegen",
-      ) as HTMLDetailsElement;
       expect(details.open).toBe(false);
 
       fireEvent.click(screen.getByText("+ Person anlegen"));
