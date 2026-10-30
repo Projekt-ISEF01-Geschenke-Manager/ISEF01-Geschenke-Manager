@@ -2,7 +2,9 @@ import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
 
 // Gleiche Kopfzeile auf allen Seiten (Wireframe-Annotation "Allgemein").
-export function SiteHeader() {
+// badge: zusaetzliche Kennzeichnung, z. B. "Geteilte Ansicht · nur lesen"
+// auf der oeffentlichen Teilen-Route (A10) - ersetzt dort den Claim-Text.
+export function SiteHeader({ badge }: { badge?: string }) {
   return (
    
 <header
@@ -38,7 +40,7 @@ className="h-14 w-14 shrink-0 object-contain brightness-0 invert"
 
  
 <span className="text-sm tracking-[0.12em] text-white/90">
-  Klug schenken
+  {badge ?? "Klug schenken"}
 </span>
 
 </span>
