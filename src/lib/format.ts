@@ -13,6 +13,27 @@ const MONTH_NAMES = [
   "Dezember",
 ];
 
+const MONTH_NAMES_SHORT = [
+  "Jan",
+  "Feb",
+  "Mär",
+  "Apr",
+  "Mai",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Okt",
+  "Nov",
+  "Dez",
+];
+
+// Kurzer Monatsname fuer das Datumsabzeichen bei "Naechste Anlaesse"
+// (Uebersicht-Wireframe, z. B. "14. / Nov").
+export function monthAbbreviation(month: number): string {
+  return MONTH_NAMES_SHORT[month - 1];
+}
+
 export function formatBirthday(
   day: number | null,
   month: number | null,
