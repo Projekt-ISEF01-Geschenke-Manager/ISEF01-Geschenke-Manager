@@ -40,12 +40,10 @@ describe("GiftForm", () => {
         screen.queryByRole("combobox", { name: /für wen/i }),
       ).toBeNull();
 
-      const personIdField = document.querySelector(
-        'input[name="personId"]',
-      ) as HTMLInputElement;
+      const personIdField = document.querySelector('input[name="personId"]');
       expect(personIdField).not.toBeNull();
-      expect(personIdField.type).toBe("hidden");
-      expect(personIdField.value).toBe("person-1");
+      expect(personIdField?.getAttribute("type")).toBe("hidden");
+      expect(personIdField?.getAttribute("value")).toBe("person-1");
 
       const titleInput = screen.getByLabelText(/idee \*/i);
       expect(document.activeElement).toBe(titleInput);
