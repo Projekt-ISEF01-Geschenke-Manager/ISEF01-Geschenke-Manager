@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { formatBirthday, initials, joinWithUnd } from "./format";
+import {
+  formatBirthday,
+  initials,
+  joinWithUnd,
+  monthAbbreviation,
+} from "./format";
 
 describe("formatBirthday", () => {
   it("gibt null zurück ohne Tag/Monat", () => {
@@ -46,5 +51,13 @@ describe("initials", () => {
 
   it("ignoriert mehrfache Leerzeichen und weitere Wörter", () => {
     expect(initials("Oma  Erna  Müller")).toBe("OE");
+  });
+});
+
+describe("monthAbbreviation", () => {
+  it("gibt den dreibuchstabigen Monatsnamen zurück", () => {
+    expect(monthAbbreviation(11)).toBe("Nov");
+    expect(monthAbbreviation(12)).toBe("Dez");
+    expect(monthAbbreviation(1)).toBe("Jan");
   });
 });
