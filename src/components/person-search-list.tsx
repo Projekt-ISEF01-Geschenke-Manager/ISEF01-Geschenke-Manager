@@ -27,7 +27,9 @@ export function PersonSearchList({ people }: { people: PersonCard[] }) {
         <input
           type="search"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            setQuery(event.target.value);
+          }}
           placeholder="Person suchen …"
           className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-sm dark:border-neutral-600"
         />
