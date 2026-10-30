@@ -32,7 +32,8 @@ bleibt unverändert.
 
 [data-theme="dark"] {
   --bg: #121113;
-  --bg-fade-top: #261f21;      /* Verlauf unter dem Header, 300px lang */
+  --bg-fade-top: #261f21;      /* Verlauf unter dem Header, laeuft ueber die
+                                   volle Hoehe des Seiteninhalts aus */
   --tile: #1a1819;             /* Feature-Karten, Hinweis-Box */
   --card: #221e1f;             /* Login-/Registrierungs-Karte */
   --card-border: #4a4244;
