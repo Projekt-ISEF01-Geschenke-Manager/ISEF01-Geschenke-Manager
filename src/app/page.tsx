@@ -69,12 +69,14 @@ export default async function Home({
     <>
       <SiteHeader />
 
-      {/* Verlauf unter dem Header, siehe DESIGN-DARKMODE.md. */}
+      {/* Verlauf unter dem Header, siehe DESIGN-DARKMODE.md. Laenge skaliert
+          mit der Viewport-Hoehe statt eines festen Pixelwerts, damit es auf
+          grossen Desktop-Bildschirmen kein harter Block bleibt. */}
       <main
         className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-4 py-10"
         style={{
           background:
-            "linear-gradient(180deg, var(--bg-fade-top) 0, var(--bg) 300px)",
+            "linear-gradient(180deg, var(--bg-fade-top) 0, var(--bg) clamp(220px, 35vh, 520px))",
         }}
       >
         {error && (

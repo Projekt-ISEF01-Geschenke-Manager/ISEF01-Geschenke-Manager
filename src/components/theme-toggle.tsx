@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { Moon, Sun } from "lucide-react";
 
 // Schalter statt Icon-Button (Design-Spezifikation, siehe
 // DESIGN-DARKMODE.md). aria-checked startet statisch bei false (jsx-a11y
@@ -38,9 +39,14 @@ export function ThemeToggle() {
       aria-checked={false}
       aria-label="Hell-/Dunkelmodus umschalten"
       onClick={toggle}
-      className="relative h-9 w-[68px] shrink-0 cursor-pointer rounded-full border border-white bg-white/20 transition active:scale-95"
+      className="relative h-8 w-14 shrink-0 cursor-pointer rounded-full border border-white/70 bg-white/20 transition active:scale-95"
     >
-      <span className="absolute top-1 left-1 h-7 w-7 rounded-full bg-white shadow transition-transform duration-200 dark:translate-x-[32px]" />
+      <Sun className="absolute top-1/2 left-1.5 h-4 w-4 -translate-y-1/2 text-white/80" />
+      <Moon className="absolute top-1/2 right-1.5 h-3.5 w-3.5 -translate-y-1/2 text-white/80" />
+      <span className="absolute top-1 left-1 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow transition-transform duration-200 dark:translate-x-6">
+        <Sun className="h-3.5 w-3.5 text-amber-500 dark:hidden" />
+        <Moon className="hidden h-3.5 w-3.5 text-neutral-700 dark:block" />
+      </span>
     </button>
   );
 }
