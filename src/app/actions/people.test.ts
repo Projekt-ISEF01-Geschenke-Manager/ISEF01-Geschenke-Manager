@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const revalidatePathMock = vi.fn();
 vi.mock("next/cache", () => ({
-  revalidatePath: (path: string) => revalidatePathMock(path),
+  revalidatePath: (path: string, type?: string) => revalidatePathMock(path, type),
 }));
 
 const insertMock = vi.fn();
@@ -159,7 +159,7 @@ describe("createPerson", () => {
       interests: ["Garten", "Kochen"],
       notes: "Mag keine Süßigkeiten mehr.",
     });
-    expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard");
+    expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard", "layout");
   });
 
   it("gibt einen Fehler zurück, wenn niemand eingeloggt ist", async () => {
@@ -195,7 +195,7 @@ describe("updatePerson", () => {
       "id",
       "person-42",
     );
-    expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard");
+    expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard", "layout");
   });
 
   it("validiert genauso wie beim Anlegen", async () => {
@@ -226,7 +226,7 @@ describe("deletePerson", () => {
 
     expect(result).toEqual({ success: true });
     expect(deleteMock).toHaveBeenCalledWith("people", "id", "person-42");
-    expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard");
+    expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard", "layout");
   });
 
   it("gibt einen Fehler zurück und aktualisiert die Übersicht NICHT, wenn das Löschen fehlschlägt", async () => {
