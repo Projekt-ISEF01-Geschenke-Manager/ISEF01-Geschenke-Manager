@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 // Server-side Supabase client for Server Components, Route Handlers and
 // Server Actions. Reads/writes the auth session via Next.js cookies.
@@ -27,4 +28,21 @@ export async function createClient() {
       },
     },
   );
+}
+
+// Gemeinsame Auth-Pruefung fuer Server Components, die eine eingeloggte
+// Nutzer:in brauchen (Dashboard, Personenseite, ...). Leitet sonst zur
+// Startseite weiter - an einer Stelle gepflegt, damit beide Seiten
+// konsistent bleiben (Codacy-Review-Hinweis).
+export async function requireUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/");
+  }
+
+  return { supabase, user };
 }
