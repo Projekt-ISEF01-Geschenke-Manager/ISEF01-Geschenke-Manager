@@ -1,19 +1,32 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { deletePerson } from "@/app/actions/people";
 
 export function DeletePersonButton({
   personId,
   personName,
+  redirectTo,
 }: {
   personId: string;
   personName: string;
+  // Falls gesetzt: nach erfolgreichem Loeschen dorthin wechseln (z. B. von
+  // der Personenseite zurueck zur Uebersicht, da die Person dort nicht
+  // mehr existiert).
+  redirectTo?: string;
 }) {
+  const router = useRouter();
   const [state, formAction] = useActionState(
     deletePerson.bind(null, personId),
     undefined,
   );
+
+  useEffect(() => {
+    if (state?.success && redirectTo) {
+      router.push(redirectTo);
+    }
+  }, [state, redirectTo, router]);
 
   return (
     <form

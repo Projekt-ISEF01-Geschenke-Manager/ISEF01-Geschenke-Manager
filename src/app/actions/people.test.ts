@@ -224,7 +224,7 @@ describe("deletePerson", () => {
 
     const result = await deletePerson("person-42");
 
-    expect(result).toBeUndefined();
+    expect(result).toEqual({ success: true });
     expect(deleteMock).toHaveBeenCalledWith("people", "id", "person-42");
     expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard");
   });

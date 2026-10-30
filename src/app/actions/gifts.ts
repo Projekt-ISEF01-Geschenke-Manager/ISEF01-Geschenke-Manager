@@ -81,7 +81,7 @@ export async function createGift(
     return { error: error.message, values };
   }
 
-  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
   return { success: true };
 }
 
@@ -103,10 +103,10 @@ export async function setGiftStatus(giftId: string, status: GiftStatus) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
 }
 
-export type DeleteGiftState = { error?: string } | undefined;
+export type DeleteGiftState = { error?: string; success?: boolean } | undefined;
 
 export async function deleteGift(
   giftId: string,
@@ -124,5 +124,6 @@ export async function deleteGift(
     return { error: error.message };
   }
 
-  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
+  return { success: true };
 }

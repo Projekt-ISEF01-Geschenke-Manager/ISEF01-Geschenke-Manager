@@ -150,7 +150,7 @@ export async function createPerson(
     return { error: error.message, values: parsed.values };
   }
 
-  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
 }
 
 export async function updatePerson(
@@ -173,10 +173,10 @@ export async function updatePerson(
     return { error: error.message, values: parsed.values };
   }
 
-  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
 }
 
-export type DeletePersonState = { error?: string } | undefined;
+export type DeletePersonState = { error?: string; success?: boolean } | undefined;
 
 // Zweiter Parameter (prevState von useActionState) wird nicht ausgewertet,
 // muss aber fuer die Bindung an useActionState in der Signatur stehen.
@@ -194,5 +194,9 @@ export async function deletePerson(
     return { error: error.message };
   }
 
-  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
+  // success:true macht den Erfolg vom Ausgangszustand (undefined)
+  // unterscheidbar - wichtig fuer Aufrufer, die danach weiterleiten
+  // wollen (z. B. von der Personenseite zurueck zur Uebersicht).
+  return { success: true };
 }

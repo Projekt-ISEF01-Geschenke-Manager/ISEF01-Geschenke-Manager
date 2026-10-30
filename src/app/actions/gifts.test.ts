@@ -157,7 +157,7 @@ describe("deleteGift", () => {
 
     const result = await deleteGift("gift-1");
 
-    expect(result).toBeUndefined();
+    expect(result).toEqual({ success: true });
     expect(deleteMock).toHaveBeenCalledWith("gifts", "id", "gift-1");
     expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard");
   });

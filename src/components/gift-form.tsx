@@ -9,10 +9,15 @@ export function GiftForm({
   people,
   occasions,
   defaultPersonId,
+  lockedPersonName,
 }: {
-  people: Option[];
+  // Entweder people (Dropdown zum Auswaehlen, Uebersicht) oder
+  // lockedPersonName + defaultPersonId (Person steht schon fest,
+  // Personenseite - A8: "Nur der Titel, die Person steht schon fest").
+  people?: Option[];
   occasions: Option[];
   defaultPersonId?: string;
+  lockedPersonName?: string;
 }) {
   const [state, formAction] = useActionState<GiftFormState, FormData>(
     createGift,
@@ -41,24 +46,28 @@ export function GiftForm({
       )}
 
       <form ref={formRef} action={formAction} className="flex flex-col gap-3">
-        <label className="flex flex-col gap-1 text-sm">
-          Für wen? *
-          <select
-            name="personId"
-            required
-            defaultValue={state?.values?.personId ?? defaultPersonId ?? ""}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
-          >
-            <option value="" disabled>
-              Person auswählen
-            </option>
-            {people.map((person) => (
-              <option key={person.id} value={person.id}>
-                {person.name}
+        {lockedPersonName ? (
+          <input type="hidden" name="personId" value={defaultPersonId} />
+        ) : (
+          <label className="flex flex-col gap-1 text-sm">
+            Für wen? *
+            <select
+              name="personId"
+              required
+              defaultValue={state?.values?.personId ?? defaultPersonId ?? ""}
+              className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+            >
+              <option value="" disabled>
+                Person auswählen
               </option>
-            ))}
-          </select>
-        </label>
+              {people?.map((person) => (
+                <option key={person.id} value={person.id}>
+                  {person.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
 
         <label className="flex flex-col gap-1 text-sm">
           Idee *
@@ -67,6 +76,7 @@ export function GiftForm({
             type="text"
             name="title"
             required
+            autoFocus={!!lockedPersonName}
             placeholder="z. B. Kräutergarten-Set"
             defaultValue={state?.values?.title}
             className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
