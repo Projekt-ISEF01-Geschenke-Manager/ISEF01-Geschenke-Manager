@@ -176,7 +176,12 @@ export function DashboardOverview({
         <GiftForm people={people} occasions={occasions} onSuccess={handleGiftSaved} />
       </Modal>
 
-      <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />
+      <Toast
+        message={toastMessage}
+        onDismiss={() => {
+          setToastMessage(null);
+        }}
+      />
     </>
   );
 }
