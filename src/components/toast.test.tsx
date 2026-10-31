@@ -30,4 +30,35 @@ describe("Toast", () => {
 
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
+
+  it(
+    "schließt sich trotzdem nach 3s, auch wenn der Elternteil mit einer " +
+      "neuen onDismiss-Referenz neu rendert (z. B. durch einen Re-Render " +
+      "aus einem anderen Grund)",
+    () => {
+      const dismissCalls: number[] = [];
+      let renderCount = 0;
+      const { rerender } = render(
+        <Toast
+          message="Idee wurde erfasst"
+          onDismiss={() => dismissCalls.push(++renderCount)}
+        />,
+      );
+
+      // Neue Funktionsreferenz, wie sie z. B. "() => setToastMessage(null)"
+      // bei jedem Render von DashboardOverview waere - darf den Timer NICHT
+      // zuruecksetzen, sonst bliebe der Toast bei haeufigen Re-Renders
+      // dauerhaft sichtbar statt nach 3s zu verschwinden.
+      vi.advanceTimersByTime(1500);
+      rerender(
+        <Toast
+          message="Idee wurde erfasst"
+          onDismiss={() => dismissCalls.push(++renderCount)}
+        />,
+      );
+      vi.advanceTimersByTime(1500);
+
+      expect(dismissCalls).toHaveLength(1);
+    },
+  );
 });

@@ -20,7 +20,16 @@ export function Toast({
     if (!message) return;
     const timer = setTimeout(onDismiss, AUTO_DISMISS_MS);
     return () => clearTimeout(timer);
-  }, [message, onDismiss]);
+    // onDismiss bewusst nicht in den Dependencies: Aufrufer wie
+    // DashboardOverview uebergeben bei jedem Render eine neue
+    // Funktionsreferenz (z. B. "() => setToastMessage(null)") - mit
+    // onDismiss in den Deps wuerde JEDER Re-Render des Elternteils den
+    // Timer neu starten, solange der Toast sichtbar ist, und ihn so
+    // effektiv auf unbestimmte Zeit offen halten statt nach 3s zu
+    // schliessen. Der Effekt soll ausschliesslich an echte
+    // message-Wechsel gekoppelt sein.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message]);
 
   if (!message) return null;
 
