@@ -45,7 +45,11 @@ describe("Modal", () => {
 
     // Klick direkt auf das <dialog> (entspricht dem Klick auf ::backdrop,
     // siehe Kommentar in modal.tsx).
-    fireEvent.click(dialogRef.current!);
+    const dialog = dialogRef.current;
+    if (!dialog) {
+      throw new Error("dialogRef wurde nicht gesetzt");
+    }
+    fireEvent.click(dialog);
 
     expect(closeMock).toHaveBeenCalledTimes(1);
   });

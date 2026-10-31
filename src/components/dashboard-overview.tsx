@@ -48,8 +48,12 @@ export function DashboardOverview({
   const giftDialogRef = useRef<HTMLDialogElement>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const openPersonModal = () => personDialogRef.current?.showModal();
-  const openGiftModal = () => giftDialogRef.current?.showModal();
+  const openPersonModal = () => {
+    personDialogRef.current?.showModal();
+  };
+  const openGiftModal = () => {
+    giftDialogRef.current?.showModal();
+  };
 
   function handlePersonSaved() {
     personDialogRef.current?.close();

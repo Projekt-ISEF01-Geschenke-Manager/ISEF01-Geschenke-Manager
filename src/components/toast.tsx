@@ -31,8 +31,12 @@ export function Toast({
 
   useEffect(() => {
     if (!message) return;
-    const timer = setTimeout(() => onDismissRef.current(), AUTO_DISMISS_MS);
-    return () => clearTimeout(timer);
+    const timer = setTimeout(() => {
+      onDismissRef.current();
+    }, AUTO_DISMISS_MS);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [message]);
 
   if (!message) return null;
