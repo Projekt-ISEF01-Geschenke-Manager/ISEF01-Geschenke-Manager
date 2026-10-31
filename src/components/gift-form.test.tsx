@@ -1,14 +1,16 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { GiftForm } from "./gift-form";
 
+const createGiftMock = vi.fn();
 vi.mock("@/app/actions/gifts", () => ({
-  createGift: vi.fn(),
+  createGift: (...args: unknown[]) => createGiftMock(...args),
 }));
 
 afterEach(() => {
   cleanup();
+  createGiftMock.mockReset();
 });
 
 const occasions = [{ id: "occasion-1", name: "Weihnachten" }];
@@ -49,4 +51,49 @@ describe("GiftForm", () => {
       expect(document.activeElement).toBe(titleInput);
     },
   );
+
+  it("ruft onSuccess auf, sobald das Speichern erfolgreich war (Popup auf der Übersicht soll dann schließen)", async () => {
+    createGiftMock.mockResolvedValue({ success: true });
+    const onSuccess = vi.fn();
+    render(
+      <GiftForm
+        people={people}
+        occasions={occasions}
+        onSuccess={onSuccess}
+      />,
+    );
+
+    fireEvent.change(screen.getByRole("combobox", { name: /für wen/i }), {
+      target: { value: "person-1" },
+    });
+    fireEvent.change(screen.getByLabelText(/idee \*/i), {
+      target: { value: "Kräutergarten-Set" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Idee speichern" }));
+
+    await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1));
+  });
+
+  it("ruft onSuccess NICHT auf, wenn das Speichern fehlschlägt", async () => {
+    createGiftMock.mockResolvedValue({ error: "db down" });
+    const onSuccess = vi.fn();
+    render(
+      <GiftForm
+        people={people}
+        occasions={occasions}
+        onSuccess={onSuccess}
+      />,
+    );
+
+    fireEvent.change(screen.getByRole("combobox", { name: /für wen/i }), {
+      target: { value: "person-1" },
+    });
+    fireEvent.change(screen.getByLabelText(/idee \*/i), {
+      target: { value: "Kräutergarten-Set" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Idee speichern" }));
+
+    await waitFor(() => expect(screen.getByText("db down")).not.toBeNull());
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
 });

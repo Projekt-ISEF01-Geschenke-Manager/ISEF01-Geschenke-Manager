@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { PersonForm } from "./person-form";
 import { GiftForm } from "./gift-form";
 import { PersonSearchList, type PersonCard } from "./person-search-list";
 import { Modal } from "./modal";
+import { Toast } from "./toast";
 import { monthAbbreviation } from "@/lib/format";
 
 type Option = { id: string; name: string };
@@ -45,9 +46,20 @@ export function DashboardOverview({
 }) {
   const personDialogRef = useRef<HTMLDialogElement>(null);
   const giftDialogRef = useRef<HTMLDialogElement>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const openPersonModal = () => personDialogRef.current?.showModal();
   const openGiftModal = () => giftDialogRef.current?.showModal();
+
+  function handlePersonSaved() {
+    personDialogRef.current?.close();
+    setToastMessage("Person wurde hinzugefügt");
+  }
+
+  function handleGiftSaved() {
+    giftDialogRef.current?.close();
+    setToastMessage("Idee wurde erfasst");
+  }
 
   const showAnlaesseCard = upcoming.length > 0 || (weihnachten && weihnachten.peopleCount > 0);
   const weihnachtenPct =
@@ -154,11 +166,13 @@ export function DashboardOverview({
       </div>
 
       <Modal dialogRef={personDialogRef} title="Person anlegen">
-        <PersonForm />
+        <PersonForm onSuccess={handlePersonSaved} />
       </Modal>
       <Modal dialogRef={giftDialogRef} title="Idee erfassen">
-        <GiftForm people={people} occasions={occasions} />
+        <GiftForm people={people} occasions={occasions} onSuccess={handleGiftSaved} />
       </Modal>
+
+      <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />
     </>
   );
 }

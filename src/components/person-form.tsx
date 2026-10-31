@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import {
   createPerson,
   updatePerson,
@@ -17,7 +17,16 @@ export type EditablePerson = {
   notes: string | null;
 };
 
-export function PersonForm({ person }: { person?: EditablePerson }) {
+export function PersonForm({
+  person,
+  onSuccess,
+}: {
+  person?: EditablePerson;
+  // Nur im Popup auf der Übersicht gesetzt - schließt das Popup und zeigt
+  // eine Bestätigung (siehe DashboardOverview). Auf der Personenseite
+  // (Bearbeiten-Formular) bleibt das Formular wie bisher offen stehen.
+  onSuccess?: () => void;
+}) {
   const action = person ? updatePerson.bind(null, person.id) : createPerson;
   const initialState: PersonFormState = person
     ? {
@@ -32,6 +41,17 @@ export function PersonForm({ person }: { person?: EditablePerson }) {
       }
     : undefined;
   const [state, formAction] = useActionState(action, initialState);
+
+  useEffect(() => {
+    if (state?.success) {
+      onSuccess?.();
+    }
+    // onSuccess bewusst nicht in den Dependencies - DashboardOverview
+    // uebergibt bei jedem Render eine neue Funktionsreferenz; der Effekt
+    // soll ausschliesslich an echte state-Wechsel (Formular-Submit)
+    // gekoppelt sein, nicht an Re-Renders des Elternteils.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   return (
     <div>

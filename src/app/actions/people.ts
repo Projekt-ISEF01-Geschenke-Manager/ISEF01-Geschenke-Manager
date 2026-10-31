@@ -16,6 +16,7 @@ const DAYS_IN_MONTH = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 export type PersonFormState =
   | {
       error?: string;
+      success?: boolean;
       values?: {
         name: string;
         birthdayDay: string;
@@ -151,6 +152,10 @@ export async function createPerson(
   }
 
   revalidatePath("/dashboard", "layout");
+  // success:true macht den Erfolg vom Ausgangszustand (undefined)
+  // unterscheidbar - das Popup auf der Übersicht schließt sich erst dann
+  // automatisch (siehe PersonForm/DashboardOverview).
+  return { success: true };
 }
 
 export async function updatePerson(
@@ -174,6 +179,7 @@ export async function updatePerson(
   }
 
   revalidatePath("/dashboard", "layout");
+  return { success: true };
 }
 
 export type DeletePersonState = { error?: string; success?: boolean } | undefined;

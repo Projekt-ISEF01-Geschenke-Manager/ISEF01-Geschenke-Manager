@@ -3,15 +3,35 @@ import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { cleanup, render, screen, fireEvent } from "@testing-library/react";
 import { DashboardOverview } from "./dashboard-overview";
 
-// PersonForm/GiftForm haben eigene Tests (person-form.test.tsx fehlt noch,
-// gift-form.test.tsx existiert) - hier interessiert nur, ob die Popups
-// durch die richtigen Trigger geöffnet werden, nicht das Formular selbst.
+// PersonForm/GiftForm haben eigene Tests (person-form.test.tsx,
+// gift-form.test.tsx) - hier interessiert nur, ob die Popups durch die
+// richtigen Trigger geöffnet werden und ob onSuccess (simuliert über einen
+// Platzhalter-Button) das Popup schließt und die Bestätigung zeigt, nicht
+// das Formular selbst.
 vi.mock("./person-form", () => ({
-  PersonForm: () => <div>PersonForm-Platzhalter</div>,
+  PersonForm: ({ onSuccess }: { onSuccess?: () => void }) => (
+    <div>
+      PersonForm-Platzhalter
+      <button type="button" onClick={onSuccess}>
+        Person-Erfolg simulieren
+      </button>
+    </div>
+  ),
 }));
 vi.mock("./gift-form", () => ({
-  GiftForm: ({ people }: { people: { id: string; name: string }[] }) => (
-    <div>GiftForm-Platzhalter für {people.length} Person(en)</div>
+  GiftForm: ({
+    people,
+    onSuccess,
+  }: {
+    people: { id: string; name: string }[];
+    onSuccess?: () => void;
+  }) => (
+    <div>
+      GiftForm-Platzhalter für {people.length} Person(en)
+      <button type="button" onClick={onSuccess}>
+        Idee-Erfolg simulieren
+      </button>
+    </div>
   ),
 }));
 
@@ -33,18 +53,25 @@ const personCards = people.map((p) => ({
 // bestehende Methode zum Umhüllen) - deshalb selbst auf dem Prototyp
 // definieren statt zu spyOn.
 let showModalMock: ReturnType<typeof vi.fn<() => void>>;
+let closeMock: ReturnType<typeof vi.fn<(returnValue?: string) => void>>;
 
 beforeEach(() => {
   showModalMock = vi.fn(function (this: HTMLDialogElement) {
     this.setAttribute("open", "");
   });
+  closeMock = vi.fn(function (this: HTMLDialogElement) {
+    this.removeAttribute("open");
+  });
   HTMLDialogElement.prototype.showModal = showModalMock;
+  HTMLDialogElement.prototype.close = closeMock;
 });
 
 afterEach(() => {
   cleanup();
-  // @ts-expect-error - jsdom kennt showModal() nativ nicht, Stub entfernen
+  // @ts-expect-error - jsdom kennt showModal()/close() nativ nicht, Stubs entfernen
   delete HTMLDialogElement.prototype.showModal;
+  // @ts-expect-error - siehe oben
+  delete HTMLDialogElement.prototype.close;
 });
 
 describe("DashboardOverview", () => {
@@ -120,5 +147,44 @@ describe("DashboardOverview", () => {
     );
 
     expect(screen.queryByRole("button", { name: "+ Idee erfassen" })).toBeNull();
+  });
+
+  it("schließt das Person-Popup und zeigt eine Bestätigung, sobald die Person gespeichert wurde", () => {
+    render(
+      <DashboardOverview
+        people={people}
+        personCards={personCards}
+        occasions={[]}
+        upcoming={[]}
+        weihnachten={null}
+      />,
+    );
+
+    const [headerButton] = screen.getAllByRole("button", {
+      name: "+ Person anlegen",
+    });
+    fireEvent.click(headerButton);
+    fireEvent.click(screen.getByRole("button", { name: "Person-Erfolg simulieren" }));
+
+    expect(closeMock).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Person wurde hinzugefügt")).not.toBeNull();
+  });
+
+  it("schließt das Idee-Popup und zeigt eine Bestätigung, sobald die Idee gespeichert wurde", () => {
+    render(
+      <DashboardOverview
+        people={people}
+        personCards={personCards}
+        occasions={[]}
+        upcoming={[]}
+        weihnachten={null}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "+ Idee erfassen" }));
+    fireEvent.click(screen.getByRole("button", { name: "Idee-Erfolg simulieren" }));
+
+    expect(closeMock).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Idee wurde erfasst")).not.toBeNull();
   });
 });

@@ -10,6 +10,7 @@ export function GiftForm({
   occasions,
   defaultPersonId,
   lockedPersonName,
+  onSuccess,
 }: {
   // Entweder people (Dropdown zum Auswaehlen, Uebersicht) oder
   // lockedPersonName + defaultPersonId (Person steht schon fest,
@@ -18,6 +19,11 @@ export function GiftForm({
   occasions: Option[];
   defaultPersonId?: string;
   lockedPersonName?: string;
+  // Nur im Popup auf der Übersicht gesetzt - schließt das Popup und zeigt
+  // eine Bestätigung (siehe DashboardOverview). Auf der Personenseite
+  // bleibt das Formular wie bisher offen, um mehrere Ideen hintereinander
+  // zu erfassen (A8).
+  onSuccess?: () => void;
 }) {
   const [state, formAction] = useActionState<GiftFormState, FormData>(
     createGift,
@@ -34,7 +40,10 @@ export function GiftForm({
     if (state?.success) {
       formRef.current?.reset();
       titleRef.current?.focus();
+      onSuccess?.();
     }
+    // onSuccess bewusst nicht in den Dependencies, siehe person-form.tsx.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   return (
