@@ -28,19 +28,23 @@ const personCards = people.map((p) => ({
   purchasedCount: 0,
 }));
 
-let showModalSpy: ReturnType<typeof vi.spyOn>;
+// jsdom implementiert <dialog> nur als normales Element, showModal()
+// existiert dort nicht einmal als No-op-Stub (vi.spyOn bräuchte eine
+// bestehende Methode zum Umhüllen) - deshalb selbst auf dem Prototyp
+// definieren statt zu spyOn.
+let showModalMock: ReturnType<typeof vi.fn<() => void>>;
 
 beforeEach(() => {
-  showModalSpy = vi
-    .spyOn(HTMLDialogElement.prototype, "showModal")
-    .mockImplementation(function (this: HTMLDialogElement) {
-      this.setAttribute("open", "");
-    });
+  showModalMock = vi.fn(function (this: HTMLDialogElement) {
+    this.setAttribute("open", "");
+  });
+  HTMLDialogElement.prototype.showModal = showModalMock;
 });
 
 afterEach(() => {
   cleanup();
-  vi.restoreAllMocks();
+  // @ts-expect-error - jsdom kennt showModal() nativ nicht, Stub entfernen
+  delete HTMLDialogElement.prototype.showModal;
 });
 
 describe("DashboardOverview", () => {
@@ -57,7 +61,7 @@ describe("DashboardOverview", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "+ Person anlegen" }));
 
-    expect(showModalSpy).toHaveBeenCalledTimes(1);
+    expect(showModalMock).toHaveBeenCalledTimes(1);
     expect(screen.getByText("PersonForm-Platzhalter")).not.toBeNull();
   });
 
@@ -77,7 +81,7 @@ describe("DashboardOverview", () => {
     const addButtons = screen.getAllByText("+ Person anlegen");
     fireEvent.click(addButtons[addButtons.length - 1]);
 
-    expect(showModalSpy).toHaveBeenCalledTimes(1);
+    expect(showModalMock).toHaveBeenCalledTimes(1);
   });
 
   it('öffnet das Idee-Popup über "+ Idee erfassen" und reicht people/occasions durch', () => {
@@ -93,7 +97,7 @@ describe("DashboardOverview", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "+ Idee erfassen" }));
 
-    expect(showModalSpy).toHaveBeenCalledTimes(1);
+    expect(showModalMock).toHaveBeenCalledTimes(1);
     expect(
       screen.getByText("GiftForm-Platzhalter für 2 Person(en)"),
     ).not.toBeNull();
