@@ -14,8 +14,16 @@ export type PersonCard = {
 
 // Sucheingabe filtert clientseitig (alle Personen sind schon geladen,
 // kein eigener Request je Tastendruck noetig) - siehe Wireframe-Annotation
-// "Deine Personen" (Suche nach Namen).
-export function PersonSearchList({ people }: { people: PersonCard[] }) {
+// "Deine Personen" (Suche nach Namen). onAddPerson oeffnet dasselbe Popup
+// wie der "+ Person anlegen"-Button oben auf der Seite (Wireframe-Annotation
+// 8: zweiter Weg, eine Person anzulegen).
+export function PersonSearchList({
+  people,
+  onAddPerson,
+}: {
+  people: PersonCard[];
+  onAddPerson: () => void;
+}) {
   const [query, setQuery] = useState("");
   const filtered = people.filter((person) =>
     person.name.toLowerCase().includes(query.trim().toLowerCase()),
@@ -35,16 +43,20 @@ export function PersonSearchList({ people }: { people: PersonCard[] }) {
         />
       )}
 
-      {people.length === 0 ? (
+      {people.length === 0 && (
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
           Lege deine erste Person an.
         </p>
-      ) : filtered.length === 0 ? (
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          Keine Person gefunden.
-        </p>
-      ) : (
-        filtered.map((person) => (
+      )}
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {people.length > 0 && filtered.length === 0 && (
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 sm:col-span-2">
+            Keine Person gefunden.
+          </p>
+        )}
+
+        {filtered.map((person) => (
           <Link
             key={person.id}
             href={`/dashboard/personen/${person.id}`}
@@ -78,28 +90,16 @@ export function PersonSearchList({ people }: { people: PersonCard[] }) {
               </p>
             </div>
           </Link>
-        ))
-      )}
+        ))}
 
-      {/* Zweiter Weg, eine Person anzulegen (Wireframe-Annotation 8) -
-          #person-anlegen springt zum Formular oben auf der Seite. Oeffnet
-          das <details> explizit, statt sich auf das (nicht in jedem
-          Browser garantierte) automatische Aufklappen beim Anker-Sprung zu
-          verlassen - und zwar VOR dem Sprung, damit die Seite nicht erst
-          an die falsche Stelle scrollt und danach durch das Aufklappen
-          verspringt. */}
-      <a
-        href="#person-anlegen"
-        onClick={() => {
-          const details = document.getElementById("person-anlegen");
-          if (details instanceof HTMLDetailsElement) {
-            details.open = true;
-          }
-        }}
-        className="flex items-center justify-center rounded-2xl border border-dashed border-neutral-300 p-4 text-sm text-neutral-600 transition hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-900"
-      >
-        + Person anlegen
-      </a>
+        <button
+          type="button"
+          onClick={onAddPerson}
+          className="flex items-center justify-center rounded-2xl border border-dashed border-accent p-4 text-sm text-accent transition hover:bg-accent/10"
+        >
+          + Person anlegen
+        </button>
+      </div>
     </div>
   );
 }

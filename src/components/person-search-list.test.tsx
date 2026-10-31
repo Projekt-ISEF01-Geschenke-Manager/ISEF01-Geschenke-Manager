@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { PersonSearchList } from "./person-search-list";
 
@@ -28,7 +28,7 @@ const people = [
 
 describe("PersonSearchList", () => {
   it("zeigt alle Personen mit Ideen- und Geschenke-Zähler", () => {
-    render(<PersonSearchList people={people} />);
+    render(<PersonSearchList people={people} onAddPerson={() => {}} />);
 
     expect(screen.getByText("Oma Erna")).not.toBeNull();
     expect(screen.getByText("Papa")).not.toBeNull();
@@ -37,7 +37,7 @@ describe("PersonSearchList", () => {
   });
 
   it("filtert die Liste nach Namen", () => {
-    render(<PersonSearchList people={people} />);
+    render(<PersonSearchList people={people} onAddPerson={() => {}} />);
 
     fireEvent.change(screen.getByPlaceholderText("Person suchen …"), {
       target: { value: "pap" },
@@ -48,7 +48,7 @@ describe("PersonSearchList", () => {
   });
 
   it("zeigt einen Hinweis, wenn die Suche nichts findet", () => {
-    render(<PersonSearchList people={people} />);
+    render(<PersonSearchList people={people} onAddPerson={() => {}} />);
 
     fireEvent.change(screen.getByPlaceholderText("Person suchen …"), {
       target: { value: "niemand" },
@@ -58,35 +58,18 @@ describe("PersonSearchList", () => {
   });
 
   it("zeigt ohne Personen den Hinweis, die erste Person anzulegen, ohne Suchfeld", () => {
-    render(<PersonSearchList people={[]} />);
+    render(<PersonSearchList people={[]} onAddPerson={() => {}} />);
 
     expect(screen.getByText("Lege deine erste Person an.")).not.toBeNull();
     expect(screen.queryByPlaceholderText("Person suchen …")).toBeNull();
   });
 
-  it("bietet immer einen zweiten Weg, eine Person anzulegen", () => {
-    render(<PersonSearchList people={people} />);
+  it("bietet immer einen zweiten Weg, eine Person anzulegen (öffnet dasselbe Popup)", () => {
+    const onAddPerson = vi.fn();
+    render(<PersonSearchList people={people} onAddPerson={onAddPerson} />);
 
-    const addLink = screen.getByText("+ Person anlegen");
-    expect(addLink.getAttribute("href")).toBe("#person-anlegen");
+    fireEvent.click(screen.getByText("+ Person anlegen"));
+
+    expect(onAddPerson).toHaveBeenCalledTimes(1);
   });
-
-  it(
-    "öffnet das Formular explizit beim Klick, statt sich auf das " +
-      "automatische Aufklappen beim Anker-Sprung zu verlassen",
-    () => {
-      const details = document.createElement("details");
-      details.id = "person-anlegen";
-      document.body.appendChild(details);
-      render(<PersonSearchList people={people} />);
-
-      expect(details.open).toBe(false);
-
-      fireEvent.click(screen.getByText("+ Person anlegen"));
-
-      expect(details.open).toBe(true);
-
-      details.remove();
-    },
-  );
 });
