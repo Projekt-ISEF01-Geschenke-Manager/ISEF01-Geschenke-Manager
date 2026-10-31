@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import {
   createPerson,
   updatePerson,
@@ -42,15 +42,20 @@ export function PersonForm({
     : undefined;
   const [state, formAction] = useActionState(action, initialState);
 
+  // Ref statt onSuccess direkt in den Dependencies: DashboardOverview
+  // uebergibt bei jedem Render eine neue Funktionsreferenz, die Ref bleibt
+  // aber ueber Renders hinweg dieselbe - der Effekt soll ausschliesslich an
+  // echte state-Wechsel (Formular-Submit) gekoppelt sein, nicht an
+  // Re-Renders des Elternteils.
+  const onSuccessRef = useRef(onSuccess);
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+  });
+
   useEffect(() => {
     if (state?.success) {
-      onSuccess?.();
+      onSuccessRef.current?.();
     }
-    // onSuccess bewusst nicht in den Dependencies - DashboardOverview
-    // uebergibt bei jedem Render eine neue Funktionsreferenz; der Effekt
-    // soll ausschliesslich an echte state-Wechsel (Formular-Submit)
-    // gekoppelt sein, nicht an Re-Renders des Elternteils.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { CheckCircle2 } from "lucide-react";
 
 const AUTO_DISMISS_MS = 3000;
@@ -16,19 +16,23 @@ export function Toast({
   message: string | null;
   onDismiss: () => void;
 }) {
+  // Ref statt onDismiss direkt in den Dependencies: Aufrufer wie
+  // DashboardOverview uebergeben bei jedem Render eine neue
+  // Funktionsreferenz (z. B. "() => setToastMessage(null)") - mit
+  // onDismiss direkt in den Deps wuerde JEDER Re-Render des Elternteils
+  // den Timer neu starten, solange der Toast sichtbar ist, und ihn so
+  // effektiv auf unbestimmte Zeit offen halten statt nach 3s zu
+  // schliessen. Die Ref bleibt ueber Renders hinweg dieselbe, der Effekt
+  // ist damit nur an echte message-Wechsel gekoppelt.
+  const onDismissRef = useRef(onDismiss);
+  useEffect(() => {
+    onDismissRef.current = onDismiss;
+  });
+
   useEffect(() => {
     if (!message) return;
-    const timer = setTimeout(onDismiss, AUTO_DISMISS_MS);
+    const timer = setTimeout(() => onDismissRef.current(), AUTO_DISMISS_MS);
     return () => clearTimeout(timer);
-    // onDismiss bewusst nicht in den Dependencies: Aufrufer wie
-    // DashboardOverview uebergeben bei jedem Render eine neue
-    // Funktionsreferenz (z. B. "() => setToastMessage(null)") - mit
-    // onDismiss in den Deps wuerde JEDER Re-Render des Elternteils den
-    // Timer neu starten, solange der Toast sichtbar ist, und ihn so
-    // effektiv auf unbestimmte Zeit offen halten statt nach 3s zu
-    // schliessen. Der Effekt soll ausschliesslich an echte
-    // message-Wechsel gekoppelt sein.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message]);
 
   if (!message) return null;

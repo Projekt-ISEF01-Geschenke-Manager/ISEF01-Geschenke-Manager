@@ -32,6 +32,12 @@ export function GiftForm({
   const titleRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
+  // Ref statt onSuccess direkt in den Dependencies, siehe person-form.tsx.
+  const onSuccessRef = useRef(onSuccess);
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+  });
+
   // Nach erfolgreichem Speichern wird das Formular geleert (Titel/Link),
   // Fokus geht zurueck aufs Titel-Feld - mehrere Ideen hintereinander
   // erfassen (A8). state.success ist vom Ausgangszustand (undefined)
@@ -40,10 +46,8 @@ export function GiftForm({
     if (state?.success) {
       formRef.current?.reset();
       titleRef.current?.focus();
-      onSuccess?.();
+      onSuccessRef.current?.();
     }
-    // onSuccess bewusst nicht in den Dependencies, siehe person-form.tsx.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   return (
