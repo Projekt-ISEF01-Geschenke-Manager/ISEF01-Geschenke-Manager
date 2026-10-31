@@ -24,9 +24,15 @@ function fillRequiredFields() {
 
 describe("PersonForm", () => {
   it("zeigt eine Fehlermeldung aus dem Server-Action-State an", async () => {
+    // Name wird trotzdem ausgefuellt - sonst blockiert die native
+    // required-Validierung des Browsers die Übermittlung schon vor der
+    // (hier gemockten) Server Action, und der Fehlerzustand wird nie
+    // gerendert. Getestet wird die Anzeige des State-Fehlers, nicht die
+    // Browser-Validierung selbst.
     createPersonMock.mockResolvedValue({ error: "Bitte gib einen Namen ein." });
     render(<PersonForm />);
 
+    fillRequiredFields();
     fireEvent.click(screen.getByRole("button", { name: "Person anlegen" }));
 
     await waitFor(() =>

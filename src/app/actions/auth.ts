@@ -134,6 +134,7 @@ export async function resendConfirmation() {
   } = await supabase.auth.getUser();
   if (!user?.email) {
     redirect("/");
+    return;
   }
 
   await supabase.auth.resend({ type: "signup", email: user.email });
