@@ -26,8 +26,9 @@ export function Modal({
       // daher explizit per fixed + translate statt margin:auto.
       className="fixed top-1/2 left-1/2 max-h-[calc(100vh-2rem)] w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border-none bg-white p-0 text-neutral-900 shadow-xl backdrop:bg-black/50 dark:bg-neutral-900 dark:text-white"
       onClick={(event) => {
-        if (event.target === dialogRef.current) {
-          dialogRef.current?.close();
+        const dialog = dialogRef.current;
+        if (dialog && event.target === dialog) {
+          dialog.close();
         }
       }}
     >

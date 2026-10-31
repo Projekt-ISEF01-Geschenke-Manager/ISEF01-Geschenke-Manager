@@ -73,7 +73,7 @@ export function DashboardOverview({
       <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
         <div className="flex flex-col gap-6">
           {upcoming.length > 0 && (
-            <div className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700">
+            <div className="rounded-2xl border border-neutral-300 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
               <h2 className="text-lg font-semibold">Nächste Anlässe</h2>
               <ul className="mt-2 flex flex-col gap-2">
                 {upcoming.map((entry) => {
@@ -97,7 +97,7 @@ export function DashboardOverview({
                       {entry.href ? (
                         <Link
                           href={entry.href}
-                          className="flex items-center gap-3 rounded-2xl border border-neutral-300 p-3 transition hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-900"
+                          className="flex items-center gap-3 rounded-2xl border border-neutral-300 p-3 transition hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800"
                         >
                           {content}
                         </Link>
@@ -114,7 +114,7 @@ export function DashboardOverview({
           )}
 
           {weihnachten && weihnachten.peopleCount > 0 && (
-            <div className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700">
+            <div className="rounded-2xl border border-neutral-300 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
               <h2 className="font-semibold">Weihnachtsstatus</h2>
               <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
                 {weihnachten.purchasedCount} von {weihnachten.peopleCount}{" "}

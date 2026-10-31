@@ -60,7 +60,7 @@ export function PersonSearchList({
           <Link
             key={person.id}
             href={`/dashboard/personen/${person.id}`}
-            className="flex items-center justify-between gap-4 rounded-2xl border border-neutral-300 p-4 transition hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-900"
+            className="flex items-center justify-between gap-4 rounded-2xl border border-neutral-300 bg-white p-4 transition hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
             <div>
               <p className="font-medium">{person.name}</p>
