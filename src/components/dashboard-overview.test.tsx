@@ -59,7 +59,12 @@ describe("DashboardOverview", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "+ Person anlegen" }));
+    // "+ Person anlegen" gibt es zweimal (Header-Button + Kachel unten in
+    // der Liste, siehe nächster Test) - hier gezielt der erste Treffer.
+    const [headerButton] = screen.getAllByRole("button", {
+      name: "+ Person anlegen",
+    });
+    fireEvent.click(headerButton);
 
     expect(showModalMock).toHaveBeenCalledTimes(1);
     expect(screen.getByText("PersonForm-Platzhalter")).not.toBeNull();
