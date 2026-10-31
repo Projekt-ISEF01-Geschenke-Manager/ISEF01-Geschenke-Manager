@@ -32,8 +32,7 @@ describe("PersonSearchList", () => {
 
     expect(screen.getByText("Oma Erna")).not.toBeNull();
     expect(screen.getByText("Papa")).not.toBeNull();
-    expect(screen.getByText("3 Ideen")).not.toBeNull();
-    expect(screen.getByText("2 Geschenke")).not.toBeNull();
+    expect(screen.getByText("3 Ideen · 2 Geschenke")).not.toBeNull();
   });
 
   it("filtert die Liste nach Namen", () => {

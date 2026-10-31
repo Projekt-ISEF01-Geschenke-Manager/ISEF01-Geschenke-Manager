@@ -27,8 +27,12 @@
   --btn-text: #ffffff;
   --tag-text: #6b4d55;
   --tag-border: #cdbab5;
-  --rule: #e3d6d2;
+  --rule: #ddcfca;
   --focus-ring: #c08a9a;
+  --avatar: #e6d5cf;
+  --inner: #ffffff;
+  --inner-border: #e3d6d2;
+  --track: #ddcfca;
 }
 
 [data-theme="dark"] {
@@ -49,8 +53,27 @@
   --btn-text: #231a1c;
   --tag-text: #dcc6bc;
   --tag-border: #5c5255;
-  --rule: #4a4244;
+  --rule: #3a3335;
   --focus-ring: #c08a9a;
+  --avatar: #2f282a;
+  --inner: #221e1f;
+  --inner-border: #383234;
+  --track: #342d2f;
+}
+
+/* Gilt in beiden Modi unveraendert (Header-Branding) - siehe
+   DESIGN-DARKMODE.md. Der Header selbst (SiteHeader) bleibt in dieser
+   Iteration bewusst unangetastet; nur der Hell/Dunkel-Schalter darin nutzt
+   die switch- und on-header-Tokens. */
+:root {
+  --header-gradient: linear-gradient(90deg, #a88b8c 0%, #d5b9ac 50%, #876a71 100%);
+  --on-header: #ffffff;
+  --on-header-btn-border: rgba(255, 255, 255, 0.8);
+  --on-header-btn-bg: rgba(255, 255, 255, 0.14);
+  --switch-track-bg: rgba(255, 255, 255, 0.2);
+  --switch-thumb: #ffffff;
+  --switch-thumb-icon: #6f5459;
+  --switch-thumb-shadow: rgba(0, 0, 0, 0.25);
 }
 
 @theme inline {
@@ -73,6 +96,16 @@
   --color-tag-border: var(--tag-border);
   --color-rule: var(--rule);
   --color-focus-ring: var(--focus-ring);
+  --color-avatar: var(--avatar);
+  --color-inner: var(--inner);
+  --color-inner-border: var(--inner-border);
+  --color-track: var(--track);
+  --color-on-header: var(--on-header);
+  --color-on-header-btn-border: var(--on-header-btn-border);
+  --color-on-header-btn-bg: var(--on-header-btn-bg);
+  --color-switch-track-bg: var(--switch-track-bg);
+  --color-switch-thumb: var(--switch-thumb);
+  --color-switch-thumb-icon: var(--switch-thumb-icon);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

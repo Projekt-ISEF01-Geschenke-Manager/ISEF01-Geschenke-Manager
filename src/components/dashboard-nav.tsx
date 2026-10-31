@@ -1,16 +1,21 @@
 import Link from "next/link";
 
-// Zweite Leiste direkt unter dem Header (Wireframe "Übersicht"). Nur
-// "Übersicht" und "Geteilte Links" sind echte Routen - "Gesamtliste" aus
-// dem Wireframe existiert noch nicht als eigene Seite und wird hier bewusst
-// weggelassen statt auf eine 404-Route zu verlinken.
+// Navigation unter dem Header - Werte 1:1 aus der Referenz-Mockup-Datei
+// (Uebersicht.dc.html) uebernommen: keine eigene Hintergrundfarbe (der
+// Verlauf des Inhaltsbereichs darunter laeuft durch), nur eine Trennlinie.
+// "Gesamtliste" ist Teil der Spezifikation, existiert aber noch nicht als
+// eigene Route - bewusst als nicht-klickbarer Platzhalter (optisch
+// identisch zum inaktiven Tab) statt auf eine 404-Seite zu verlinken.
 export function DashboardNav({ active }: { active: "uebersicht" | "geteilte-links" }) {
   return (
-    <nav className="border-b border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
-      <div className="mx-auto flex max-w-5xl gap-6 px-4">
+    <nav aria-label="Hauptnavigation" className="border-b border-rule">
+      <div className="mx-auto flex max-w-[1140px] flex-wrap gap-x-8 gap-y-2 px-6">
         <Link href="/dashboard" className={navLinkClass(active === "uebersicht")}>
           Übersicht
         </Link>
+        <span className="cursor-not-allowed border-b-[3px] border-transparent pt-4 pb-[13px] text-[15px] text-muted">
+          Gesamtliste
+        </span>
         <Link
           href="/dashboard/teilen"
           className={navLinkClass(active === "geteilte-links")}
@@ -23,8 +28,8 @@ export function DashboardNav({ active }: { active: "uebersicht" | "geteilte-link
 }
 
 function navLinkClass(isActive: boolean) {
-  const base = "border-b-2 px-1 py-4 text-sm font-medium transition";
+  const base = "border-b-[3px] pt-4 pb-[13px] text-[15px] transition";
   return isActive
-    ? `${base} border-neutral-900 text-neutral-900 dark:border-white dark:text-white`
-    : `${base} border-transparent text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white`;
+    ? `${base} border-accent font-semibold text-heading`
+    : `${base} border-transparent text-muted hover:opacity-85`;
 }

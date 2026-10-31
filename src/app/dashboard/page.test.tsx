@@ -6,6 +6,10 @@ const peopleOrderMock = vi.fn();
 const occasionsOrderMock = vi.fn();
 const giftsSelectMock = vi.fn();
 let fullName: string | undefined = "Adrian";
+// Standardmäßig bestätigt, damit bestehende Tests nicht unerwartet das
+// E-Mail-Bestätigungs-Banner mitrendern - eigener Test weiter unten prüft
+// explizit den unbestätigten Fall.
+let emailConfirmedAt: string | null = "2026-10-01T00:00:00.000Z";
 
 vi.mock("@/lib/supabase/server", () => ({
   requireUser: async () => ({
@@ -23,12 +27,16 @@ vi.mock("@/lib/supabase/server", () => ({
         throw new Error(`Unerwartete Tabelle in Test: ${table}`);
       },
     },
-    user: { user_metadata: { full_name: fullName } },
+    user: {
+      user_metadata: { full_name: fullName },
+      email_confirmed_at: emailConfirmedAt,
+    },
   }),
 }));
 
 vi.mock("@/app/actions/auth", () => ({
   signout: async () => {},
+  resendConfirmation: async () => {},
 }));
 
 const { default: DashboardPage } = await import("./page");
@@ -42,6 +50,7 @@ beforeEach(() => {
   occasionsOrderMock.mockReset();
   giftsSelectMock.mockReset();
   fullName = "Adrian";
+  emailConfirmedAt = "2026-10-01T00:00:00.000Z";
 });
 
 afterEach(() => {
@@ -127,9 +136,9 @@ describe("DashboardPage", () => {
       render(element);
 
       const heading = screen.getByText("Nächste Anlässe");
-      const list = heading.parentElement?.querySelector("ul");
-      const labels = Array.from(list?.querySelectorAll("li") ?? []).map(
-        (li) => li.textContent,
+      const entriesWrapper = heading.nextElementSibling;
+      const labels = Array.from(entriesWrapper?.children ?? []).map(
+        (row) => row.textContent,
       );
 
       // Geburtstag (in 19 Tagen) kommt vor Weihnachten (in 59 Tagen);
@@ -198,6 +207,33 @@ describe("DashboardPage", () => {
     const element = await DashboardPage();
     render(element);
 
-    expect(screen.queryByText("Weihnachtsstatus")).toBeNull();
+    expect(screen.queryByText(/^Weihnachten \d{4}$/)).toBeNull();
+  });
+});
+
+describe("E-Mail-Bestätigungs-Banner", () => {
+  it("zeigt das Banner, wenn die E-Mail-Adresse noch nicht bestätigt ist", async () => {
+    emailConfirmedAt = null;
+    peopleOrderMock.mockResolvedValue({ data: [] });
+    occasionsOrderMock.mockResolvedValue({ data: [] });
+    giftsSelectMock.mockResolvedValue({ data: [] });
+
+    const element = await DashboardPage();
+    render(element);
+
+    expect(screen.getByText(/Bitte bestätige deine E-Mail-Adresse/)).not.toBeNull();
+    expect(screen.getByText("Erneut senden")).not.toBeNull();
+  });
+
+  it("blendet das Banner aus, wenn die E-Mail-Adresse schon bestätigt ist", async () => {
+    emailConfirmedAt = "2026-10-01T00:00:00.000Z";
+    peopleOrderMock.mockResolvedValue({ data: [] });
+    occasionsOrderMock.mockResolvedValue({ data: [] });
+    giftsSelectMock.mockResolvedValue({ data: [] });
+
+    const element = await DashboardPage();
+    render(element);
+
+    expect(screen.queryByText(/Bitte bestätige deine E-Mail-Adresse/)).toBeNull();
   });
 });
