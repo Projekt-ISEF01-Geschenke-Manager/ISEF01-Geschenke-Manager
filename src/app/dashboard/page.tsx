@@ -130,22 +130,32 @@ export default async function DashboardPage() {
     <>
       <SiteHeader userName={firstName} />
       <DashboardNav active="uebersicht" />
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
-        <DashboardOverview
-          people={(people ?? []).map((p) => ({ id: p.id, name: p.name }))}
-          personCards={personCards}
-          occasions={occasions ?? []}
-          upcoming={upcoming}
-          weihnachten={
-            weihnachtenPeopleCount > 0
-              ? {
-                  peopleCount: weihnachtenPeopleCount,
-                  purchasedCount: weihnachtenPurchasedCount,
-                }
-              : null
-          }
-        />
-      </main>
+      {/* Gleicher Verlauf wie auf Startseite/Login (siehe DESIGN-DARKMODE.md)
+          - ohne ihn wirkte der Dashboard-Hintergrund im Dunkelmodus flach
+          schwarz statt stimmig zum Header auszulaufen. */}
+      <div
+        className="flex flex-1 flex-col"
+        style={{
+          background: "linear-gradient(180deg, var(--bg-fade-top) 0%, var(--bg) 100%)",
+        }}
+      >
+        <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
+          <DashboardOverview
+            people={(people ?? []).map((p) => ({ id: p.id, name: p.name }))}
+            personCards={personCards}
+            occasions={occasions ?? []}
+            upcoming={upcoming}
+            weihnachten={
+              weihnachtenPeopleCount > 0
+                ? {
+                    peopleCount: weihnachtenPeopleCount,
+                    purchasedCount: weihnachtenPurchasedCount,
+                  }
+                : null
+            }
+          />
+        </main>
+      </div>
       <SiteFooter />
     </>
   );

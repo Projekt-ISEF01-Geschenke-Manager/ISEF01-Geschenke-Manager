@@ -5,6 +5,11 @@ der Startseite (`/`, Landingpage + Login) und der Registrierungsseite. Der
 Header (`SiteHeader`, Giftwise-Branding) ist davon **nicht** betroffen und
 bleibt unverändert.
 
+Auf Nutzerwunsch (31.10.2026) erweitert auf die Übersicht/Dashboard-Seite:
+Hintergrund-Verlauf unter dem Header und die Akzentfarben (`--accent`,
+`--btn-bg`) für Buttons/Popups gelten dort genauso, damit sich Dashboard und
+Startseite/Login nicht mehr stilistisch widersprechen.
+
 ## CSS-Variablen
 
 ```css
