@@ -64,44 +64,42 @@ export function PersonSearchList({
           <Link
             key={person.id}
             href={`/dashboard/personen/${person.id}`}
-            className="flex items-center gap-4 rounded-2xl bg-tile p-5 transition hover:opacity-85"
+            className="flex items-center gap-3 rounded-2xl bg-tile p-4 transition hover:opacity-85"
           >
-            <span className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-full bg-avatar text-lg font-bold text-text">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-avatar text-sm font-bold text-text">
               {initials(person.name)}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-xl font-bold text-heading">{person.name}</p>
+              <p className="text-base font-semibold text-heading">{person.name}</p>
               {person.birthday && (
-                <p className="mt-1 text-[15px] text-muted">
-                  Geburtstag: {person.birthday}
-                </p>
+                <p className="text-xs text-muted">Geburtstag: {person.birthday}</p>
               )}
               {person.interests.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
+                <div className="mt-1 flex flex-wrap gap-1.5">
                   {person.interests.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-full border border-tag-border px-3 py-1 text-sm text-tag-text"
+                      className="rounded-full border border-tag-border px-2 py-0.5 text-xs text-tag-text"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
               )}
-              <p className="mt-2 text-[15px] text-text">
+              <p className="mt-1 text-xs text-text">
                 {person.ideaCount} {person.ideaCount === 1 ? "Idee" : "Ideen"} ·{" "}
                 {person.purchasedCount}{" "}
                 {person.purchasedCount === 1 ? "Geschenk" : "Geschenke"}
               </p>
             </div>
-            <ChevronRight className="h-6 w-6 shrink-0 text-muted" />
+            <ChevronRight className="h-5 w-5 shrink-0 text-muted" />
           </Link>
         ))}
 
         <button
           type="button"
           onClick={onAddPerson}
-          className="flex min-h-[130px] items-center justify-center rounded-2xl border border-dashed border-input-border p-5 text-lg font-medium text-accent transition hover:opacity-85"
+          className="flex min-h-[90px] items-center justify-center rounded-2xl border border-dashed border-input-border p-4 text-sm font-medium text-accent transition hover:opacity-85"
         >
           + Person anlegen
         </button>
