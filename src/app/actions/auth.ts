@@ -122,3 +122,20 @@ export async function signout() {
   await supabase.auth.signOut();
   redirect("/");
 }
+
+// Banner "Bitte bestätige deine E-Mail-Adresse" auf der Übersicht
+// (DESIGN-DARKMODE.md). Kein eigenes Rate-Limiting wie bei login/register -
+// die Server Action ist nur eingeloggten Nutzer:innen zugänglich, das
+// anonyme Missbrauchsszenario (QA5) besteht hier nicht.
+export async function resendConfirmation() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.email) {
+    redirect("/");
+    return;
+  }
+
+  await supabase.auth.resend({ type: "signup", email: user.email });
+}

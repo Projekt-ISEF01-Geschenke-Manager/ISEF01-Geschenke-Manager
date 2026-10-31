@@ -91,7 +91,7 @@ describe("createPerson", () => {
         birthdayYear: "",
       }),
     );
-    expect(result).toBeUndefined();
+    expect(result).toEqual({ success: true });
     expect(insertMock).toHaveBeenCalledWith(
       "people",
       expect.objectContaining({ birthday_day: 29, birthday_month: 2, birthday_year: null }),
@@ -120,7 +120,7 @@ describe("createPerson", () => {
         notes: "",
       }),
     );
-    expect(result).toBeUndefined();
+    expect(result).toEqual({ success: true });
     expect(insertMock).toHaveBeenCalledWith(
       "people",
       expect.objectContaining({
@@ -149,7 +149,7 @@ describe("createPerson", () => {
     insertMock.mockResolvedValue({ error: null });
     const result = await createPerson(undefined, formData(validFields));
 
-    expect(result).toBeUndefined();
+    expect(result).toEqual({ success: true });
     expect(insertMock).toHaveBeenCalledWith("people", {
       user_id: "user-1",
       name: "Oma Erna",
@@ -188,7 +188,7 @@ describe("updatePerson", () => {
     updateMock.mockResolvedValue({ error: null });
     const result = await updatePerson("person-42", undefined, formData(validFields));
 
-    expect(result).toBeUndefined();
+    expect(result).toEqual({ success: true });
     expect(updateMock).toHaveBeenCalledWith(
       "people",
       expect.objectContaining({ name: "Oma Erna" }),

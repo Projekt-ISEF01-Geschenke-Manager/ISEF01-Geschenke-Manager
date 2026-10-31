@@ -10,6 +10,7 @@ export function GiftForm({
   occasions,
   defaultPersonId,
   lockedPersonName,
+  onSuccess,
 }: {
   // Entweder people (Dropdown zum Auswaehlen, Uebersicht) oder
   // lockedPersonName + defaultPersonId (Person steht schon fest,
@@ -18,6 +19,11 @@ export function GiftForm({
   occasions: Option[];
   defaultPersonId?: string;
   lockedPersonName?: string;
+  // Nur im Popup auf der Übersicht gesetzt - schließt das Popup und zeigt
+  // eine Bestätigung (siehe DashboardOverview). Auf der Personenseite
+  // bleibt das Formular wie bisher offen, um mehrere Ideen hintereinander
+  // zu erfassen (A8).
+  onSuccess?: () => void;
 }) {
   const [state, formAction] = useActionState<GiftFormState, FormData>(
     createGift,
@@ -25,6 +31,12 @@ export function GiftForm({
   );
   const titleRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Ref statt onSuccess direkt in den Dependencies, siehe person-form.tsx.
+  const onSuccessRef = useRef(onSuccess);
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+  });
 
   // Nach erfolgreichem Speichern wird das Formular geleert (Titel/Link),
   // Fokus geht zurueck aufs Titel-Feld - mehrere Ideen hintereinander
@@ -34,6 +46,7 @@ export function GiftForm({
     if (state?.success) {
       formRef.current?.reset();
       titleRef.current?.focus();
+      onSuccessRef.current?.();
     }
   }, [state]);
 
@@ -112,7 +125,7 @@ export function GiftForm({
 
         <button
           type="submit"
-          className="cursor-pointer self-start rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-700 active:scale-95 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+          className="cursor-pointer self-start rounded-full bg-btn-bg px-5 py-2.5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95"
         >
           Idee speichern
         </button>

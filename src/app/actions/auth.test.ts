@@ -8,6 +8,8 @@ vi.mock("next/navigation", () => ({
 const signInWithPasswordMock = vi.fn();
 const signUpMock = vi.fn();
 const signOutMock = vi.fn();
+const getUserMock = vi.fn();
+const resendMock = vi.fn();
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
@@ -15,6 +17,8 @@ vi.mock("@/lib/supabase/server", () => ({
       signInWithPassword: signInWithPasswordMock,
       signUp: signUpMock,
       signOut: signOutMock,
+      getUser: getUserMock,
+      resend: resendMock,
     },
   }),
 }));
@@ -29,7 +33,7 @@ vi.mock("@/lib/rate-limit", () => ({
   RATE_LIMIT_MESSAGE: "Zu viele Versuche. Bitte warte 15 Minuten und versuche es erneut.",
 }));
 
-const { login, signup, signout } = await import("./auth");
+const { login, signup, signout, resendConfirmation } = await import("./auth");
 
 function formData(fields: Record<string, string>) {
   const fd = new FormData();
@@ -250,5 +254,32 @@ describe("signout", () => {
 
     expect(signOutMock).toHaveBeenCalled();
     expect(redirectMock).toHaveBeenCalledWith("/");
+  });
+});
+
+describe("resendConfirmation", () => {
+  it("verschickt die Bestätigungsmail erneut für die eingeloggte Adresse", async () => {
+    redirectMock.mockClear();
+    resendMock.mockClear();
+    getUserMock.mockResolvedValue({ data: { user: { email: "jakob@example.com" } } });
+
+    await resendConfirmation();
+
+    expect(resendMock).toHaveBeenCalledWith({
+      type: "signup",
+      email: "jakob@example.com",
+    });
+    expect(redirectMock).not.toHaveBeenCalled();
+  });
+
+  it("leitet zur Startseite weiter, wenn niemand eingeloggt ist", async () => {
+    redirectMock.mockClear();
+    resendMock.mockClear();
+    getUserMock.mockResolvedValue({ data: { user: null } });
+
+    await resendConfirmation();
+
+    expect(redirectMock).toHaveBeenCalledWith("/");
+    expect(resendMock).not.toHaveBeenCalled();
   });
 });

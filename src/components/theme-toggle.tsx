@@ -3,27 +3,30 @@
 import { useEffect, useRef } from "react";
 import { Moon, Sun } from "lucide-react";
 
-// Schalter statt Icon-Button (Design-Spezifikation, siehe
-// DESIGN-DARKMODE.md). aria-checked startet statisch bei false (jsx-a11y
-// verlangt das Attribut fuer role="switch") und wird gleich nach dem Mount
-// sowie bei jedem Klick per ref direkt am DOM korrigiert - eine React-Prop
-// mit dem tatsaechlichen Wert wuerde einen Hydration-Mismatch mit dem
-// Inline-Script in layout.tsx ausloesen, das data-theme schon vor dem
-// ersten Paint setzt (die Ball-Position selbst laeuft deshalb rein ueber
-// die dark:-CSS-Variante, nicht ueber React-State).
+// Schalter nach DESIGN-DARKMODE.md ("Hell/Dunkel-Schalter"): 68x36px,
+// Kugel 28px mit 3px Abstand, links im Hellmodus (left:3px), rechts im
+// Dunkelmodus (left:35px). Lebt im Header, verwendet aber eigene
+// --switch-*/--on-header-*-Tokens, die unabhaengig vom Hell-/Dunkelmodus
+// immer gleich bleiben (der Header selbst wird dadurch nicht veraendert).
+// aria-checked/aria-label starten statisch (jsx-a11y verlangt aria-checked
+// fuer role="switch", und ein serverseitig berechneter Wert wuerde einen
+// Hydration-Mismatch mit dem Inline-Script in layout.tsx ausloesen, das
+// data-theme schon vor dem ersten Paint setzt) und werden gleich nach dem
+// Mount sowie bei jedem Klick per ref direkt am DOM korrigiert - die
+// Kugel-Position selbst laeuft rein ueber die dark:-CSS-Variante, nicht
+// ueber React-State.
 export function ThemeToggle() {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-    buttonRef.current?.setAttribute("aria-checked", String(isDark));
+    syncA11yAttributes(buttonRef.current, isDarkMode());
   }, []);
 
   function toggle() {
     const root = document.documentElement;
-    const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    const next = isDarkMode() ? "light" : "dark";
     root.setAttribute("data-theme", next);
-    buttonRef.current?.setAttribute("aria-checked", String(next === "dark"));
+    syncA11yAttributes(buttonRef.current, next === "dark");
     try {
       localStorage.setItem("theme", next);
     } catch {
@@ -37,16 +40,34 @@ export function ThemeToggle() {
       type="button"
       role="switch"
       aria-checked={false}
-      aria-label="Hell-/Dunkelmodus umschalten"
+      aria-label="Zum dunklen Design wechseln"
       onClick={toggle}
-      className="relative h-8 w-14 shrink-0 cursor-pointer rounded-full border border-white/70 bg-white/20 transition active:scale-95"
+      className="relative h-9 w-[68px] shrink-0 cursor-pointer rounded-full border border-on-header-btn-border bg-switch-track-bg transition active:scale-95"
     >
-      <Sun className="absolute top-1/2 left-1.5 h-4 w-4 -translate-y-1/2 text-white/80" />
-      <Moon className="absolute top-1/2 right-1.5 h-3.5 w-3.5 -translate-y-1/2 text-white/80" />
-      <span className="absolute top-1 left-1 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow transition-transform duration-200 dark:translate-x-6">
-        <Sun className="h-3.5 w-3.5 text-amber-500 dark:hidden" />
-        <Moon className="hidden h-3.5 w-3.5 text-neutral-700 dark:block" />
+      <Sun strokeWidth={2} className="absolute top-[9px] left-[9px] h-4 w-4 text-on-header" />
+      <Moon strokeWidth={2} className="absolute top-[9px] right-[9px] h-4 w-4 text-on-header" />
+      <span className="absolute top-[3px] left-[3px] flex h-7 w-7 items-center justify-center rounded-full bg-switch-thumb shadow-[0_1px_3px_var(--switch-thumb-shadow)] transition-[left] duration-200 ease-in-out dark:left-[35px]">
+        <Sun
+          strokeWidth={2.2}
+          className="h-[15px] w-[15px] text-switch-thumb-icon dark:hidden"
+        />
+        <Moon
+          strokeWidth={2.2}
+          className="hidden h-[15px] w-[15px] text-switch-thumb-icon dark:block"
+        />
       </span>
     </button>
+  );
+}
+
+function isDarkMode() {
+  return document.documentElement.getAttribute("data-theme") === "dark";
+}
+
+function syncA11yAttributes(button: HTMLButtonElement | null, isDark: boolean) {
+  button?.setAttribute("aria-checked", String(isDark));
+  button?.setAttribute(
+    "aria-label",
+    isDark ? "Zum hellen Design wechseln" : "Zum dunklen Design wechseln",
   );
 }

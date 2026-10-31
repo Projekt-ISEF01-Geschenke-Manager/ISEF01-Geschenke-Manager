@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import {
   createPerson,
   updatePerson,
@@ -17,7 +17,16 @@ export type EditablePerson = {
   notes: string | null;
 };
 
-export function PersonForm({ person }: { person?: EditablePerson }) {
+export function PersonForm({
+  person,
+  onSuccess,
+}: {
+  person?: EditablePerson;
+  // Nur im Popup auf der Übersicht gesetzt - schließt das Popup und zeigt
+  // eine Bestätigung (siehe DashboardOverview). Auf der Personenseite
+  // (Bearbeiten-Formular) bleibt das Formular wie bisher offen stehen.
+  onSuccess?: () => void;
+}) {
   const action = person ? updatePerson.bind(null, person.id) : createPerson;
   const initialState: PersonFormState = person
     ? {
@@ -32,6 +41,22 @@ export function PersonForm({ person }: { person?: EditablePerson }) {
       }
     : undefined;
   const [state, formAction] = useActionState(action, initialState);
+
+  // Ref statt onSuccess direkt in den Dependencies: DashboardOverview
+  // uebergibt bei jedem Render eine neue Funktionsreferenz, die Ref bleibt
+  // aber ueber Renders hinweg dieselbe - der Effekt soll ausschliesslich an
+  // echte state-Wechsel (Formular-Submit) gekoppelt sein, nicht an
+  // Re-Renders des Elternteils.
+  const onSuccessRef = useRef(onSuccess);
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+  });
+
+  useEffect(() => {
+    if (state?.success) {
+      onSuccessRef.current?.();
+    }
+  }, [state]);
 
   return (
     <div>
@@ -113,7 +138,7 @@ export function PersonForm({ person }: { person?: EditablePerson }) {
 
         <button
           type="submit"
-          className="cursor-pointer self-start rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-700 active:scale-95 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+          className="cursor-pointer self-start rounded-full bg-btn-bg px-5 py-2.5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95"
         >
           {person ? "Speichern" : "Person anlegen"}
         </button>
