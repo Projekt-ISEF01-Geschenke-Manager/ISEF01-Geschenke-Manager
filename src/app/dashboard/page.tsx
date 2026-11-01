@@ -28,10 +28,13 @@ export default async function DashboardPage() {
   // Vornamen fragt. Fallback auf den Teil der E-Mail vor dem @: bei
   // Konten von vor der full_name-Erfassung (oder anderem Signup-Weg)
   // fehlte sonst der komplette "Angemeldet als"-Block samt
-  // Abmelden-Button im Header.
-  const firstName =
-    (user.user_metadata?.full_name as string | undefined)?.trim().split(/\s+/)[0] ??
-    user.email?.split("@")[0];
+  // Abmelden-Button im Header. Getrimmter Wert erst auf Wahrheitsgehalt
+  // geprueft (nicht nur auf null/undefined), da ein leerer oder nur aus
+  // Leerzeichen bestehender full_name sonst denselben Effekt gehabt haette.
+  const trimmedFullName = (user.user_metadata?.full_name as string | undefined)?.trim();
+  const firstName = trimmedFullName
+    ? trimmedFullName.split(/\s+/)[0]
+    : user.email?.split("@")[0];
 
   const { data: people } = await supabase
     .from("people")

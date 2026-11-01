@@ -103,6 +103,23 @@ describe("DashboardPage", () => {
     },
   );
 
+  it(
+    "nutzt den E-Mail-Fallback auch, wenn full_name nur aus Leerzeichen " +
+      "besteht (nicht nur bei undefined)",
+    async () => {
+      fullName = "   ";
+      email = "lea.vogel@example.com";
+      peopleOrderMock.mockResolvedValue({ data: [] });
+      occasionsOrderMock.mockResolvedValue({ data: [] });
+      giftsSelectMock.mockResolvedValue({ data: [] });
+
+      const element = await DashboardPage();
+      render(element);
+
+      expect(screen.getByText("lea.vogel")).not.toBeNull();
+    },
+  );
+
   it("zeigt die Zeile gar nicht, wenn weder Name noch E-Mail hinterlegt sind", async () => {
     fullName = undefined;
     email = undefined;
