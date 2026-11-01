@@ -60,7 +60,7 @@ className="h-14 w-14 shrink-0 object-contain brightness-0 invert"
               <form action={signout}>
                 <button
                   type="submit"
-                  className="cursor-pointer rounded-full border border-white/70 px-4 py-2 text-sm text-white transition hover:bg-white/10 active:scale-95"
+                  className="inline-flex h-8 cursor-pointer items-center rounded-full border border-white/70 px-4 text-sm text-white transition hover:bg-white/10 active:scale-95"
                 >
                   Abmelden
                 </button>
