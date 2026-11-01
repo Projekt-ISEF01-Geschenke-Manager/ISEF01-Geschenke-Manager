@@ -25,10 +25,13 @@ export default async function DashboardPage() {
   // Nur der Vorname (siehe Wireframe-Annotation "Vorname aus der
   // Registrierung") - full_name koennte theoretisch mehrere Woerter
   // enthalten, auch wenn das Registrierungsformular selbst nur nach dem
-  // Vornamen fragt.
-  const firstName = (user.user_metadata?.full_name as string | undefined)
-    ?.trim()
-    .split(/\s+/)[0];
+  // Vornamen fragt. Fallback auf den Teil der E-Mail vor dem @: bei
+  // Konten von vor der full_name-Erfassung (oder anderem Signup-Weg)
+  // fehlte sonst der komplette "Angemeldet als"-Block samt
+  // Abmelden-Button im Header.
+  const firstName =
+    (user.user_metadata?.full_name as string | undefined)?.trim().split(/\s+/)[0] ??
+    user.email?.split("@")[0];
 
   const { data: people } = await supabase
     .from("people")

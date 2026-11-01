@@ -6,6 +6,7 @@ const peopleOrderMock = vi.fn();
 const occasionsOrderMock = vi.fn();
 const giftsSelectMock = vi.fn();
 let fullName: string | undefined = "Adrian";
+let email: string | undefined = "adrian@example.com";
 // Standardmäßig bestätigt, damit bestehende Tests nicht unerwartet das
 // E-Mail-Bestätigungs-Banner mitrendern - eigener Test weiter unten prüft
 // explizit den unbestätigten Fall.
@@ -29,6 +30,7 @@ vi.mock("@/lib/supabase/server", () => ({
     },
     user: {
       user_metadata: { full_name: fullName },
+      email,
       email_confirmed_at: emailConfirmedAt,
     },
   }),
@@ -50,6 +52,7 @@ beforeEach(() => {
   occasionsOrderMock.mockReset();
   giftsSelectMock.mockReset();
   fullName = "Adrian";
+  email = "adrian@example.com";
   emailConfirmedAt = "2026-10-01T00:00:00.000Z";
 });
 
@@ -83,8 +86,26 @@ describe("DashboardPage", () => {
     expect(screen.queryByText("Jakob Höynck")).toBeNull();
   });
 
-  it("zeigt die Zeile gar nicht, wenn kein Name hinterlegt ist", async () => {
+  it(
+    "nutzt den Teil vor dem @ aus der E-Mail als Fallback, wenn kein " +
+      "full_name hinterlegt ist (z. B. ältere Konten ohne diese Metadaten)",
+    async () => {
+      fullName = undefined;
+      email = "mia.schmidt@example.com";
+      peopleOrderMock.mockResolvedValue({ data: [] });
+      occasionsOrderMock.mockResolvedValue({ data: [] });
+      giftsSelectMock.mockResolvedValue({ data: [] });
+
+      const element = await DashboardPage();
+      render(element);
+
+      expect(screen.getByText("mia.schmidt")).not.toBeNull();
+    },
+  );
+
+  it("zeigt die Zeile gar nicht, wenn weder Name noch E-Mail hinterlegt sind", async () => {
     fullName = undefined;
+    email = undefined;
     peopleOrderMock.mockResolvedValue({ data: [] });
     occasionsOrderMock.mockResolvedValue({ data: [] });
     giftsSelectMock.mockResolvedValue({ data: [] });
