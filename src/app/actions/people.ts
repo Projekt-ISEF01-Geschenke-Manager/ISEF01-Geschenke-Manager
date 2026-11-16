@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 // Server Actions sind als Endpunkte aufrufbar, nicht nur ueber das eigene
@@ -184,10 +185,11 @@ export async function updatePerson(
 
 export type DeletePersonState = { error?: string; success?: boolean } | undefined;
 
-// Zweiter Parameter (prevState von useActionState) wird nicht ausgewertet,
+// Dritter Parameter (prevState von useActionState) wird nicht ausgewertet,
 // muss aber fuer die Bindung an useActionState in der Signatur stehen.
 export async function deletePerson(
   personId: string,
+  redirectTo?: string,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   prevState?: DeletePersonState,
 ): Promise<DeletePersonState> {
@@ -201,8 +203,18 @@ export async function deletePerson(
   }
 
   revalidatePath("/dashboard", "layout");
+
+  // redirect() direkt hier statt client-seitig per router.push() in einem
+  // useEffect: revalidatePath() oben sorgt dafuer, dass die aktuelle Route
+  // (z. B. die jetzt geloeschte Personenseite) neu gerendert wird, sobald
+  // diese Action zurueckkehrt - faende die Weiterleitung erst danach im
+  // Client statt, wuerde notFound() dort zuerst greifen (404 statt
+  // Weiterleitung, siehe Issue #156).
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+
   // success:true macht den Erfolg vom Ausgangszustand (undefined)
-  // unterscheidbar - wichtig fuer Aufrufer, die danach weiterleiten
-  // wollen (z. B. von der Personenseite zurueck zur Uebersicht).
+  // unterscheidbar - relevant fuer Aufrufer ohne redirectTo.
   return { success: true };
 }
