@@ -18,7 +18,7 @@ export function DeletePersonButton({
   // notFound() ausloesen, bevor die Weiterleitung greift (Issue #156).
   redirectTo?: string;
 }) {
-  const [state, formAction] = useActionState(
+  const [state, formAction, isPending] = useActionState(
     deletePerson.bind(null, personId, redirectTo),
     undefined,
   );
@@ -43,9 +43,10 @@ export function DeletePersonButton({
       )}
       <button
         type="submit"
-        className="cursor-pointer text-sm text-red-700 underline transition hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+        disabled={isPending}
+        className="cursor-pointer text-sm text-red-700 underline transition hover:text-red-900 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
       >
-        Löschen
+        {isPending ? "Wird gelöscht …" : "Löschen"}
       </button>
     </form>
   );
