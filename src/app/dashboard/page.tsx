@@ -2,9 +2,6 @@ import { Mail } from "lucide-react";
 import { connection } from "next/server";
 import { requireUser } from "@/lib/supabase/server";
 import { resendConfirmation } from "@/app/actions/auth";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
-import { DashboardNav } from "@/components/dashboard-nav";
 import { DashboardOverview, type UpcomingEntry } from "@/components/dashboard-overview";
 import { type PersonCard } from "@/components/person-search-list";
 import { formatBirthday } from "@/lib/format";
@@ -34,19 +31,6 @@ export default async function DashboardPage() {
   const overviewKey = crypto.randomUUID();
 
   const { supabase, user } = await requireUser();
-  // Nur der Vorname (siehe Wireframe-Annotation "Vorname aus der
-  // Registrierung") - full_name koennte theoretisch mehrere Woerter
-  // enthalten, auch wenn das Registrierungsformular selbst nur nach dem
-  // Vornamen fragt. Fallback auf den Teil der E-Mail vor dem @: bei
-  // Konten von vor der full_name-Erfassung (oder anderem Signup-Weg)
-  // fehlte sonst der komplette "Angemeldet als"-Block samt
-  // Abmelden-Button im Header. Getrimmter Wert erst auf Wahrheitsgehalt
-  // geprueft (nicht nur auf null/undefined), da ein leerer oder nur aus
-  // Leerzeichen bestehender full_name sonst denselben Effekt gehabt haette.
-  const trimmedFullName = (user.user_metadata?.full_name as string | undefined)?.trim();
-  const firstName = trimmedFullName
-    ? trimmedFullName.split(/\s+/)[0]
-    : user.email?.split("@")[0];
 
   const { data: people } = await supabase
     .from("people")
@@ -147,11 +131,8 @@ export default async function DashboardPage() {
   }));
 
   return (
-    <>
-      <SiteHeader userName={firstName} />
-      <DashboardNav active="uebersicht" />
-      {/* Verlauf unter Header/Nav, 260px lang (Referenz: Uebersicht.dc.html). */}
-      <div
+    // Verlauf unter Header/Nav, 260px lang (Referenz: Uebersicht.dc.html).
+    <div
         className="flex flex-1 flex-col"
         style={{
           background: "linear-gradient(180deg, var(--bg-fade-top) 0px, var(--bg) 260px)",
@@ -193,9 +174,7 @@ export default async function DashboardPage() {
                 : null
             }
           />
-        </main>
-      </div>
-      <SiteFooter />
-    </>
+      </main>
+    </div>
   );
 }

@@ -5,11 +5,10 @@ import { cleanup, render, screen } from "@testing-library/react";
 const peopleOrderMock = vi.fn();
 const occasionsOrderMock = vi.fn();
 const giftsSelectMock = vi.fn();
-let fullName: string | undefined = "Adrian";
-let email: string | undefined = "adrian@example.com";
 // Standardmäßig bestätigt, damit bestehende Tests nicht unerwartet das
 // E-Mail-Bestätigungs-Banner mitrendern - eigener Test weiter unten prüft
-// explizit den unbestätigten Fall.
+// explizit den unbestätigten Fall. Der Vorname/"Angemeldet als"-Teil lebt
+// jetzt im Dashboard-Layout (siehe layout.test.tsx), nicht mehr hier.
 let emailConfirmedAt: string | null = "2026-10-01T00:00:00.000Z";
 
 vi.mock("@/lib/supabase/server", () => ({
@@ -29,8 +28,6 @@ vi.mock("@/lib/supabase/server", () => ({
       },
     },
     user: {
-      user_metadata: { full_name: fullName },
-      email,
       email_confirmed_at: emailConfirmedAt,
     },
   }),
@@ -58,8 +55,6 @@ beforeEach(() => {
   peopleOrderMock.mockReset();
   occasionsOrderMock.mockReset();
   giftsSelectMock.mockReset();
-  fullName = "Adrian";
-  email = "adrian@example.com";
   emailConfirmedAt = "2026-10-01T00:00:00.000Z";
 });
 
@@ -69,77 +64,6 @@ afterEach(() => {
 });
 
 describe("DashboardPage", () => {
-  it("zeigt den Vornamen aus den Nutzer:innen-Metadaten", async () => {
-    peopleOrderMock.mockResolvedValue({ data: [] });
-    occasionsOrderMock.mockResolvedValue({ data: [] });
-    giftsSelectMock.mockResolvedValue({ data: [] });
-
-    const element = await DashboardPage();
-    render(element);
-
-    expect(screen.getByText("Adrian")).not.toBeNull();
-  });
-
-  it("zeigt nur den ersten Namen, auch wenn full_name mehrere Wörter enthält", async () => {
-    fullName = "Jakob Höynck";
-    peopleOrderMock.mockResolvedValue({ data: [] });
-    occasionsOrderMock.mockResolvedValue({ data: [] });
-    giftsSelectMock.mockResolvedValue({ data: [] });
-
-    const element = await DashboardPage();
-    render(element);
-
-    expect(screen.getByText("Jakob")).not.toBeNull();
-    expect(screen.queryByText("Jakob Höynck")).toBeNull();
-  });
-
-  it(
-    "nutzt den Teil vor dem @ aus der E-Mail als Fallback, wenn kein " +
-      "full_name hinterlegt ist (z. B. ältere Konten ohne diese Metadaten)",
-    async () => {
-      fullName = undefined;
-      email = "mia.schmidt@example.com";
-      peopleOrderMock.mockResolvedValue({ data: [] });
-      occasionsOrderMock.mockResolvedValue({ data: [] });
-      giftsSelectMock.mockResolvedValue({ data: [] });
-
-      const element = await DashboardPage();
-      render(element);
-
-      expect(screen.getByText("mia.schmidt")).not.toBeNull();
-    },
-  );
-
-  it(
-    "nutzt den E-Mail-Fallback auch, wenn full_name nur aus Leerzeichen " +
-      "besteht (nicht nur bei undefined)",
-    async () => {
-      fullName = "   ";
-      email = "lea.vogel@example.com";
-      peopleOrderMock.mockResolvedValue({ data: [] });
-      occasionsOrderMock.mockResolvedValue({ data: [] });
-      giftsSelectMock.mockResolvedValue({ data: [] });
-
-      const element = await DashboardPage();
-      render(element);
-
-      expect(screen.getByText("lea.vogel")).not.toBeNull();
-    },
-  );
-
-  it("zeigt die Zeile gar nicht, wenn weder Name noch E-Mail hinterlegt sind", async () => {
-    fullName = undefined;
-    email = undefined;
-    peopleOrderMock.mockResolvedValue({ data: [] });
-    occasionsOrderMock.mockResolvedValue({ data: [] });
-    giftsSelectMock.mockResolvedValue({ data: [] });
-
-    const element = await DashboardPage();
-    render(element);
-
-    expect(screen.queryByText(/Angemeldet als/)).toBeNull();
-  });
-
   it(
     "zeigt Geburtstage der naechsten 60 Tage und Weihnachten, sortiert " +
       "nach Tagen bis dahin",
