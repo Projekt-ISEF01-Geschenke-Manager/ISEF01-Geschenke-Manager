@@ -41,6 +41,13 @@ vi.mock("@/app/actions/auth", () => ({
   resendConfirmation: async () => {},
 }));
 
+// connection() braucht echten Next.js-Request-Kontext (nicht im Unit-Test
+// vorhanden) - hier nur fuer den DashboardOverview-Remount-Key gebraucht
+// (Issue #167), fuer die Tests selbst ohne Bedeutung.
+vi.mock("next/server", () => ({
+  connection: async () => {},
+}));
+
 const { default: DashboardPage } = await import("./page");
 
 // Fixer "heute"-Zeitpunkt, damit die Tage-bis-Berechnungen deterministisch
