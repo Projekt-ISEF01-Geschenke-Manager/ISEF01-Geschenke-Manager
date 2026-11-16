@@ -1,7 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState } from "react";
 import { deletePerson } from "@/app/actions/people";
 
 export function DeletePersonButton({
@@ -13,20 +12,16 @@ export function DeletePersonButton({
   personName: string;
   // Falls gesetzt: nach erfolgreichem Loeschen dorthin wechseln (z. B. von
   // der Personenseite zurueck zur Uebersicht, da die Person dort nicht
-  // mehr existiert).
+  // mehr existiert). Die Weiterleitung passiert serverseitig in der
+  // deletePerson-Action selbst (siehe dort) statt hier per router.push() -
+  // sonst koennte die jetzt geloeschte Personenseite kurz neu rendern und
+  // notFound() ausloesen, bevor die Weiterleitung greift (Issue #156).
   redirectTo?: string;
 }) {
-  const router = useRouter();
   const [state, formAction] = useActionState(
-    deletePerson.bind(null, personId),
+    deletePerson.bind(null, personId, redirectTo),
     undefined,
   );
-
-  useEffect(() => {
-    if (state?.success && redirectTo) {
-      router.push(redirectTo);
-    }
-  }, [state, redirectTo, router]);
 
   return (
     <form

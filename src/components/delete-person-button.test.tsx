@@ -8,15 +8,9 @@ vi.mock("@/app/actions/people", () => ({
   deletePerson: vi.fn(),
 }));
 
-const pushMock = vi.fn();
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: pushMock }),
-}));
-
 const deletePersonMock = vi.mocked(deletePerson);
 
 beforeEach(() => {
-  pushMock.mockClear();
   deletePersonMock.mockReset();
   vi.spyOn(window, "confirm").mockReturnValue(true);
 });
@@ -27,8 +21,13 @@ afterEach(() => {
 });
 
 describe("DeletePersonButton", () => {
+  // Die eigentliche Weiterleitung passiert serverseitig in der
+  // deletePerson-Action (redirect()), siehe people.test.ts - hier wird nur
+  // geprueft, dass die Komponente redirectTo korrekt mit personId an die
+  // Action bindet (Issue #156: vorher per router.push() im Client, was zu
+  // einer 404-Seite statt Weiterleitung fuehren konnte).
   it(
-    "leitet nach erfolgreichem Löschen zu redirectTo weiter, wenn gesetzt " +
+    "bindet redirectTo an die deletePerson-Action, wenn gesetzt " +
       "(z. B. von der Personenseite zurück zur Übersicht)",
     async () => {
       deletePersonMock.mockResolvedValue({ success: true });
@@ -42,18 +41,31 @@ describe("DeletePersonButton", () => {
 
       fireEvent.click(screen.getByRole("button", { name: "Löschen" }));
 
-      await waitFor(() => expect(pushMock).toHaveBeenCalledWith("/dashboard"));
+      await waitFor(() =>
+        expect(deletePersonMock).toHaveBeenCalledWith(
+          "person-1",
+          "/dashboard",
+          undefined,
+          expect.anything(),
+        ),
+      );
     },
   );
 
-  it("leitet NICHT weiter, wenn kein redirectTo übergeben wurde", async () => {
+  it("bindet redirectTo als undefined, wenn keines übergeben wurde", async () => {
     deletePersonMock.mockResolvedValue({ success: true });
     render(<DeletePersonButton personId="person-1" personName="Oma Erna" />);
 
     fireEvent.click(screen.getByRole("button", { name: "Löschen" }));
 
-    await waitFor(() => expect(deletePersonMock).toHaveBeenCalled());
-    expect(pushMock).not.toHaveBeenCalled();
+    await waitFor(() =>
+      expect(deletePersonMock).toHaveBeenCalledWith(
+        "person-1",
+        undefined,
+        undefined,
+        expect.anything(),
+      ),
+    );
   });
 
   it("bricht ab, wenn die Sicherheitsabfrage abgelehnt wird", async () => {
@@ -69,6 +81,5 @@ describe("DeletePersonButton", () => {
     fireEvent.click(screen.getByRole("button", { name: "Löschen" }));
 
     expect(deletePersonMock).not.toHaveBeenCalled();
-    expect(pushMock).not.toHaveBeenCalled();
   });
 });
