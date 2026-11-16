@@ -25,10 +25,10 @@ export function GiftForm({
   // zu erfassen (A8).
   onSuccess?: () => void;
 }) {
-  const [state, formAction] = useActionState<GiftFormState, FormData>(
-    createGift,
-    undefined,
-  );
+  const [state, formAction, isPending] = useActionState<
+    GiftFormState,
+    FormData
+  >(createGift, undefined);
   const titleRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -125,9 +125,10 @@ export function GiftForm({
 
         <button
           type="submit"
-          className="cursor-pointer self-start rounded-full bg-btn-bg px-5 py-2.5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95"
+          disabled={isPending}
+          className="cursor-pointer self-start rounded-full bg-btn-bg px-5 py-2.5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Idee speichern
+          {isPending ? "Wird gespeichert …" : "Idee speichern"}
         </button>
       </form>
     </div>
