@@ -1,4 +1,5 @@
 import { Mail } from "lucide-react";
+import { connection } from "next/server";
 import { requireUser } from "@/lib/supabase/server";
 import { resendConfirmation } from "@/app/actions/auth";
 import { SiteHeader } from "@/components/site-header";
@@ -21,6 +22,17 @@ export const instant = false;
 const UPCOMING_WINDOW_DAYS = 60;
 
 export default async function DashboardPage() {
+  // Erzwingt einen frischen DashboardOverview-Zustand (Toast, Popups) bei
+  // jedem echten Seitenaufruf: ohne den key behaelt die Client-Komponente
+  // bei einer client-seitigen Navigation sonst ggf. ihren alten Zustand -
+  // z. B. den "Person wurde hinzugefuegt"-Toast, falls man kurz danach zu
+  // einer anderen Seite wechselt und (z. B. ueber deletePerson()
+  // redirect()) schnell wieder auf /dashboard landet (Issue #167).
+  // connection() vor crypto.randomUUID(), weil Cache Components zufaellige
+  // Werte sonst als Build-Zeit-Wert einfrieren wuerde.
+  await connection();
+  const overviewKey = crypto.randomUUID();
+
   const { supabase, user } = await requireUser();
   // Nur der Vorname (siehe Wireframe-Annotation "Vorname aus der
   // Registrierung") - full_name koennte theoretisch mehrere Woerter
@@ -166,6 +178,7 @@ export default async function DashboardPage() {
             </div>
           )}
           <DashboardOverview
+            key={overviewKey}
             people={(people ?? []).map((p) => ({ id: p.id, name: p.name }))}
             personCards={personCards}
             occasions={occasions ?? []}
