@@ -1,35 +1,49 @@
-import Link from "next/link";
+"use client";
 
-// Navigation unter dem Header - Werte 1:1 aus der Referenz-Mockup-Datei
-// (Uebersicht.dc.html) uebernommen: keine eigene Hintergrundfarbe (der
-// Verlauf des Inhaltsbereichs darunter laeuft durch), nur eine Trennlinie.
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+// Liefert nur die Tabs selbst (keine eigene Flaeche/Hintergrund mehr) -
+// lebt als nav-Slot direkt in der Header-Zeile (SiteHeader) im
+// Dashboard-Layout, nicht mehr als eigener Balken darunter und nicht mehr
+// pro Seite einzeln eingebunden. Ermittelt den aktiven Tab selbst ueber
+// usePathname(), statt einen active-Prop von jeder einzelnen Seite zu
+// verlangen - sonst vergisst eine Seite (wie zuvor /dashboard/teilen) das
+// leicht, und die Navigation wirkt dort inkonsistent oder fehlt ganz.
+// Pillenform statt Unterstreichung, weil eine Linie auf dem Farbverlauf
+// des Headers kaum auffaellt; die aktive Pille ist dunkel getoent statt
+// hell, damit sie unabhaengig davon, ob sie gerade auf dem hellen oder
+// dunklen Teil des Verlaufs sitzt, immer gut lesbar bleibt. Inaktive Tabs
+// bekommen stattdessen einen Schlagschatten hinter dem Text.
 // "Gesamtliste" ist Teil der Spezifikation, existiert aber noch nicht als
 // eigene Route - bewusst als nicht-klickbarer Platzhalter (optisch
 // identisch zum inaktiven Tab) statt auf eine 404-Seite zu verlinken.
-export function DashboardNav({ active }: { active: "uebersicht" | "geteilte-links" }) {
+export function DashboardNav() {
+  const pathname = usePathname();
+  const isUebersicht = pathname === "/dashboard";
+  const isGeteilteLinks = pathname.startsWith("/dashboard/teilen");
+
   return (
-    <nav aria-label="Hauptnavigation" className="border-b border-rule">
-      <div className="mx-auto flex max-w-[1140px] flex-wrap gap-x-8 gap-y-2 px-6">
-        <Link href="/dashboard" className={navLinkClass(active === "uebersicht")}>
-          Übersicht
-        </Link>
-        <span className="cursor-not-allowed border-b-[3px] border-transparent pt-4 pb-[13px] text-[15px] text-muted">
-          Gesamtliste
-        </span>
-        <Link
-          href="/dashboard/teilen"
-          className={navLinkClass(active === "geteilte-links")}
-        >
-          Geteilte Links
-        </Link>
-      </div>
+    <nav
+      aria-label="Hauptnavigation"
+      className="order-last flex w-full flex-wrap gap-1 sm:order-none sm:w-auto sm:justify-center"
+    >
+      <Link href="/dashboard" className={tabClass(isUebersicht)}>
+        Übersicht
+      </Link>
+      <span className="cursor-not-allowed rounded-full px-4 py-2 text-sm whitespace-nowrap text-white/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.45)]">
+        Gesamtliste
+      </span>
+      <Link href="/dashboard/teilen" className={tabClass(isGeteilteLinks)}>
+        Geteilte Links
+      </Link>
     </nav>
   );
 }
 
-function navLinkClass(isActive: boolean) {
-  const base = "border-b-[3px] pt-4 pb-[13px] text-[15px] transition";
+function tabClass(isActive: boolean) {
+  const base = "rounded-full px-4 py-2 text-sm whitespace-nowrap transition";
   return isActive
-    ? `${base} border-accent font-semibold text-heading`
-    : `${base} border-transparent text-muted hover:opacity-85`;
+    ? `${base} bg-black/20 font-semibold text-white shadow-[0_1px_4px_rgba(0,0,0,0.25)] [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]`
+    : `${base} text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.45)] hover:bg-black/10`;
 }

@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/supabase/server";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { ShareLinkForm } from "@/components/share-link-form";
 import { SharedLinkItem } from "@/components/shared-link-item";
 
@@ -37,9 +35,7 @@ export default async function SharedLinksPage({
   }));
 
   return (
-    <>
-      <SiteHeader />
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 2xl:max-w-3xl">
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 2xl:max-w-3xl">
         <Link
           href="/dashboard"
           className="w-fit text-sm text-neutral-600 hover:underline dark:text-neutral-400"
@@ -82,8 +78,6 @@ export default async function SharedLinksPage({
             </ul>
           )}
         </div>
-      </main>
-      <SiteFooter />
-    </>
+    </main>
   );
 }

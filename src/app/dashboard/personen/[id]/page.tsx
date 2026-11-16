@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { requireUser } from "@/lib/supabase/server";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { PersonForm } from "@/components/person-form";
 import { DeletePersonButton } from "@/components/delete-person-button";
 import { GiftForm } from "@/components/gift-form";
@@ -61,9 +59,7 @@ export default async function PersonPage({
   );
 
   return (
-    <>
-      <SiteHeader />
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 2xl:max-w-3xl">
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 2xl:max-w-3xl">
         <Link
           href="/dashboard"
           className="w-fit text-sm text-neutral-600 hover:underline dark:text-neutral-400"
@@ -144,8 +140,6 @@ export default async function PersonPage({
             </ul>
           )}
         </div>
-      </main>
-      <SiteFooter />
-    </>
+    </main>
   );
 }
