@@ -1,0 +1,5 @@
+# Jede Pull-Request-Änderung braucht ein Approval vom Code Owner, bevor sie
+# in main gemerged werden kann (siehe Branch-Protection auf main). Jakob ist
+# als Repo-Admin selbst davon ausgenommen und kann weiterhin ohne fremdes
+# Approval mergen; HanyouAdi und JonasDavid1520 brauchen Jakobs Approval.
+* @Jakobhyn
