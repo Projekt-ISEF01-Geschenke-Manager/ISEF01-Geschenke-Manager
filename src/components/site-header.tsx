@@ -21,7 +21,7 @@ export function SiteHeader({ badge, userName }: { badge?: string; userName?: str
   }}
 >
 
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:gap-4 sm:py-5">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:gap-4 sm:py-5 2xl:max-w-[1600px]">
         <Link href="/" className="flex min-w-0 items-center gap-3 sm:gap-4">
 
 

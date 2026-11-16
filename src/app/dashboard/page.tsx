@@ -157,7 +157,7 @@ export default async function DashboardPage() {
           background: "linear-gradient(180deg, var(--bg-fade-top) 0px, var(--bg) 260px)",
         }}
       >
-        <main className="mx-auto flex w-full max-w-[1140px] flex-1 flex-col gap-7 px-6 pt-8 pb-14">
+        <main className="mx-auto flex w-full max-w-[1140px] flex-1 flex-col gap-7 px-6 pt-8 pb-14 2xl:max-w-[1600px]">
           {!user.email_confirmed_at && (
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-tile px-4 py-3">
               <div className="flex items-center gap-3 text-sm text-text">

@@ -55,9 +55,11 @@ export function PersonSearchList({
         <p className="text-sm text-muted">Lege deine erste Person an.</p>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
         {people.length > 0 && filtered.length === 0 && (
-          <p className="text-sm text-muted sm:col-span-2">Keine Person gefunden.</p>
+          <p className="text-sm text-muted sm:col-span-2 2xl:col-span-3">
+            Keine Person gefunden.
+          </p>
         )}
 
         {filtered.map((person) => (
