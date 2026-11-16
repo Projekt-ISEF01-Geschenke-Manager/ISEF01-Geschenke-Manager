@@ -110,7 +110,9 @@ export function GiftItem({
             </button>
             <button
               type="button"
-              onClick={() => setIsEditing(false)}
+              onClick={() => {
+                setIsEditing(false);
+              }}
               className="cursor-pointer text-xs text-neutral-600 underline dark:text-neutral-400"
             >
               Abbrechen
@@ -159,7 +161,9 @@ export function GiftItem({
           </button>
           <button
             type="button"
-            onClick={() => setIsEditing(true)}
+            onClick={() => {
+              setIsEditing(true);
+            }}
             className="cursor-pointer text-xs text-neutral-600 underline dark:text-neutral-400"
           >
             Bearbeiten
