@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, useActionState, useEffect, useState } from "react";
+import { useTransition, useActionState, useState } from "react";
 import {
   setGiftStatus,
   deleteGift,
@@ -46,12 +46,17 @@ export function GiftItem({
   const isPurchased = gift.status === "purchased";
 
   // Formular nach erfolgreichem Speichern wieder einklappen - zeigt dann
-  // die aktualisierten Werte aus dem (neu geladenen) gift-Objekt an.
-  useEffect(() => {
-    if (updateState?.success) {
+  // die aktualisierten Werte aus dem (neu geladenen) gift-Objekt an. Direkt
+  // waehrend des Renders statt in einem Effect angepasst (React-Pattern
+  // "Adjusting state when a prop changes"), weil set-state-in-effect sonst
+  // unnoetig eine zusaetzliche Render-Kaskade ausloest.
+  const [lastUpdateState, setLastUpdateState] = useState(updateState);
+  if (updateState !== lastUpdateState) {
+    setLastUpdateState(updateState);
+    if (updateState?.success && isEditing) {
       setIsEditing(false);
     }
-  }, [updateState]);
+  }
 
   function toggleStatus() {
     const next: GiftStatus = isPurchased ? "idea" : "purchased";
