@@ -14,7 +14,7 @@ export function SharedLinkItem({
   peopleNames: string[];
   createdAt: string;
 }) {
-  const [state, formAction] = useActionState(
+  const [state, formAction, isPending] = useActionState(
     deleteSharedLink.bind(null, linkId),
     undefined,
   );
@@ -72,9 +72,10 @@ export function SharedLinkItem({
       >
         <button
           type="submit"
-          className="cursor-pointer text-sm text-red-700 underline transition hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+          disabled={isPending}
+          className="cursor-pointer text-sm text-red-700 underline transition hover:text-red-900 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
         >
-          Widerrufen
+          {isPending ? "Wird widerrufen …" : "Widerrufen"}
         </button>
       </form>
     </li>

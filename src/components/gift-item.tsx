@@ -29,7 +29,7 @@ export function GiftItem({
 }) {
   const [isPending, startTransition] = useTransition();
   const [isEditing, setIsEditing] = useState(false);
-  const [deleteState, deleteAction] = useActionState(
+  const [deleteState, deleteAction, isDeletePending] = useActionState(
     deleteGift.bind(null, gift.id),
     undefined,
   );
@@ -172,9 +172,10 @@ export function GiftItem({
           <form action={deleteAction}>
             <button
               type="submit"
-              className="cursor-pointer text-xs text-red-700 underline transition hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+              disabled={isDeletePending}
+              className="cursor-pointer text-xs text-red-700 underline transition hover:text-red-900 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
             >
-              Löschen
+              {isDeletePending ? "Wird gelöscht …" : "Löschen"}
             </button>
           </form>
         </div>
