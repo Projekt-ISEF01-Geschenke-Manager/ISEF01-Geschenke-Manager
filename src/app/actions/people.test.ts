@@ -5,6 +5,11 @@ vi.mock("next/cache", () => ({
   revalidatePath: (path: string, type?: string) => revalidatePathMock(path, type),
 }));
 
+const redirectMock = vi.fn();
+vi.mock("next/navigation", () => ({
+  redirect: (path: string) => redirectMock(path),
+}));
+
 const insertMock = vi.fn();
 const updateMock = vi.fn();
 const deleteMock = vi.fn();
@@ -227,6 +232,26 @@ describe("deletePerson", () => {
     expect(result).toEqual({ success: true });
     expect(deleteMock).toHaveBeenCalledWith("people", "id", "person-42");
     expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard", "layout");
+  });
+
+  it("leitet weiter, wenn redirectTo übergeben wurde, statt success:true zurückzugeben", async () => {
+    revalidatePathMock.mockClear();
+    redirectMock.mockClear();
+    deleteMock.mockReset().mockResolvedValue({ error: null });
+
+    await deletePerson("person-42", "/dashboard");
+
+    expect(redirectMock).toHaveBeenCalledWith("/dashboard");
+  });
+
+  it("leitet NICHT weiter, wenn kein redirectTo übergeben wurde", async () => {
+    redirectMock.mockClear();
+    deleteMock.mockReset().mockResolvedValue({ error: null });
+
+    const result = await deletePerson("person-42");
+
+    expect(result).toEqual({ success: true });
+    expect(redirectMock).not.toHaveBeenCalled();
   });
 
   it("gibt einen Fehler zurück und aktualisiert die Übersicht NICHT, wenn das Löschen fehlschlägt", async () => {
