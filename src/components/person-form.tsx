@@ -40,7 +40,7 @@ export function PersonForm({
         },
       }
     : undefined;
-  const [state, formAction] = useActionState(action, initialState);
+  const [state, formAction, isPending] = useActionState(action, initialState);
 
   // Ref statt onSuccess direkt in den Dependencies: DashboardOverview
   // uebergibt bei jedem Render eine neue Funktionsreferenz, die Ref bleibt
@@ -138,9 +138,10 @@ export function PersonForm({
 
         <button
           type="submit"
-          className="cursor-pointer self-start rounded-full bg-btn-bg px-5 py-2.5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95"
+          disabled={isPending}
+          className="cursor-pointer self-start rounded-full bg-btn-bg px-5 py-2.5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {person ? "Speichern" : "Person anlegen"}
+          {isPending ? "Wird gespeichert …" : person ? "Speichern" : "Person anlegen"}
         </button>
       </form>
     </div>
