@@ -39,7 +39,7 @@ export default async function SharedLinksPage({
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 2xl:max-w-3xl">
         <Link
           href="/dashboard"
           className="w-fit text-sm text-neutral-600 hover:underline dark:text-neutral-400"
