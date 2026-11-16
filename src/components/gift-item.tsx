@@ -6,6 +6,7 @@ import {
   deleteGift,
   updateGift,
   type GiftStatus,
+  type GiftFormState,
 } from "@/app/actions/gifts";
 
 export type Gift = {
@@ -32,7 +33,7 @@ export function GiftItem({
     deleteGift.bind(null, gift.id),
     undefined,
   );
-  const [updateState, updateAction] = useActionState(
+  const [updateState, updateAction] = useActionState<GiftFormState, FormData>(
     updateGift.bind(null, gift.id),
     {
       values: {
