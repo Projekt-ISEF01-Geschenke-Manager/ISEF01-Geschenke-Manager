@@ -29,7 +29,9 @@ vi.mock("@/lib/supabase/server", () => ({
   }),
 }));
 
-const { createGift, setGiftStatus, deleteGift } = await import("./gifts");
+const { createGift, updateGift, setGiftStatus, deleteGift } = await import(
+  "./gifts"
+);
 
 function formData(fields: Record<string, string>) {
   const fd = new FormData();
@@ -113,6 +115,76 @@ describe("createGift", () => {
   it("gibt einen Supabase-Fehler weiter, statt die Übersicht zu aktualisieren", async () => {
     insertMock.mockResolvedValue({ error: { message: "db down" } });
     const result = await createGift(undefined, formData(validFields));
+    expect(result?.error).toBe("db down");
+    expect(revalidatePathMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateGift", () => {
+  beforeEach(() => {
+    revalidatePathMock.mockClear();
+    updateMock.mockReset();
+  });
+
+  it("lehnt einen fehlenden Titel ab, ohne die Datenbank anzufassen", async () => {
+    const result = await updateGift(
+      "gift-1",
+      undefined,
+      formData({ ...validFields, title: "" }),
+    );
+    expect(result?.error).toBe("Bitte gib einen Titel für die Idee ein.");
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it("lehnt einen unsicheren Link ab (z. B. javascript:)", async () => {
+    const result = await updateGift(
+      "gift-1",
+      undefined,
+      formData({ ...validFields, link: "javascript:alert(1)" }),
+    );
+    expect(result?.error).toBe(
+      "Bitte gib einen gültigen Link an (beginnend mit http:// oder https://).",
+    );
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it("aktualisiert Titel, Link und Anlass der bestehenden Idee", async () => {
+    updateMock.mockResolvedValue({ error: null });
+    const result = await updateGift("gift-1", undefined, formData(validFields));
+
+    expect(result).toEqual({ success: true });
+    expect(updateMock).toHaveBeenCalledWith(
+      "gifts",
+      {
+        title: "Kräutergarten-Set",
+        link: "https://shop-beispiel.de/kraeutergarten",
+        occasion_id: "occasion-1",
+      },
+      "id",
+      "gift-1",
+    );
+    expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard", "layout");
+  });
+
+  it("erlaubt das Entfernen von Link und Anlass (nur Titel bleibt Pflicht)", async () => {
+    updateMock.mockResolvedValue({ error: null });
+    const result = await updateGift(
+      "gift-1",
+      undefined,
+      formData({ personId: "person-1", title: "Gutschein", link: "", occasionId: "" }),
+    );
+    expect(result).toEqual({ success: true });
+    expect(updateMock).toHaveBeenCalledWith(
+      "gifts",
+      { title: "Gutschein", link: null, occasion_id: null },
+      "id",
+      "gift-1",
+    );
+  });
+
+  it("gibt einen Supabase-Fehler weiter, statt die Übersicht zu aktualisieren", async () => {
+    updateMock.mockResolvedValue({ error: { message: "db down" } });
+    const result = await updateGift("gift-1", undefined, formData(validFields));
     expect(result?.error).toBe("db down");
     expect(revalidatePathMock).not.toHaveBeenCalled();
   });

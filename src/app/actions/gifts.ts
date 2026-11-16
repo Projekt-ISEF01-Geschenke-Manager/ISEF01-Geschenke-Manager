@@ -78,6 +78,52 @@ export async function createGift(
   return { success: true };
 }
 
+// Spiegelt updatePerson() in people.ts: giftId per bind() vorne angehängt,
+// Person bleibt beim Bearbeiten unveraendert (eine Idee kann nicht einer
+// anderen Person zugeordnet werden) - deshalb kein personId-Feld im
+// Formular, values.personId bleibt leer und wird von GiftItem nicht
+// angezeigt.
+export async function updateGift(
+  giftId: string,
+  _prevState: GiftFormState,
+  formData: FormData,
+): Promise<GiftFormState> {
+  const title = formString(formData.get("title"));
+  const link = formString(formData.get("link"));
+  const occasionId = formString(formData.get("occasionId"));
+
+  const values = { personId: "", title, link, occasionId };
+
+  if (!title) {
+    return { error: "Bitte gib einen Titel für die Idee ein.", values };
+  }
+  if (link && !isValidHttpUrl(link)) {
+    return {
+      error: "Bitte gib einen gültigen Link an (beginnend mit http:// oder https://).",
+      values,
+    };
+  }
+
+  const supabase = await createClient();
+  // RLS stellt sicher, dass nur die eigene Idee bearbeitet werden kann,
+  // auch falls giftId manipuliert wird.
+  const { error } = await supabase
+    .from("gifts")
+    .update({
+      title,
+      link: link || null,
+      occasion_id: occasionId || null,
+    })
+    .eq("id", giftId);
+
+  if (error) {
+    return { error: error.message, values };
+  }
+
+  revalidatePath("/dashboard", "layout");
+  return { success: true };
+}
+
 export async function setGiftStatus(giftId: string, status: GiftStatus) {
   if (!GIFT_STATUSES.includes(status)) {
     throw new Error(`Ungültiger Status: ${status}`);

@@ -40,7 +40,7 @@ export default async function PersonPage({
 
   const { data: giftsData } = await supabase
     .from("gifts")
-    .select("id, title, link, status, occasions(name)")
+    .select("id, title, link, status, occasion_id, occasions(name)")
     .eq("person_id", id)
     .order("created_at", { ascending: false });
 
@@ -49,6 +49,7 @@ export default async function PersonPage({
     title: gift.title,
     link: gift.link,
     status: gift.status,
+    occasion_id: gift.occasion_id,
     occasion_name:
       (gift.occasions as unknown as { name: string } | null)?.name ?? null,
   }));
@@ -138,7 +139,7 @@ export default async function PersonPage({
           ) : (
             <ul className="mt-2 divide-y divide-neutral-200 border-t border-neutral-200 dark:divide-neutral-700 dark:border-neutral-700">
               {gifts.map((gift) => (
-                <GiftItem key={gift.id} gift={gift} />
+                <GiftItem key={gift.id} gift={gift} occasions={occasions ?? []} />
               ))}
             </ul>
           )}

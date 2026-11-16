@@ -1,29 +1,119 @@
 "use client";
 
-import { useTransition, useActionState } from "react";
-import { setGiftStatus, deleteGift, type GiftStatus } from "@/app/actions/gifts";
+import { useTransition, useActionState, useEffect, useState } from "react";
+import {
+  setGiftStatus,
+  deleteGift,
+  updateGift,
+  type GiftStatus,
+} from "@/app/actions/gifts";
 
 export type Gift = {
   id: string;
   title: string;
   link: string | null;
   status: string;
+  occasion_id: string | null;
   occasion_name: string | null;
 };
 
-export function GiftItem({ gift }: { gift: Gift }) {
+type Occasion = { id: string; name: string };
+
+export function GiftItem({
+  gift,
+  occasions,
+}: {
+  gift: Gift;
+  occasions: Occasion[];
+}) {
   const [isPending, startTransition] = useTransition();
+  const [isEditing, setIsEditing] = useState(false);
   const [deleteState, deleteAction] = useActionState(
     deleteGift.bind(null, gift.id),
     undefined,
   );
+  const [updateState, updateAction] = useActionState(
+    updateGift.bind(null, gift.id),
+    {
+      values: {
+        personId: "",
+        title: gift.title,
+        link: gift.link ?? "",
+        occasionId: gift.occasion_id ?? "",
+      },
+    },
+  );
   const isPurchased = gift.status === "purchased";
+
+  // Formular nach erfolgreichem Speichern wieder einklappen - zeigt dann
+  // die aktualisierten Werte aus dem (neu geladenen) gift-Objekt an.
+  useEffect(() => {
+    if (updateState?.success) {
+      setIsEditing(false);
+    }
+  }, [updateState]);
 
   function toggleStatus() {
     const next: GiftStatus = isPurchased ? "idea" : "purchased";
     startTransition(() => {
       setGiftStatus(gift.id, next);
     });
+  }
+
+  if (isEditing) {
+    return (
+      <li className="py-2">
+        <form action={updateAction} className="flex flex-col gap-2">
+          <input
+            type="text"
+            name="title"
+            required
+            placeholder="Titel der Idee"
+            defaultValue={updateState?.values?.title}
+            className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-sm dark:border-neutral-600"
+          />
+          <input
+            type="url"
+            name="link"
+            placeholder="https://…"
+            defaultValue={updateState?.values?.link}
+            className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-sm dark:border-neutral-600"
+          />
+          <select
+            name="occasionId"
+            defaultValue={updateState?.values?.occasionId ?? ""}
+            className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-sm dark:border-neutral-600"
+          >
+            <option value="">Ohne Anlass</option>
+            {occasions.map((occasion) => (
+              <option key={occasion.id} value={occasion.id}>
+                {occasion.name}
+              </option>
+            ))}
+          </select>
+          {updateState?.error && (
+            <p className="text-xs text-red-700 dark:text-red-400">
+              {updateState.error}
+            </p>
+          )}
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              className="cursor-pointer rounded-full bg-btn-bg px-3 py-1 text-xs font-medium text-btn-text transition hover:opacity-90 active:scale-95"
+            >
+              Speichern
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="cursor-pointer text-xs text-neutral-600 underline dark:text-neutral-400"
+            >
+              Abbrechen
+            </button>
+          </div>
+        </form>
+      </li>
+    );
   }
 
   return (
@@ -61,6 +151,13 @@ export function GiftItem({ gift }: { gift: Gift }) {
             }`}
           >
             {isPurchased ? "besorgt" : "offen"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsEditing(true)}
+            className="cursor-pointer text-xs text-neutral-600 underline dark:text-neutral-400"
+          >
+            Bearbeiten
           </button>
           <form action={deleteAction}>
             <button
