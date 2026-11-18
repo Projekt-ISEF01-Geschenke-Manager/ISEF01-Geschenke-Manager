@@ -68,7 +68,7 @@ export function GiftForm({
               name="personId"
               required
               defaultValue={state?.values?.personId ?? defaultPersonId ?? ""}
-              className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+              className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
             >
               <option value="" disabled>
                 Person auswählen
@@ -92,7 +92,7 @@ export function GiftForm({
             autoFocus={!!lockedPersonName}
             placeholder="z. B. Kräutergarten-Set"
             defaultValue={state?.values?.title}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
           />
         </label>
 
@@ -103,7 +103,7 @@ export function GiftForm({
             name="link"
             placeholder="https://…"
             defaultValue={state?.values?.link}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
           />
         </label>
 
@@ -112,7 +112,7 @@ export function GiftForm({
           <select
             name="occasionId"
             defaultValue={state?.values?.occasionId ?? ""}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
           >
             <option value="">Ohne Anlass</option>
             {occasions.map((occasion) => (

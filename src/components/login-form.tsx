@@ -27,7 +27,7 @@ export function LoginForm() {
             name="email"
             required
             defaultValue={state?.email}
-            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none"
+            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 text-base focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none sm:text-sm"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm text-text">
@@ -36,7 +36,7 @@ export function LoginForm() {
             type="password"
             name="password"
             required
-            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none"
+            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 text-base focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none sm:text-sm"
           />
         </label>
 
