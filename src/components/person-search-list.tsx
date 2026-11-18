@@ -46,7 +46,7 @@ export function PersonSearchList({
               setQuery(event.target.value);
             }}
             placeholder="Person suchen …"
-            className="h-12 w-[260px] max-w-full rounded-xl border border-input-border bg-input-bg px-4 text-[15px] text-text placeholder:text-muted"
+            className="h-12 w-[260px] max-w-full rounded-xl border border-input-border bg-input-bg px-4 text-base text-text placeholder:text-muted sm:text-[15px]"
           />
         )}
       </div>

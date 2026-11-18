@@ -75,7 +75,7 @@ export function PersonForm({
             required
             placeholder="z. B. Oma Erna"
             defaultValue={state?.values?.name}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
           />
         </label>
 
@@ -89,7 +89,7 @@ export function PersonForm({
               max={31}
               placeholder="Tag"
               defaultValue={state?.values?.birthdayDay}
-              className="w-20 rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+              className="w-20 rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
             />
             <input
               type="number"
@@ -98,7 +98,7 @@ export function PersonForm({
               max={12}
               placeholder="Monat"
               defaultValue={state?.values?.birthdayMonth}
-              className="w-24 rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+              className="w-24 rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
             />
             <input
               type="number"
@@ -107,7 +107,7 @@ export function PersonForm({
               max={2100}
               placeholder="Jahr (optional)"
               defaultValue={state?.values?.birthdayYear}
-              className="flex-1 rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+              className="flex-1 rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
             />
           </div>
         </div>
@@ -119,7 +119,7 @@ export function PersonForm({
             name="interests"
             placeholder="z. B. Garten, Kochen"
             defaultValue={state?.values?.interests}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
           />
           <span className="text-xs text-neutral-500 dark:text-neutral-400">
             Mit Komma getrennt
@@ -132,7 +132,7 @@ export function PersonForm({
             name="notes"
             rows={2}
             defaultValue={state?.values?.notes}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-600"
+            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
           />
         </label>
 

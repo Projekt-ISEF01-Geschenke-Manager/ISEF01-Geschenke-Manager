@@ -76,19 +76,19 @@ export function GiftItem({
             required
             placeholder="Titel der Idee"
             defaultValue={updateState?.values?.title}
-            className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-sm dark:border-neutral-600"
+            className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-base dark:border-neutral-600 sm:text-sm"
           />
           <input
             type="url"
             name="link"
             placeholder="https://…"
             defaultValue={updateState?.values?.link}
-            className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-sm dark:border-neutral-600"
+            className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-base dark:border-neutral-600 sm:text-sm"
           />
           <select
             name="occasionId"
             defaultValue={updateState?.values?.occasionId ?? ""}
-            className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-sm dark:border-neutral-600"
+            className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-base dark:border-neutral-600 sm:text-sm"
           >
             <option value="">Ohne Anlass</option>
             {occasions.map((occasion) => (

@@ -31,7 +31,7 @@ export function RegisterForm() {
             required
             placeholder="Dein Vorname"
             defaultValue={state?.values?.name}
-            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none"
+            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 text-base focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none sm:text-sm"
           />
         </label>
 
@@ -43,7 +43,7 @@ export function RegisterForm() {
             required
             placeholder="name@beispiel.de"
             defaultValue={state?.values?.email}
-            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none"
+            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 text-base focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none sm:text-sm"
           />
         </label>
 
@@ -54,7 +54,7 @@ export function RegisterForm() {
             name="password"
             required
             minLength={8}
-            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none"
+            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 text-base focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none sm:text-sm"
           />
           <span className="text-xs text-muted">Mindestens 8 Zeichen</span>
         </label>
@@ -66,7 +66,7 @@ export function RegisterForm() {
             name="passwordRepeat"
             required
             minLength={8}
-            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none"
+            className="h-11 rounded-lg border border-input-border bg-input-bg px-3 text-base focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none sm:text-sm"
           />
         </label>
 
