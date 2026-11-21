@@ -372,7 +372,7 @@ describe("setNewPassword", () => {
   it("lehnt nicht übereinstimmende Passwörter ab", async () => {
     const result = await setNewPassword(
       undefined,
-      formData({ password: "geheim123", passwordRepeat: "anders1234" }), // gitleaks:allow (Testwert, kein echtes Secret)
+      formData({ password: "geheim!123", passwordRepeat: "anders!1234" }),
     );
 
     expect(result?.error).toBe("Die Passwörter stimmen nicht überein.");
@@ -384,10 +384,10 @@ describe("setNewPassword", () => {
 
     const result = await setNewPassword(
       undefined,
-      formData({ password: "neuesPasswort1", passwordRepeat: "neuesPasswort1" }), // gitleaks:allow (Testwert, kein echtes Secret)
+      formData({ password: "neuesPasswort!1", passwordRepeat: "neuesPasswort!1" }),
     );
 
-    expect(updateUserMock).toHaveBeenCalledWith({ password: "neuesPasswort1" }); // gitleaks:allow (Testwert, kein echtes Secret)
+    expect(updateUserMock).toHaveBeenCalledWith({ password: "neuesPasswort!1" });
     expect(redirectMock).toHaveBeenCalledWith("/dashboard");
     expect(result).toBeUndefined();
   });
@@ -399,7 +399,7 @@ describe("setNewPassword", () => {
 
     const result = await setNewPassword(
       undefined,
-      formData({ password: "neuesPasswort1", passwordRepeat: "neuesPasswort1" }),
+      formData({ password: "neuesPasswort!1", passwordRepeat: "neuesPasswort!1" }),
     );
 
     expect(result).toEqual({ error: "Auth session missing" });

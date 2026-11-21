@@ -30,17 +30,14 @@ describe("NewPasswordForm", () => {
 
     render(<NewPasswordForm />);
 
-    const passwordInput = document.querySelector('input[name="password"]');
-    const passwordRepeatInput = document.querySelector(
-      'input[name="passwordRepeat"]',
-    );
-    expect(passwordInput).not.toBeNull();
-    expect(passwordRepeatInput).not.toBeNull();
-
-    fireEvent.change(passwordInput as HTMLInputElement, {
+    // Die Hilfetext-Span steht im selben <label> wie das Eingabefeld, direkt
+    // nach dem Input ohne Leerzeichen dazwischen - der berechnete
+    // Accessible Name haengt daher beide Textknoten ohne Trennzeichen
+    // aneinander ("Neues PasswortMindestens 8 Zeichen").
+    fireEvent.change(screen.getByLabelText("Neues PasswortMindestens 8 Zeichen"), {
       target: { value: "geheim123" },
     });
-    fireEvent.change(passwordRepeatInput as HTMLInputElement, {
+    fireEvent.change(screen.getByLabelText("Neues Passwort wiederholen"), {
       target: { value: "anders1234" },
     });
     fireEvent.click(screen.getByRole("button", { name: /passwort speichern/i }));
