@@ -10,6 +10,8 @@ const signUpMock = vi.fn();
 const signOutMock = vi.fn();
 const getUserMock = vi.fn();
 const resendMock = vi.fn();
+const resetPasswordForEmailMock = vi.fn();
+const updateUserMock = vi.fn();
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
@@ -19,6 +21,8 @@ vi.mock("@/lib/supabase/server", () => ({
       signOut: signOutMock,
       getUser: getUserMock,
       resend: resendMock,
+      resetPasswordForEmail: resetPasswordForEmailMock,
+      updateUser: updateUserMock,
     },
   }),
 }));
@@ -33,7 +37,8 @@ vi.mock("@/lib/rate-limit", () => ({
   RATE_LIMIT_MESSAGE: "Zu viele Versuche. Bitte warte 15 Minuten und versuche es erneut.",
 }));
 
-const { login, signup, signout, resendConfirmation } = await import("./auth");
+const { login, signup, signout, resendConfirmation, requestPasswordReset, setNewPassword } =
+  await import("./auth");
 
 function formData(fields: Record<string, string>) {
   const fd = new FormData();
@@ -281,5 +286,123 @@ describe("resendConfirmation", () => {
 
     expect(redirectMock).toHaveBeenCalledWith("/");
     expect(resendMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("requestPasswordReset", () => {
+  const NEUTRAL_MESSAGE =
+    "Wenn zu dieser E-Mail-Adresse ein bestätigtes Konto existiert, haben wir einen Link zum Zurücksetzen verschickt.";
+
+  beforeEach(() => {
+    resetPasswordForEmailMock.mockReset().mockResolvedValue({ error: null });
+    checkAndRecordAttemptMock
+      .mockReset()
+      .mockResolvedValue({ limited: false, attemptId: "attempt-1" });
+  });
+
+  it("verschickt den Reset-Link und gibt eine neutrale Rückmeldung (ZA6)", async () => {
+    const result = await requestPasswordReset(
+      undefined,
+      formData({ email: "jakob@example.de" }),
+    );
+
+    expect(resetPasswordForEmailMock).toHaveBeenCalledWith(
+      "jakob@example.de",
+      expect.objectContaining({
+        redirectTo: expect.stringContaining("/auth/confirm?next=/konto/neues-passwort"),
+      }),
+    );
+    expect(result).toEqual({ message: NEUTRAL_MESSAGE });
+  });
+
+  it("gibt dieselbe neutrale Rückmeldung, auch wenn Supabase einen Fehler meldet (verrät nicht, ob ein Konto existiert)", async () => {
+    resetPasswordForEmailMock.mockResolvedValue({
+      error: { message: "User not found" },
+    });
+
+    const result = await requestPasswordReset(
+      undefined,
+      formData({ email: "unbekannt@example.de" }),
+    );
+
+    expect(result).toEqual({ message: NEUTRAL_MESSAGE });
+  });
+
+  it("blockiert bei zu vielen Versuchen (QA5), ohne Supabase aufzurufen", async () => {
+    checkAndRecordAttemptMock.mockResolvedValue({
+      limited: true,
+      attemptId: null,
+    });
+
+    const result = await requestPasswordReset(
+      undefined,
+      formData({ email: "jakob@example.de" }),
+    );
+
+    expect(result).toEqual({
+      message: "Zu viele Versuche. Bitte warte 15 Minuten und versuche es erneut.",
+    });
+    expect(resetPasswordForEmailMock).not.toHaveBeenCalled();
+  });
+
+  it("ruft Supabase nicht ohne E-Mail-Adresse auf, gibt aber trotzdem die neutrale Rückmeldung", async () => {
+    const result = await requestPasswordReset(undefined, formData({}));
+
+    expect(resetPasswordForEmailMock).not.toHaveBeenCalled();
+    expect(result).toEqual({ message: NEUTRAL_MESSAGE });
+  });
+});
+
+describe("setNewPassword", () => {
+  beforeEach(() => {
+    redirectMock.mockClear();
+    updateUserMock.mockReset();
+  });
+
+  it("lehnt ein zu kurzes Passwort ab (unter 8 Zeichen)", async () => {
+    const result = await setNewPassword(
+      undefined,
+      formData({ password: "kurz", passwordRepeat: "kurz" }),
+    );
+
+    expect(result?.error).toBe("Das Passwort muss mindestens 8 Zeichen lang sein.");
+    expect(updateUserMock).not.toHaveBeenCalled();
+  });
+
+  it("lehnt nicht übereinstimmende Passwörter ab", async () => {
+    const result = await setNewPassword(
+      undefined,
+      formData({ password: "geheim!123", passwordRepeat: "anders!1234" }),
+    );
+
+    expect(result?.error).toBe("Die Passwörter stimmen nicht überein.");
+    expect(updateUserMock).not.toHaveBeenCalled();
+  });
+
+  it("setzt bei gültigen, übereinstimmenden Passwörtern das neue Passwort und leitet auf /dashboard weiter", async () => {
+    updateUserMock.mockResolvedValue({ error: null });
+
+    const result = await setNewPassword(
+      undefined,
+      formData({ password: "neuesPasswort!1", passwordRepeat: "neuesPasswort!1" }),
+    );
+
+    expect(updateUserMock).toHaveBeenCalledWith({ password: "neuesPasswort!1" });
+    expect(redirectMock).toHaveBeenCalledWith("/dashboard");
+    expect(result).toBeUndefined();
+  });
+
+  it("gibt einen Supabase-Fehler weiter, z. B. bei einer abgelaufenen Recovery-Sitzung", async () => {
+    updateUserMock.mockResolvedValue({
+      error: { message: "Auth session missing" },
+    });
+
+    const result = await setNewPassword(
+      undefined,
+      formData({ password: "neuesPasswort!1", passwordRepeat: "neuesPasswort!1" }),
+    );
+
+    expect(result).toEqual({ error: "Auth session missing" });
+    expect(redirectMock).not.toHaveBeenCalled();
   });
 });
