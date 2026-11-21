@@ -91,10 +91,21 @@ export default async function SharedViewPage({
     year: "numeric",
   });
 
+  // Bei nur einer Person bliebe die zweite Grid-Spalte leer und der
+  // Container wirkt auf großen Bildschirmen sehr leer (Feedback: "auf PC
+  // ist sehr viel freie Fläche") - dann stattdessen die Personen-Karte
+  // volle Breite und die Ideen darin zweispaltig, statt die Spalte neben
+  // der einen Karte leer zu lassen.
+  const singlePerson = people.length === 1;
+
   return (
     <>
       <SiteHeader badge="Geteilte Ansicht · nur lesen" />
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
+      {/* Gleiche Container-Breite wie Dashboard/Personenseite (dort
+          max-w-[1140px] ... 2xl:max-w-[1600px]) statt der bisherigen
+          max-w-2xl - Wireframe (geteilte-ansicht.html) nutzt --container:
+          1140px fuer 2 Personen nebeneinander. */}
+      <main className="mx-auto flex w-full max-w-[1140px] flex-1 flex-col gap-7 px-6 pt-8 pb-14 2xl:max-w-[1600px]">
         <div className="rounded-2xl border border-neutral-300 bg-neutral-50 p-4 text-sm dark:border-neutral-700 dark:bg-neutral-900">
           <p className="font-medium">Hinweis</p>
           <p className="mt-1 text-neutral-600 dark:text-neutral-400">
@@ -104,7 +115,7 @@ export default async function SharedViewPage({
         </div>
 
         <div>
-          <h1 className="text-2xl font-semibold">
+          <h1 className="text-[28px] font-semibold">
             Geschenkideen für {joinWithUnd(people.map((person) => person.name))}
           </h1>
           <p className="text-sm text-neutral-600 dark:text-neutral-400">
@@ -113,7 +124,16 @@ export default async function SharedViewPage({
           </p>
         </div>
 
-        <div className="flex flex-col gap-6">
+        {/* Nebeneinander ab lg: (Wireframe: 2 Spalten), darunter gestapelt -
+            bei nur einer Person stattdessen volle Breite (siehe
+            singlePerson oben). */}
+        <div
+          className={
+            singlePerson
+              ? "flex flex-col gap-6"
+              : "grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start"
+          }
+        >
           {people.map((person) => {
             const birthday = formatBirthday(
               person.birthday_day,
@@ -125,14 +145,14 @@ export default async function SharedViewPage({
             return (
               <div
                 key={person.id}
-                className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700"
+                className="rounded-2xl border border-neutral-300 p-6 dark:border-neutral-700"
               >
-                <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-sm font-medium dark:bg-neutral-800">
+                <div className="flex items-center gap-3 border-b border-neutral-200 pb-4 dark:border-neutral-700">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-avatar text-sm font-bold text-text">
                     {initials(person.name)}
                   </span>
                   <div>
-                    <p className="font-medium">{person.name}</p>
+                    <p className="font-semibold">{person.name}</p>
                     {birthday && (
                       <p className="text-sm text-neutral-600 dark:text-neutral-400">
                         Geburtstag: {birthday}
@@ -142,11 +162,17 @@ export default async function SharedViewPage({
                 </div>
 
                 {gifts.length === 0 ? (
-                  <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-400">
+                  <p className="mt-4 text-sm text-neutral-600 dark:text-neutral-400">
                     Noch keine Ideen.
                   </p>
                 ) : (
-                  <ul className="mt-3 divide-y divide-neutral-200 border-t border-neutral-200 dark:divide-neutral-700 dark:border-neutral-700">
+                  <ul
+                    className={
+                      singlePerson
+                        ? "mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2"
+                        : "mt-4 flex flex-col gap-3"
+                    }
+                  >
                     {gifts.map((gift) => (
                       <SharedGiftItem key={gift.id} gift={gift} />
                     ))}
