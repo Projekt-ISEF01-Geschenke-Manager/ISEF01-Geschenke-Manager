@@ -172,12 +172,16 @@ export function GiftItem({
                 den uebrigen Aktions-Buttons rechts statt bei den reinen
                 Info-Chips (Anlass) links - sonst wirkt der Status wie ein
                 Label statt wie eine klickbare Umschaltung (Feedback:
-                "sieht man nicht, dass es ein Button ist"). */}
+                "sieht man nicht, dass es ein Button ist"). Gleiche Größe
+                wie Bearbeiten/Löschen (px-3 py-1 statt px-2.5 py-0.5) und
+                mit Schatten - sonst wirkt er trotz Füllfarbe/Icon
+                weiterhin wie ein Label statt wie ein echter Button
+                (Feedback: "sieht nicht nach einem richtigen Button aus"). */}
             <button
               type="button"
               onClick={toggleStatus}
               disabled={isPending}
-              className={`inline-flex cursor-pointer items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap transition active:scale-95 ${
+              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium whitespace-nowrap shadow-sm transition active:scale-95 ${
                 isPurchased
                   ? "border-green-600 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-500 dark:bg-green-950 dark:text-green-400 dark:hover:bg-green-900"
                   : "border-neutral-400 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:border-neutral-500 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
