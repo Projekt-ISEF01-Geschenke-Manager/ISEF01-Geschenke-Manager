@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { setNewPassword, type NewPasswordState } from "@/app/actions/auth";
 
 const initialState: NewPasswordState = undefined;
@@ -10,6 +11,25 @@ export function NewPasswordForm() {
     setNewPassword,
     initialState,
   );
+
+  if (state?.success) {
+    return (
+      <div className="rounded-2xl border border-card-border bg-card p-6">
+        <h2 className="text-xl font-semibold text-heading">
+          Passwort geändert
+        </h2>
+        <p className="mt-3 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800 dark:bg-green-950 dark:text-green-300">
+          Dein Passwort wurde erfolgreich geändert.
+        </p>
+        <Link
+          href="/dashboard"
+          className="mt-4 inline-block h-11 cursor-pointer rounded-full bg-btn-bg px-5 py-2.5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95"
+        >
+          Weiter zur Übersicht
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl border border-card-border bg-card p-6">
