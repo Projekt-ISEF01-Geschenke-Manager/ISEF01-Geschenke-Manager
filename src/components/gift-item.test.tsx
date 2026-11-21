@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { cleanup, render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { GiftItem, type Gift } from "./gift-item";
 
@@ -12,8 +12,13 @@ vi.mock("@/app/actions/gifts", () => ({
   updateGift: (...args: unknown[]) => updateGiftMock(...args),
 }));
 
+beforeEach(() => {
+  vi.spyOn(window, "confirm").mockReturnValue(true);
+});
+
 afterEach(() => {
   cleanup();
+  vi.restoreAllMocks();
   setGiftStatusMock.mockReset();
   deleteGiftMock.mockReset();
   updateGiftMock.mockReset();
@@ -101,6 +106,27 @@ describe("GiftItem – Bearbeiten (Issue #154)", () => {
     await waitFor(() =>
       expect(screen.queryByDisplayValue("Kräutergarten-Set")).toBeNull(),
     );
+  });
+
+  it("fragt vor dem Löschen nach und löscht erst nach Bestätigung", async () => {
+    deleteGiftMock.mockResolvedValue({ success: true });
+    render(<GiftItem gift={gift} occasions={occasions} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Löschen" }));
+
+    expect(window.confirm).toHaveBeenCalledWith(
+      "„Kräutergarten-Set“ wirklich löschen?",
+    );
+    await waitFor(() => expect(deleteGiftMock).toHaveBeenCalled());
+  });
+
+  it("löscht nicht, wenn die Sicherheitsabfrage abgelehnt wird", () => {
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+    render(<GiftItem gift={gift} occasions={occasions} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Löschen" }));
+
+    expect(deleteGiftMock).not.toHaveBeenCalled();
   });
 
   it("zeigt einen Fehler an und bleibt im Bearbeiten-Modus, wenn das Speichern fehlschlägt", async () => {

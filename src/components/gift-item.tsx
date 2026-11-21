@@ -208,7 +208,16 @@ export function GiftItem({
             >
               Bearbeiten
             </button>
-            <form action={deleteAction}>
+            {/* Sicherheitsabfrage wie bei DeletePersonButton (dort #156) -
+                "Löschen" loeschte bisher sofort ohne Rueckfrage. */}
+            <form
+              action={deleteAction}
+              onSubmit={(event) => {
+                if (!confirm(`„${gift.title}“ wirklich löschen?`)) {
+                  event.preventDefault();
+                }
+              }}
+            >
               <button
                 type="submit"
                 disabled={isDeletePending}
