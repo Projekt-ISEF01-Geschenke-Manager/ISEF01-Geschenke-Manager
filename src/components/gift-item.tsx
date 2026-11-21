@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, useActionState, useState } from "react";
+import { useTransition, useActionState, useState, useRef } from "react";
 import { ExternalLink, Circle, CheckCircle2, ChevronDown } from "lucide-react";
 import {
   setGiftStatus,
@@ -10,6 +10,7 @@ import {
   type GiftFormState,
 } from "@/app/actions/gifts";
 import { shortLink } from "@/lib/url";
+import { Modal } from "@/components/modal";
 
 export type Gift = {
   id: string;
@@ -31,6 +32,7 @@ export function GiftItem({
 }) {
   const [isPending, startTransition] = useTransition();
   const [isEditing, setIsEditing] = useState(false);
+  const deleteDialogRef = useRef<HTMLDialogElement>(null);
   const [deleteState, deleteAction, isDeletePending] = useActionState(
     deleteGift.bind(null, gift.id),
     undefined,
@@ -208,38 +210,52 @@ export function GiftItem({
             >
               Bearbeiten
             </button>
-            {/* Sicherheitsabfrage wie bei DeletePersonButton (dort #156) -
-                "Löschen" loeschte bisher sofort ohne Rueckfrage. */}
-            <form
-              action={deleteAction}
-              onSubmit={(event) => {
-                if (!confirm(`„${gift.title}“ wirklich löschen?`)) {
-                  event.preventDefault();
-                }
-              }}
+            {/* Sicherheitsabfrage als eigenes Popup (Modal-Komponente)
+                statt des nativen window.confirm() - sah mit Browser-/OS-
+                Chrome zu fremd im App-Design aus (Feedback: "nicht über
+                Google so ein Popup"). */}
+            <button
+              type="button"
+              onClick={() => deleteDialogRef.current?.showModal()}
+              className="cursor-pointer rounded-full border border-red-300 px-3 py-1 text-xs text-red-700 transition hover:bg-red-50 active:scale-95 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
             >
-              <button
-                type="submit"
-                disabled={isDeletePending}
-                className="cursor-pointer rounded-full border border-red-300 px-3 py-1 text-xs text-red-700 transition hover:bg-red-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
-              >
-                {isDeletePending ? "Wird gelöscht …" : "Löschen"}
-              </button>
-            </form>
+              Löschen
+            </button>
           </div>
         </div>
       </div>
+
+      <Modal dialogRef={deleteDialogRef} title="Idee löschen">
+        <p className="text-sm">„{gift.title}“ wirklich löschen?</p>
+        {deleteState?.error && (
+          <p className="mt-2 text-xs text-red-700 dark:text-red-400">
+            {deleteState.error}
+          </p>
+        )}
+        <div className="mt-4 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => deleteDialogRef.current?.close()}
+            className="cursor-pointer rounded-full border border-neutral-300 px-3 py-1.5 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+          >
+            Abbrechen
+          </button>
+          <form action={deleteAction}>
+            <button
+              type="submit"
+              disabled={isDeletePending}
+              className="cursor-pointer rounded-full bg-red-700 px-3 py-1.5 text-sm font-medium text-white transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isDeletePending ? "Wird gelöscht …" : "Löschen"}
+            </button>
+          </form>
+        </div>
+      </Modal>
 
       {/* Aufgaben-Platzhalter - Checkliste folgt erst in Stufe 3 (#94). */}
       <p className="mt-3 border-t border-dashed border-neutral-200 pt-3 text-xs text-neutral-400 dark:border-neutral-700 dark:text-neutral-500">
         Aufgaben folgen in einer späteren Ausbaustufe (#94).
       </p>
-
-      {deleteState?.error && (
-        <p className="mt-2 text-xs text-red-700 dark:text-red-400">
-          {deleteState.error}
-        </p>
-      )}
     </li>
   );
 }
