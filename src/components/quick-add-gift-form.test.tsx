@@ -44,7 +44,7 @@ describe("QuickAddGiftForm", () => {
     fireEvent.change(screen.getByPlaceholderText(/link \(optional\)/i), {
       target: { value: "https://shop-beispiel.de/gartenschere" },
     });
-    fireEvent.change(document.querySelector('select[name="occasionId"]')!, {
+    fireEvent.change(screen.getByRole("combobox"), {
       target: { value: "occasion-2" },
     });
     fireEvent.click(screen.getByRole("button", { name: /speichern/i }));
