@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { requireUser } from "@/lib/supabase/server";
 import { PersonCard } from "@/components/person-card";
-import { QuickAddGiftForm } from "@/components/quick-add-gift-form";
+import { IdeenCard } from "@/components/ideen-card";
 import { GiftItem, type Gift } from "@/components/gift-item";
 import { ComingSoonCard } from "@/components/coming-soon-card";
 import { formatBirthday } from "@/lib/format";
@@ -83,18 +83,13 @@ export default async function PersonPage({
           bisher nur Platzhalter (#21, #85) - noch keine echten Daten/
           Funktionen dahinter. */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
-        <div className="rounded-2xl border border-neutral-300 p-6 dark:border-neutral-700">
-          <h2 className="text-lg font-semibold">Ideen ({gifts.length})</h2>
-          <div className="mt-3">
-            <QuickAddGiftForm personId={person.id} />
-          </div>
-
+        <IdeenCard personId={person.id} giftsCount={gifts.length}>
           {gifts.length === 0 ? (
-            <p className="mt-4 text-sm text-neutral-600 dark:text-neutral-400">
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">
               Noch keine Ideen für {person.name}.
             </p>
           ) : (
-            <ul className="mt-4 flex flex-col gap-3">
+            <ul className="flex flex-col gap-3">
               {gifts.map((gift) => (
                 <GiftItem
                   key={gift.id}
@@ -104,7 +99,7 @@ export default async function PersonPage({
               ))}
             </ul>
           )}
-        </div>
+        </IdeenCard>
 
         <div className="flex flex-col gap-6">
           <ComingSoonCard
