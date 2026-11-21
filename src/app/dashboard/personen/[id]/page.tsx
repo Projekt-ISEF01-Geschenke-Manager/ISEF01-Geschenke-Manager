@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/supabase/server";
 import { PersonCard } from "@/components/person-card";
 import { QuickAddGiftForm } from "@/components/quick-add-gift-form";
 import { GiftItem, type Gift } from "@/components/gift-item";
+import { ComingSoonCard } from "@/components/coming-soon-card";
 import { formatBirthday } from "@/lib/format";
 import { daysUntilNextOccurrence, formatDaysUntil } from "@/lib/upcoming";
 
@@ -67,7 +68,7 @@ export default async function PersonPage({
       : null;
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 2xl:max-w-3xl">
+    <main className="mx-auto flex w-full max-w-[1140px] flex-1 flex-col gap-7 px-6 pt-8 pb-14 2xl:max-w-[1600px]">
       <Link
         href="/dashboard"
         className="w-fit text-sm text-neutral-600 hover:underline dark:text-neutral-400"
@@ -77,23 +78,44 @@ export default async function PersonPage({
 
       <PersonCard person={person} birthdayText={birthdayText} />
 
-      <div className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700">
-        <h2 className="text-lg font-semibold">Ideen ({gifts.length})</h2>
-        <div className="mt-3">
-          <QuickAddGiftForm personId={person.id} />
+      {/* Zweispaltig wie im Wireframe (Kernansicht 2): Ideen links, Fruehere
+          Geschenke + Vorschlaege rechts daneben. Die rechte Spalte ist
+          bisher nur Platzhalter (#21, #85) - noch keine echten Daten/
+          Funktionen dahinter. */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+        <div className="rounded-2xl border border-neutral-300 p-6 dark:border-neutral-700">
+          <h2 className="text-lg font-semibold">Ideen ({gifts.length})</h2>
+          <div className="mt-3">
+            <QuickAddGiftForm personId={person.id} />
+          </div>
+
+          {gifts.length === 0 ? (
+            <p className="mt-4 text-sm text-neutral-600 dark:text-neutral-400">
+              Noch keine Ideen für {person.name}.
+            </p>
+          ) : (
+            <ul className="mt-4 flex flex-col gap-3">
+              {gifts.map((gift) => (
+                <GiftItem
+                  key={gift.id}
+                  gift={gift}
+                  occasions={occasions ?? []}
+                />
+              ))}
+            </ul>
+          )}
         </div>
 
-        {gifts.length === 0 ? (
-          <p className="mt-4 text-sm text-neutral-600 dark:text-neutral-400">
-            Noch keine Ideen für {person.name}.
-          </p>
-        ) : (
-          <ul className="mt-4 flex flex-col gap-3">
-            {gifts.map((gift) => (
-              <GiftItem key={gift.id} gift={gift} occasions={occasions ?? []} />
-            ))}
-          </ul>
-        )}
+        <div className="flex flex-col gap-6">
+          <ComingSoonCard
+            title="Frühere Geschenke"
+            description={`Hier siehst du bald, was du ${person.name} schon geschenkt hast – inkl. Anlass und Datum. Folgt in einer späteren Ausbaustufe (#21).`}
+          />
+          <ComingSoonCard
+            title={`Vorschläge für ${person.name}`}
+            description="Passend zu Interessen und bisherigen Geschenken schlagen wir dir hier automatisch neue Ideen vor. Folgt in einer späteren Ausbaustufe (#85)."
+          />
+        </div>
       </div>
     </main>
   );

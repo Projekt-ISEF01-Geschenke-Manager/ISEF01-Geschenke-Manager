@@ -20,14 +20,14 @@ export function PersonCard({
   const [editing, setEditing] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700 sm:p-6">
+    <div className="rounded-2xl border border-neutral-300 p-6 dark:border-neutral-700">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex items-start gap-4">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-avatar text-sm font-bold text-text">
+        <div className="flex items-start gap-5">
+          <span className="flex h-[84px] w-[84px] shrink-0 items-center justify-center rounded-full bg-avatar text-xl font-bold text-text">
             {initials(person.name)}
           </span>
           <div className="min-w-0">
-            <h1 className="text-xl font-semibold">{person.name}</h1>
+            <h1 className="text-[28px] font-semibold">{person.name}</h1>
             {birthdayText && (
               <p className="text-sm text-neutral-600 dark:text-neutral-400">
                 Geburtstag: {birthdayText}
@@ -56,10 +56,10 @@ export function PersonCard({
           </div>
         </div>
 
-        <div className="flex shrink-0 gap-2">
+        <div className="flex shrink-0 gap-2.5">
           <Link
             href={`/dashboard/teilen?person=${person.id}`}
-            className="cursor-pointer rounded-full border border-neutral-300 px-4 py-2 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+            className="flex h-11 w-[130px] cursor-pointer items-center justify-center rounded-full border border-neutral-300 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
           >
             Ideen teilen
           </Link>
@@ -68,7 +68,7 @@ export function PersonCard({
             onClick={() => {
               setEditing((value) => !value);
             }}
-            className="cursor-pointer rounded-full border border-neutral-300 px-4 py-2 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+            className="h-11 w-[130px] cursor-pointer rounded-full border border-neutral-300 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
           >
             {editing ? "Fertig" : "Bearbeiten"}
           </button>
@@ -76,7 +76,7 @@ export function PersonCard({
       </div>
 
       {editing && (
-        <div className="mt-4 flex flex-col gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-700">
+        <div className="mt-5 flex flex-col gap-3 border-t border-neutral-200 pt-5 dark:border-neutral-700">
           <PersonForm person={person} />
           <DeletePersonButton
             personId={person.id}

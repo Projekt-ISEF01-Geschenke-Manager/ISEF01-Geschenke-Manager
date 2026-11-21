@@ -23,7 +23,7 @@ export function QuickAddGiftForm({ personId }: { personId: string }) {
 
   return (
     <div>
-      <form ref={formRef} action={formAction} className="flex gap-2">
+      <form ref={formRef} action={formAction} className="flex gap-2.5">
         <input type="hidden" name="personId" value={personId} />
         <input
           ref={titleRef}
@@ -31,12 +31,12 @@ export function QuickAddGiftForm({ personId }: { personId: string }) {
           name="title"
           required
           placeholder="Neue Idee, z. B. Gartenschere …"
-          className="min-w-0 flex-1 rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
+          className="h-11 min-w-0 flex-1 rounded-md border border-neutral-300 bg-transparent px-3 text-base dark:border-neutral-600 sm:text-sm"
         />
         <button
           type="submit"
           disabled={isPending}
-          className="shrink-0 cursor-pointer rounded-full bg-btn-bg px-5 py-2 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+          className="h-11 w-[120px] shrink-0 cursor-pointer rounded-full bg-btn-bg text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isPending ? "…" : "Speichern"}
         </button>

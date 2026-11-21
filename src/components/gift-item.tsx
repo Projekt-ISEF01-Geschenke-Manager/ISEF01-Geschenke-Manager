@@ -128,61 +128,84 @@ export function GiftItem({
   return (
     <li className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="font-semibold">{gift.title}</p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-            <span className="rounded-full border border-neutral-300 px-2.5 py-0.5 text-xs dark:border-neutral-600">
-              {gift.occasion_name ?? "ohne Anlass"}
-            </span>
-            <button
-              type="button"
-              onClick={toggleStatus}
-              disabled={isPending}
-              className={`cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition active:scale-95 ${
-                isPurchased
-                  ? "border-green-600 text-green-700 dark:border-green-500 dark:text-green-400"
-                  : "border-neutral-300 text-neutral-600 dark:border-neutral-600 dark:text-neutral-400"
-              }`}
-            >
-              {isPurchased ? "besorgt ✓" : "offen"}
-            </button>
-          </div>
-          {gift.link && (
-            <p className="mt-1.5 text-sm">
-              <a
-                href={gift.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 underline"
+        <div className="flex min-w-0 items-start gap-3">
+          {/* Bild-Platzhalter - Bild-Upload folgt erst in Stufe 3 (#95). */}
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-neutral-300 text-[11px] text-neutral-400 dark:border-neutral-600 dark:text-neutral-500">
+            Bild
+          </span>
+          <div className="min-w-0">
+            <p className="font-semibold">{gift.title}</p>
+            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+              <span className="rounded-full border border-neutral-300 px-2.5 py-0.5 text-xs dark:border-neutral-600">
+                {gift.occasion_name ?? "ohne Anlass"}
+              </span>
+              <button
+                type="button"
+                onClick={toggleStatus}
+                disabled={isPending}
+                className={`cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition active:scale-95 ${
+                  isPurchased
+                    ? "border-green-600 text-green-700 dark:border-green-500 dark:text-green-400"
+                    : "border-neutral-300 text-neutral-600 dark:border-neutral-600 dark:text-neutral-400"
+                }`}
               >
-                <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                {gift.link.replace(/^https?:\/\//, "")}
-              </a>
-            </p>
-          )}
+                {isPurchased ? "besorgt ✓" : "offen"}
+              </button>
+            </div>
+            {gift.link && (
+              <p className="mt-1.5 text-sm">
+                <a
+                  href={gift.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 underline"
+                >
+                  <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                  {gift.link.replace(/^https?:\/\//, "")}
+                </a>
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          {/* Platzhalter - "Idee in Geschenk umwandeln" (Anlass/Datum-Dialog) folgt erst in Stufe 2 (#26). */}
           <button
             type="button"
-            onClick={() => {
-              setIsEditing(true);
-            }}
-            className="cursor-pointer text-xs text-neutral-600 underline dark:text-neutral-400"
+            disabled
+            title="Folgt in einer späteren Ausbaustufe (#26)"
+            className="cursor-not-allowed rounded-full border border-dashed border-neutral-300 px-3 py-1 text-xs whitespace-nowrap text-neutral-400 dark:border-neutral-600 dark:text-neutral-500"
           >
-            Bearbeiten
+            Als Geschenk übernehmen
           </button>
-          <form action={deleteAction}>
+          <div className="flex items-center gap-3">
             <button
-              type="submit"
-              disabled={isDeletePending}
-              className="cursor-pointer text-xs text-red-700 underline transition hover:text-red-900 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
+              type="button"
+              onClick={() => {
+                setIsEditing(true);
+              }}
+              className="cursor-pointer text-xs text-neutral-600 underline dark:text-neutral-400"
             >
-              {isDeletePending ? "Wird gelöscht …" : "Löschen"}
+              Bearbeiten
             </button>
-          </form>
+            <form action={deleteAction}>
+              <button
+                type="submit"
+                disabled={isDeletePending}
+                className="cursor-pointer text-xs text-red-700 underline transition hover:text-red-900 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
+              >
+                {isDeletePending ? "Wird gelöscht …" : "Löschen"}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
+
+      {/* Aufgaben-Platzhalter - Checkliste folgt erst in Stufe 3 (#94). */}
+      <p className="mt-3 border-t border-dashed border-neutral-200 pt-3 text-xs text-neutral-400 dark:border-neutral-700 dark:text-neutral-500">
+        Aufgaben folgen in einer späteren Ausbaustufe (#94).
+      </p>
+
       {deleteState?.error && (
         <p className="mt-2 text-xs text-red-700 dark:text-red-400">
           {deleteState.error}
