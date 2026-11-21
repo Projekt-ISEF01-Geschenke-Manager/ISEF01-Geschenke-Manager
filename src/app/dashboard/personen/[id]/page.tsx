@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { requireUser } from "@/lib/supabase/server";
-import { PersonForm } from "@/components/person-form";
-import { DeletePersonButton } from "@/components/delete-person-button";
-import { GiftForm } from "@/components/gift-form";
+import { PersonCard } from "@/components/person-card";
+import { QuickAddGiftForm } from "@/components/quick-add-gift-form";
 import { GiftItem, type Gift } from "@/components/gift-item";
 import { formatBirthday } from "@/lib/format";
+import { daysUntilNextOccurrence, formatDaysUntil } from "@/lib/upcoming";
 
 export const instant = false;
 
@@ -52,94 +52,49 @@ export default async function PersonPage({
       (gift.occasions as unknown as { name: string } | null)?.name ?? null,
   }));
 
-  const birthday = formatBirthday(
-    person.birthday_day,
-    person.birthday_month,
-    person.birthday_year,
-  );
+  // Countdown nur, wenn Tag UND Monat gesetzt sind (Jahr bleibt optional,
+  // siehe formatBirthday) - Personenseite-Wireframe: "Geburtstag: 14.
+  // November · in 19 Tagen".
+  const birthdayText =
+    person.birthday_day !== null && person.birthday_month !== null
+      ? `${formatBirthday(person.birthday_day, person.birthday_month, person.birthday_year)} · ${formatDaysUntil(
+          daysUntilNextOccurrence(
+            person.birthday_day,
+            person.birthday_month,
+            new Date(),
+          ),
+        )}`
+      : null;
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 2xl:max-w-3xl">
-        <Link
-          href="/dashboard"
-          className="w-fit text-sm text-neutral-600 hover:underline dark:text-neutral-400"
-        >
-          ‹ Zurück zur Übersicht
-        </Link>
+      <Link
+        href="/dashboard"
+        className="w-fit text-sm text-neutral-600 hover:underline dark:text-neutral-400"
+      >
+        ‹ Zurück zur Übersicht
+      </Link>
 
-        <div className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700">
-          <h1 className="text-xl font-semibold">{person.name}</h1>
-          {birthday && (
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              Geburtstag: {birthday}
-            </p>
-          )}
-          {person.interests.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {person.interests.map((tag: string) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs dark:bg-neutral-800"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-          {person.notes && (
-            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-              {person.notes}
-            </p>
-          )}
+      <PersonCard person={person} birthdayText={birthdayText} />
 
-          <div className="mt-3 flex items-center gap-4">
-            <details>
-              <summary className="cursor-pointer text-sm text-neutral-600 underline dark:text-neutral-400">
-                Bearbeiten
-              </summary>
-              <div className="mt-3 flex flex-col gap-3">
-                <PersonForm person={person} />
-                <DeletePersonButton
-                  personId={person.id}
-                  personName={person.name}
-                  redirectTo="/dashboard"
-                />
-              </div>
-            </details>
-            <Link
-              href={`/dashboard/teilen?person=${person.id}`}
-              className="text-sm text-neutral-600 underline dark:text-neutral-400"
-            >
-              Ideen teilen
-            </Link>
-          </div>
+      <div className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700">
+        <h2 className="text-lg font-semibold">Ideen ({gifts.length})</h2>
+        <div className="mt-3">
+          <QuickAddGiftForm personId={person.id} />
         </div>
 
-        <div className="rounded-2xl border-2 border-neutral-900 p-4 dark:border-white">
-          <h2 className="font-semibold">Idee erfassen</h2>
-          <div className="mt-3">
-            <GiftForm
-              occasions={occasions ?? []}
-              defaultPersonId={person.id}
-              lockedPersonName={person.name}
-            />
-          </div>
-        </div>
-
-        <div>
-          <h2 className="text-lg font-semibold">Ideen ({gifts.length})</h2>
-          {gifts.length === 0 ? (
-            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-              Noch keine Ideen für {person.name}.
-            </p>
-          ) : (
-            <ul className="mt-2 divide-y divide-neutral-200 border-t border-neutral-200 dark:divide-neutral-700 dark:border-neutral-700">
-              {gifts.map((gift) => (
-                <GiftItem key={gift.id} gift={gift} occasions={occasions ?? []} />
-              ))}
-            </ul>
-          )}
-        </div>
+        {gifts.length === 0 ? (
+          <p className="mt-4 text-sm text-neutral-600 dark:text-neutral-400">
+            Noch keine Ideen für {person.name}.
+          </p>
+        ) : (
+          <ul className="mt-4 flex flex-col gap-3">
+            {gifts.map((gift) => (
+              <GiftItem key={gift.id} gift={gift} occasions={occasions ?? []} />
+            ))}
+          </ul>
+        )}
+      </div>
     </main>
   );
 }
