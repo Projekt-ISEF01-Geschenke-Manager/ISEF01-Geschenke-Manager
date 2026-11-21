@@ -44,14 +44,22 @@ describe("QuickAddGiftForm", () => {
     createGiftMock.mockResolvedValue({ success: true });
     render(<QuickAddGiftForm personId="person-1" />);
 
-    const titleField = screen.getByPlaceholderText(
-      /neue idee, z\. b\. gartenschere/i,
-    ) as HTMLInputElement;
-    fireEvent.change(titleField, { target: { value: "Gartenschere" } });
+    fireEvent.change(
+      screen.getByPlaceholderText(/neue idee, z\. b\. gartenschere/i),
+      { target: { value: "Gartenschere" } },
+    );
     fireEvent.click(screen.getByRole("button", { name: /speichern/i }));
 
-    await waitFor(() => expect(titleField.value).toBe(""));
-    expect(document.activeElement).toBe(titleField);
+    await waitFor(() => {
+      expect(
+        screen.getByPlaceholderText<HTMLInputElement>(
+          /neue idee, z\. b\. gartenschere/i,
+        ).value,
+      ).toBe("");
+    });
+    expect(document.activeElement).toBe(
+      screen.getByPlaceholderText(/neue idee, z\. b\. gartenschere/i),
+    );
   });
 
   it("zeigt eine Fehlermeldung an, wenn das Speichern fehlschlägt", async () => {
