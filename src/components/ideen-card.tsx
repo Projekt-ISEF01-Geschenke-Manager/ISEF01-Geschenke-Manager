@@ -7,13 +7,17 @@ import { QuickAddGiftForm } from "@/components/quick-add-gift-form";
 // klappt die Schnelleingabe auf, "Fertig" wieder zu - statt sie wie bisher
 // immer offen zu zeigen (Feedback: Platz direkt neben der Überschrift
 // nutzen, wie beim Bearbeiten-Toggle auf der Personenseite).
+type Occasion = { id: string; name: string };
+
 export function IdeenCard({
   personId,
   giftsCount,
+  occasions,
   children,
 }: {
   personId: string;
   giftsCount: number;
+  occasions: Occasion[];
   children: ReactNode;
 }) {
   const [adding, setAdding] = useState(false);
@@ -44,7 +48,7 @@ export function IdeenCard({
 
       {adding && (
         <div className="mt-3 border-t border-neutral-200 pt-3 dark:border-neutral-700">
-          <QuickAddGiftForm personId={personId} />
+          <QuickAddGiftForm personId={personId} occasions={occasions} />
         </div>
       )}
 

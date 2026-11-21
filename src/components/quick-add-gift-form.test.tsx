@@ -13,9 +13,14 @@ afterEach(() => {
   createGiftMock.mockReset();
 });
 
+const occasions = [
+  { id: "occasion-1", name: "Weihnachten" },
+  { id: "occasion-2", name: "Geburtstag" },
+];
+
 describe("QuickAddGiftForm", () => {
-  it("zeigt Titel- und ein optionales Link-Feld, aber kein Anlass-Feld (Z1, A8: Schnelleingabe)", () => {
-    render(<QuickAddGiftForm personId="person-1" />);
+  it("zeigt Titel-, Link- und Anlass-Feld, nur Titel ist Pflicht (Z1, A8: Schnelleingabe)", () => {
+    render(<QuickAddGiftForm personId="person-1" occasions={occasions} />);
 
     expect(
       screen.getByPlaceholderText(/neue idee, z\. b\. gartenschere/i),
@@ -23,12 +28,14 @@ describe("QuickAddGiftForm", () => {
     const linkInput = document.querySelector('input[name="link"]');
     expect(linkInput).not.toBeNull();
     expect(linkInput).not.toHaveProperty("required", true);
-    expect(document.querySelector('select[name="occasionId"]')).toBeNull();
+    expect(
+      screen.getByRole("option", { name: "Weihnachten" }).parentElement,
+    ).not.toBeNull();
   });
 
-  it("übergibt die personId versteckt mit und speichert Titel und Link", async () => {
+  it("übergibt die personId versteckt mit und speichert Titel, Link und Anlass", async () => {
     createGiftMock.mockResolvedValue({ success: true });
-    render(<QuickAddGiftForm personId="person-42" />);
+    render(<QuickAddGiftForm personId="person-42" occasions={occasions} />);
 
     fireEvent.change(
       screen.getByPlaceholderText(/neue idee, z\. b\. gartenschere/i),
@@ -37,6 +44,9 @@ describe("QuickAddGiftForm", () => {
     fireEvent.change(screen.getByPlaceholderText(/link \(optional\)/i), {
       target: { value: "https://shop-beispiel.de/gartenschere" },
     });
+    fireEvent.change(document.querySelector('select[name="occasionId"]')!, {
+      target: { value: "occasion-2" },
+    });
     fireEvent.click(screen.getByRole("button", { name: /speichern/i }));
 
     await waitFor(() => expect(createGiftMock).toHaveBeenCalled());
@@ -44,11 +54,12 @@ describe("QuickAddGiftForm", () => {
     expect(formData.get("personId")).toBe("person-42");
     expect(formData.get("title")).toBe("Gartenschere");
     expect(formData.get("link")).toBe("https://shop-beispiel.de/gartenschere");
+    expect(formData.get("occasionId")).toBe("occasion-2");
   });
 
   it("leert das Feld und fokussiert es wieder nach erfolgreichem Speichern", async () => {
     createGiftMock.mockResolvedValue({ success: true });
-    render(<QuickAddGiftForm personId="person-1" />);
+    render(<QuickAddGiftForm personId="person-1" occasions={occasions} />);
 
     fireEvent.change(
       screen.getByPlaceholderText(/neue idee, z\. b\. gartenschere/i),
@@ -76,7 +87,7 @@ describe("QuickAddGiftForm", () => {
 
   it("zeigt eine Fehlermeldung an, wenn das Speichern fehlschlägt", async () => {
     createGiftMock.mockResolvedValue({ error: "Das hat nicht geklappt." });
-    render(<QuickAddGiftForm personId="person-1" />);
+    render(<QuickAddGiftForm personId="person-1" occasions={occasions} />);
 
     fireEvent.change(
       screen.getByPlaceholderText(/neue idee, z\. b\. gartenschere/i),

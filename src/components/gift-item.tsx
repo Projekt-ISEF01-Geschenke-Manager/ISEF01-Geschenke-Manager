@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition, useActionState, useState } from "react";
-import { ExternalLink, Circle, CheckCircle2 } from "lucide-react";
+import { ExternalLink, Circle, CheckCircle2, ChevronDown } from "lucide-react";
 import {
   setGiftStatus,
   deleteGift,
@@ -87,18 +87,21 @@ export function GiftItem({
             defaultValue={updateState?.values?.link}
             className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-base dark:border-neutral-600 sm:text-sm"
           />
-          <select
-            name="occasionId"
-            defaultValue={updateState?.values?.occasionId ?? ""}
-            className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-base dark:border-neutral-600 sm:text-sm"
-          >
-            <option value="">Ohne Anlass</option>
-            {occasions.map((occasion) => (
-              <option key={occasion.id} value={occasion.id}>
-                {occasion.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              name="occasionId"
+              defaultValue={updateState?.values?.occasionId ?? ""}
+              className="w-full appearance-none rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 pr-9 text-base dark:border-neutral-600 sm:text-sm"
+            >
+              <option value="">Ohne Anlass</option>
+              {occasions.map((occasion) => (
+                <option key={occasion.id} value={occasion.id}>
+                  {occasion.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+          </div>
           {updateState?.error && (
             <p className="text-xs text-red-700 dark:text-red-400">
               {updateState.error}

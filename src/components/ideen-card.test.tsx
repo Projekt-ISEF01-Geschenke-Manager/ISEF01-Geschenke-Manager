@@ -12,7 +12,7 @@ afterEach(cleanup);
 describe("IdeenCard", () => {
   it("zeigt die Ideen-Liste, aber die Schnelleingabe erst nach Klick auf „+ Idee hinzufügen“", () => {
     render(
-      <IdeenCard personId="person-1" giftsCount={2}>
+      <IdeenCard personId="person-1" giftsCount={2} occasions={[]}>
         <p>Liste der Ideen</p>
       </IdeenCard>,
     );

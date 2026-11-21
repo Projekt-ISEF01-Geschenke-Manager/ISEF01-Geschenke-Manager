@@ -83,7 +83,11 @@ export default async function PersonPage({
           bisher nur Platzhalter (#21, #85) - noch keine echten Daten/
           Funktionen dahinter. */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
-        <IdeenCard personId={person.id} giftsCount={gifts.length}>
+        <IdeenCard
+          personId={person.id}
+          giftsCount={gifts.length}
+          occasions={occasions ?? []}
+        >
           {gifts.length === 0 ? (
             <p className="text-sm text-neutral-600 dark:text-neutral-400">
               Noch keine Ideen für {person.name}.
