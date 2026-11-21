@@ -52,6 +52,12 @@ vi.mock("@/lib/supabase/service", () => ({
 
 const { toggleGiftStatusViaSharedLink } = await import("./shared-gifts");
 
+function formData(purchasedBy?: string) {
+  const fd = new FormData();
+  if (purchasedBy !== undefined) fd.set("purchasedBy", purchasedBy);
+  return fd;
+}
+
 describe("toggleGiftStatusViaSharedLink", () => {
   beforeEach(() => {
     revalidatePathMock.mockClear();
@@ -74,9 +80,24 @@ describe("toggleGiftStatusViaSharedLink", () => {
       "gift-1",
       // @ts-expect-error - absichtlich ein ungültiger Wert für den Test
       "given",
+      undefined,
+      formData(),
     );
 
     expect(result).toEqual({ error: "Ungültiger Status." });
+    expect(checkAndRecordAttemptMock).not.toHaveBeenCalled();
+  });
+
+  it("lehnt einen zu langen Namen ab", async () => {
+    const result = await toggleGiftStatusViaSharedLink(
+      "token-1",
+      "gift-1",
+      "purchased",
+      undefined,
+      formData("x".repeat(81)),
+    );
+
+    expect(result?.error).toMatch(/höchstens 80 zeichen/i);
     expect(checkAndRecordAttemptMock).not.toHaveBeenCalled();
   });
 
@@ -90,6 +111,8 @@ describe("toggleGiftStatusViaSharedLink", () => {
       "token-1",
       "gift-1",
       "purchased",
+      undefined,
+      formData(),
     );
 
     expect(result?.error).toMatch(/zu viele versuche/i);
@@ -108,6 +131,8 @@ describe("toggleGiftStatusViaSharedLink", () => {
       "token-unbekannt",
       "gift-1",
       "purchased",
+      undefined,
+      formData(),
     );
 
     expect(result?.error).toMatch(/nicht mehr gültig/i);
@@ -128,14 +153,15 @@ describe("toggleGiftStatusViaSharedLink", () => {
       "token-1",
       "gift-1",
       "purchased",
+      undefined,
+      formData(),
     );
 
     expect(result?.error).toMatch(/gehört nicht zu diesem geteilten link/i);
     expect(giftUpdateMock).not.toHaveBeenCalled();
   });
 
-  it("schaltet den Status um, wenn die Idee zu einer freigegebenen Person gehört", async () => {
-    linkSelectMock.mockClear();
+  it("schaltet den Status um und speichert den (getrimmten) Namen, wenn als besorgt markiert wird", async () => {
     linkSingleMock.mockResolvedValue({
       data: { shared_link_people: [{ person_id: "person-1" }] },
       error: null,
@@ -150,12 +176,67 @@ describe("toggleGiftStatusViaSharedLink", () => {
       "token-1",
       "gift-1",
       "purchased",
+      undefined,
+      formData("  Max  "),
     );
 
     expect(result).toEqual({ success: true });
-    expect(giftUpdateMock).toHaveBeenCalledWith({ status: "purchased" });
+    expect(giftUpdateMock).toHaveBeenCalledWith({
+      status: "purchased",
+      purchased_by: "Max",
+    });
     expect(giftUpdateEqMock).toHaveBeenCalledWith("id", "gift-1");
     expect(revalidatePathMock).toHaveBeenCalledWith("/teilen/token-1");
+  });
+
+  it("speichert purchased_by als null, wenn kein Name angegeben wurde", async () => {
+    linkSingleMock.mockResolvedValue({
+      data: { shared_link_people: [{ person_id: "person-1" }] },
+      error: null,
+    });
+    giftSingleMock.mockResolvedValue({
+      data: { id: "gift-1", person_id: "person-1" },
+      error: null,
+    });
+    giftUpdateEqMock.mockResolvedValue({ error: null });
+
+    await toggleGiftStatusViaSharedLink(
+      "token-1",
+      "gift-1",
+      "purchased",
+      undefined,
+      formData(),
+    );
+
+    expect(giftUpdateMock).toHaveBeenCalledWith({
+      status: "purchased",
+      purchased_by: null,
+    });
+  });
+
+  it("leert purchased_by wieder, wenn auf 'offen' zurückgesetzt wird - auch falls ein Name im Formular mitkommt", async () => {
+    linkSingleMock.mockResolvedValue({
+      data: { shared_link_people: [{ person_id: "person-1" }] },
+      error: null,
+    });
+    giftSingleMock.mockResolvedValue({
+      data: { id: "gift-1", person_id: "person-1" },
+      error: null,
+    });
+    giftUpdateEqMock.mockResolvedValue({ error: null });
+
+    await toggleGiftStatusViaSharedLink(
+      "token-1",
+      "gift-1",
+      "idea",
+      undefined,
+      formData("Max"),
+    );
+
+    expect(giftUpdateMock).toHaveBeenCalledWith({
+      status: "idea",
+      purchased_by: null,
+    });
   });
 
   it("gibt einen Fehler zurück, wenn das Update fehlschlägt", async () => {
@@ -173,6 +254,8 @@ describe("toggleGiftStatusViaSharedLink", () => {
       "token-1",
       "gift-1",
       "purchased",
+      undefined,
+      formData(),
     );
 
     expect(result).toEqual({ error: "db down" });

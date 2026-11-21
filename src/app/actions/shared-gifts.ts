@@ -14,13 +14,34 @@ export type SharedGiftStatusState = { error?: string; success?: boolean } | unde
 // weil es keinen eingeloggten Nutzer gibt, gegen den RLS pruefen koennte -
 // der Token selbst ist das Zugriffsrecht (wie beim Lesen der Seite, siehe
 // page.tsx), deshalb die Zugehoerigkeits-Pruefung unten von Hand.
+const MAX_PURCHASED_BY_LENGTH = 80;
+
 export async function toggleGiftStatusViaSharedLink(
   token: string,
   giftId: string,
   nextStatus: GiftStatus,
+  // Zweiter/dritter Parameter von useActionState (prevState/formData) -
+  // Name kommt ueber formData statt als eigenes Argument, weil er anders
+  // als token/giftId/nextStatus erst beim Absenden des Popups feststeht,
+  // nicht schon beim Binden der Aktion (siehe shared-gift-item.tsx).
+  // Freiwillige Namensangabe beim Markieren als besorgt (Feedback: "Max hat
+  // das schon besorgt" statt nur "besorgt", da mehrere anonyme Besucher
+  // denselben Link nutzen koennen). Wird beim Zuruecksetzen auf "idea"
+  // ignoriert - siehe purchasedBy-Zuweisung unten.
+  _prevState: SharedGiftStatusState,
+  formData: FormData,
 ): Promise<SharedGiftStatusState> {
   if (!GIFT_STATUSES.includes(nextStatus)) {
     return { error: "Ungültiger Status." };
+  }
+
+  const rawName = formData.get("purchasedBy");
+  const trimmedName =
+    (typeof rawName === "string" ? rawName.trim() : "") || null;
+  if (trimmedName && trimmedName.length > MAX_PURCHASED_BY_LENGTH) {
+    return {
+      error: `Name darf höchstens ${MAX_PURCHASED_BY_LENGTH} Zeichen lang sein.`,
+    };
   }
 
   const { limited } = await checkAndRecordAttempt(
@@ -64,9 +85,15 @@ export async function toggleGiftStatusViaSharedLink(
     return { error: "Diese Idee gehört nicht zu diesem geteilten Link." };
   }
 
+  // Beim Zuruecksetzen auf "idea" (nicht mehr besorgt) auch den Namen
+  // wieder leeren - sonst stuende nach einem Rueckgaengig noch der alte
+  // Name bei einer wieder offenen Idee.
   const { error } = await supabase
     .from("gifts")
-    .update({ status: nextStatus })
+    .update({
+      status: nextStatus,
+      purchased_by: nextStatus === "purchased" ? trimmedName : null,
+    })
     .eq("id", giftId);
 
   if (error) {

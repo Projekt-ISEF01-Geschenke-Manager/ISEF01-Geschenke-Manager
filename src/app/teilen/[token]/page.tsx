@@ -60,7 +60,7 @@ export default async function SharedViewPage({
   // bewusst entschieden wird (Codacy-Review-Hinweis).
   const { data: giftsData } = await supabase
     .from("gifts")
-    .select("id, title, link, status, person_id, occasions(name)")
+    .select("id, title, link, status, person_id, purchased_by, occasions(name)")
     .in("person_id", personIds)
     .in("status", GIFT_STATUSES)
     .order("created_at", { ascending: false });
@@ -73,6 +73,7 @@ export default async function SharedViewPage({
       title: gift.title,
       link: gift.link,
       status: gift.status,
+      purchased_by: gift.purchased_by,
       occasion_name:
         (gift.occasions as unknown as { name: string } | null)?.name ?? null,
     });
