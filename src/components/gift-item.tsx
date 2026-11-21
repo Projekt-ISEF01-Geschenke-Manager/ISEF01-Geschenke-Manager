@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition, useActionState, useState } from "react";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Circle, CheckCircle2 } from "lucide-react";
 import {
   setGiftStatus,
   deleteGift,
@@ -9,6 +9,7 @@ import {
   type GiftStatus,
   type GiftFormState,
 } from "@/app/actions/gifts";
+import { shortLink } from "@/lib/url";
 
 export type Gift = {
   id: string;
@@ -139,17 +140,27 @@ export function GiftItem({
               <span className="rounded-full border border-neutral-300 px-2.5 py-0.5 text-xs dark:border-neutral-600">
                 {gift.occasion_name ?? "ohne Anlass"}
               </span>
+              {/* Eigener Button-Look (gefuellter Hintergrund + Icon) statt
+                  nur-Rahmen wie der Anlass-Chip daneben - sonst wirkt der
+                  Status wie ein reines Label statt einer klickbaren
+                  Umschaltung (Feedback: "sieht man nicht, dass man das
+                  anklicken kann"). */}
               <button
                 type="button"
                 onClick={toggleStatus}
                 disabled={isPending}
-                className={`cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition active:scale-95 ${
+                className={`inline-flex cursor-pointer items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition active:scale-95 ${
                   isPurchased
-                    ? "border-green-600 text-green-700 dark:border-green-500 dark:text-green-400"
-                    : "border-neutral-300 text-neutral-600 dark:border-neutral-600 dark:text-neutral-400"
+                    ? "border-green-600 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-500 dark:bg-green-950 dark:text-green-400 dark:hover:bg-green-900"
+                    : "border-neutral-400 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:border-neutral-500 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
                 }`}
               >
-                {isPurchased ? "besorgt ✓" : "offen"}
+                {isPurchased ? (
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                ) : (
+                  <Circle className="h-3.5 w-3.5 shrink-0" />
+                )}
+                {isPurchased ? "besorgt" : "offen"}
               </button>
             </div>
             {gift.link && (
@@ -158,10 +169,11 @@ export function GiftItem({
                   href={gift.link}
                   target="_blank"
                   rel="noopener noreferrer"
+                  title={gift.link}
                   className="inline-flex items-center gap-1 underline"
                 >
                   <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                  {gift.link.replace(/^https?:\/\//, "")}
+                  {shortLink(gift.link)}
                 </a>
               </p>
             )}

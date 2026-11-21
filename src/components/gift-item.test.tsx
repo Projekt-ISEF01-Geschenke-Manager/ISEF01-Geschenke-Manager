@@ -41,6 +41,23 @@ describe("GiftItem – Bearbeiten (Issue #154)", () => {
     expect(screen.queryByDisplayValue("Kräutergarten-Set")).toBeNull();
   });
 
+  it("zeigt den Link gekürzt (nur Hostname) statt der vollen URL", () => {
+    render(<GiftItem gift={gift} occasions={occasions} />);
+
+    const link = screen.getByRole("link", { name: /shop-beispiel\.de/i });
+    expect(link.textContent).toBe("shop-beispiel.de");
+    expect(link.getAttribute("href")).toBe(gift.link);
+  });
+
+  it("zeigt den Status als klickbaren Button mit Icon statt als reines Label", () => {
+    render(<GiftItem gift={gift} occasions={occasions} />);
+
+    const statusButton = screen.getByRole("button", { name: "offen" });
+    fireEvent.click(statusButton);
+
+    expect(setGiftStatusMock).toHaveBeenCalledWith("gift-1", "purchased");
+  });
+
   it("öffnet beim Klick auf Bearbeiten ein vorausgefülltes Formular", () => {
     render(<GiftItem gift={gift} occasions={occasions} />);
 
