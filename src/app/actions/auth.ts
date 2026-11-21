@@ -166,13 +166,18 @@ export async function requestPasswordReset(
   return { message: PASSWORD_RESET_MESSAGE };
 }
 
-export type NewPasswordState = { error?: string } | undefined;
+export type NewPasswordState = { error?: string; success?: boolean } | undefined;
 
 // Erreichbar ueber den Link aus requestPasswordReset(): /auth/confirm
 // verifiziert dort das Recovery-Token und richtet dadurch bereits eine
 // Sitzung ein (siehe docs/auth-flow.md) - diese Action laeuft also in
 // einer eingeloggten Sitzung, ohne eigenes Rate-Limiting (kein anonymes
 // Missbrauchsszenario wie bei login/register/reset).
+//
+// Kein redirect() bei Erfolg: ohne sichtbares Feedback landet man sonst
+// ohne jede Bestaetigung im Dashboard, als waere nichts passiert
+// (Nutzer-Feedback). NewPasswordForm zeigt stattdessen eine
+// Erfolgsmeldung mit Link zum Dashboard an.
 export async function setNewPassword(
   _prevState: NewPasswordState,
   formData: FormData,
@@ -194,7 +199,7 @@ export async function setNewPassword(
     return { error: error.message };
   }
 
-  redirect("/dashboard");
+  return { success: true };
 }
 
 // Banner "Bitte bestätige deine E-Mail-Adresse" auf der Übersicht

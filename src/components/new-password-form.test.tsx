@@ -48,4 +48,35 @@ describe("NewPasswordForm", () => {
       ).not.toBeNull();
     });
   });
+
+  it(
+    "zeigt nach Erfolg eine Bestätigung mit Link zum Dashboard, statt " +
+      "kommentarlos dorthin weiterzuleiten",
+    async () => {
+      setNewPasswordMock.mockResolvedValue({ success: true });
+
+      render(<NewPasswordForm />);
+
+      fireEvent.change(
+        screen.getByLabelText("Neues PasswortMindestens 8 Zeichen"),
+        { target: { value: "neuesPasswort!1" } },
+      );
+      fireEvent.change(screen.getByLabelText("Neues Passwort wiederholen"), {
+        target: { value: "neuesPasswort!1" },
+      });
+      fireEvent.click(
+        screen.getByRole("button", { name: /passwort speichern/i }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(/passwort wurde erfolgreich geändert/i),
+        ).not.toBeNull();
+      });
+      expect(
+        screen.getByRole("link", { name: /weiter zur übersicht/i }),
+      ).toHaveProperty("href", "http://localhost:3000/dashboard");
+      expect(document.querySelector('input[name="password"]')).toBeNull();
+    },
+  );
 });

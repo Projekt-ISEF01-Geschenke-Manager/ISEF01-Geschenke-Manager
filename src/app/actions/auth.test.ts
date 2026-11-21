@@ -379,18 +379,23 @@ describe("setNewPassword", () => {
     expect(updateUserMock).not.toHaveBeenCalled();
   });
 
-  it("setzt bei gültigen, übereinstimmenden Passwörtern das neue Passwort und leitet auf /dashboard weiter", async () => {
-    updateUserMock.mockResolvedValue({ error: null });
+  it(
+    "setzt bei gültigen, übereinstimmenden Passwörtern das neue Passwort " +
+      "und meldet Erfolg zurück, statt stillschweigend weiterzuleiten " +
+      "(sonst landet man ohne jegliches Feedback im Dashboard)",
+    async () => {
+      updateUserMock.mockResolvedValue({ error: null });
 
-    const result = await setNewPassword(
-      undefined,
-      formData({ password: "neuesPasswort!1", passwordRepeat: "neuesPasswort!1" }),
-    );
+      const result = await setNewPassword(
+        undefined,
+        formData({ password: "neuesPasswort!1", passwordRepeat: "neuesPasswort!1" }),
+      );
 
-    expect(updateUserMock).toHaveBeenCalledWith({ password: "neuesPasswort!1" });
-    expect(redirectMock).toHaveBeenCalledWith("/dashboard");
-    expect(result).toBeUndefined();
-  });
+      expect(updateUserMock).toHaveBeenCalledWith({ password: "neuesPasswort!1" });
+      expect(redirectMock).not.toHaveBeenCalled();
+      expect(result).toEqual({ success: true });
+    },
+  );
 
   it("gibt einen Supabase-Fehler weiter, z. B. bei einer abgelaufenen Recovery-Sitzung", async () => {
     updateUserMock.mockResolvedValue({
