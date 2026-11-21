@@ -60,7 +60,13 @@ Der kostenlose Supabase-Plan limitiert, wie viele Auth-E-Mails (Bestätigung, Pa
 - **Testen im Team:** Nicht in kurzer Folge viele Test-Accounts anlegen.
 - **Live-Demo/Video (MS 5):** Vorher einmal kurz testen, ob das Limit gerade nicht ausgeschöpft ist, oder einen bereits bestätigten Test-Account vorbereiten.
 
-## 6. Verifiziert (manuell, 2026-10-22)
+## 6. Automatische Bereinigung unbestätigter Konten (ZA8, #89)
+
+Ein täglicher Cron-Job (`src/app/api/cron/daily`, siehe #83) löscht Konten, deren E-Mail-Adresse 7 Tage nach der Registrierung noch nicht bestätigt wurde (`src/lib/cron/delete-unconfirmed-accounts.ts`). Dank `on delete cascade` auf allen `user_id`-Fremdschlüsseln (siehe `database-schema.md`) entfernt das Löschen des Auth-Kontos automatisch auch alle zugehörigen Personen/Anlässe/Ideen/Freigabe-Links.
+
+**Test-Accounts ausnehmen (#81):** Beim Anlegen eines Test-Accounts `app_metadata.is_test_account` auf `true` setzen (über die Supabase Admin API oder das Dashboard unter Authentication → Users → den Nutzer bearbeiten → "Raw App Meta Data"). Nur so markierte Konten werden von der automatischen Löschung ausgenommen.
+
+## 7. Verifiziert (manuell, 2026-10-22)
 
 - Registrierung mit gültiger Test-Adresse → Bestätigungs-Mail kommt an (Absender `noreply@mail.app.supabase.io`)
 - Ungültige/bekannte Test-Domain (`@example.com`) → Supabase lehnt ab, Fehlermeldung wird korrekt angezeigt
