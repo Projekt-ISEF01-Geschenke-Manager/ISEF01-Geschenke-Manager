@@ -11,9 +11,15 @@ const FALLBACK_PATH = "/dashboard";
 // enthaelt nur token_hash und type, kein next). Deshalb bestimmt das
 // Fallback-Ziel sich am "type" der Bestaetigung selbst, statt sich auf
 // einen von Supabase durchgereichten next-Parameter zu verlassen.
-const DEFAULT_PATH_BY_TYPE: Partial<Record<EmailOtpType, string>> = {
-  recovery: "/konto/neues-passwort",
-};
+//
+// Als Map statt als Objekt-Literal: "type" kommt roh aus der Query (der
+// "as EmailOtpType"-Cast ist nur eine Typ-Behauptung, kein Laufzeit-Check)
+// - ein Objekt-Lookup mit einem ungeprueften String-Schluessel koennte
+// ueber "__proto__" o.ae. auf die Prototype-Chain zugreifen (Codacy:
+// Generic Object Injection Sink). Eine Map kennt dieses Problem nicht.
+const DEFAULT_PATH_BY_TYPE = new Map<string, string>([
+  ["recovery", "/konto/neues-passwort"],
+]);
 
 // Nur ein Pfad auf der eigenen Seite, kein absoluter Link - sonst liesse
 // sich "next" fuer eine offene Weiterleitung auf eine fremde Domain
@@ -47,7 +53,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const fallback = (type && DEFAULT_PATH_BY_TYPE[type]) || FALLBACK_PATH;
+  const fallback = (type && DEFAULT_PATH_BY_TYPE.get(type)) || FALLBACK_PATH;
   const next = safeNextPath(searchParams.get("next"), fallback);
 
   if (token_hash && type) {
