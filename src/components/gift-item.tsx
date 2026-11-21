@@ -128,7 +128,10 @@ export function GiftItem({
 
   return (
     <li className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700">
-      <div className="flex items-start justify-between gap-3">
+      {/* Stapelt auf Mobile (Bild+Titel oben, Aktions-Buttons darunter) statt
+          nebeneinander - bei fixer Breite der Buttons (shrink-0) ueberlagerte
+          sich das sonst auf schmalen Bildschirmen mit dem Titel. */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           {/* Bild-Platzhalter - Bild-Upload folgt erst in Stufe 3 (#95). */}
           <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-neutral-300 text-[11px] text-neutral-400 dark:border-neutral-600 dark:text-neutral-500">
@@ -158,8 +161,8 @@ export function GiftItem({
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-col items-end gap-2">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col items-start gap-2 sm:shrink-0 sm:items-end">
+          <div className="flex flex-wrap items-center gap-2">
             {/* Eigener Button-Look (gefuellter Hintergrund + Icon), jetzt bei
                 den uebrigen Aktions-Buttons rechts statt bei den reinen
                 Info-Chips (Anlass) links - sonst wirkt der Status wie ein
@@ -192,7 +195,7 @@ export function GiftItem({
               Als Geschenk übernehmen
             </button>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={() => {
