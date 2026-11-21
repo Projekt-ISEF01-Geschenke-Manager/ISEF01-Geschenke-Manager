@@ -1,0 +1,71 @@
+name: Changelog
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update-changelog:
+    # Nur bei einem echten PR-Merge (Commit-Message "Merge pull request #N
+    # from ..."), nicht bei jedem Push - sonst wuerde auch der eigene
+    # Changelog-Commit unten eine Endlosschleife ausloesen.
+    if: startsWith(github.event.head_commit.message, 'Merge pull request #')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PR-Titel ermitteln
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          NUMBER=$(echo "$HEAD_COMMIT_MESSAGE" | grep -oE '#[0-9]+' | head -1 | tr -d '#')
+          TITLE=$(gh pr view "$NUMBER" --json title --jq .title)
+          echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
+          echo "title=$TITLE" >> "$GITHUB_OUTPUT"
+
+      # PR-Titel/-Nummer bewusst als Env-Variablen statt direkt per ${{ }}
+      # in das Skript interpoliert - sonst koennte ein PR-Titel mit
+      # Anfuehrungszeichen o.ae. das eingebettete Python-Skript aufbrechen.
+      - name: Eintrag in CHANGELOG.md einfügen
+        env:
+          PR_TITLE: ${{ steps.pr.outputs.title }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: |
+          python3 - <<'PYEOF'
+          import datetime
+          import os
+          import pathlib
+
+          title = os.environ["PR_TITLE"]
+          number = os.environ["PR_NUMBER"]
+          today = datetime.date.today().isoformat()
+          entry = f"- {title} (#{number})"
+
+          path = pathlib.Path("CHANGELOG.md")
+          lines = path.read_text().splitlines()
+
+          heading_idx = next(
+              (i for i, line in enumerate(lines) if line.startswith("## ")),
+              len(lines),
+          )
+
+          if heading_idx < len(lines) and lines[heading_idx] == f"## {today}":
+              lines.insert(heading_idx + 1, entry)
+          else:
+              lines[heading_idx:heading_idx] = [f"## {today}", entry, ""]
+
+          path.write_text("\n".join(lines) + "\n")
+          PYEOF
+
+      - name: Commit und Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "Chore: Changelog aktualisiert (#${{ steps.pr.outputs.number }}) [skip ci]"
+          git push
