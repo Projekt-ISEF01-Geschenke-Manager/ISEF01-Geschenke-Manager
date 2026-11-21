@@ -91,6 +91,13 @@ export default async function SharedViewPage({
     year: "numeric",
   });
 
+  // Bei nur einer Person bliebe die zweite Grid-Spalte leer und der
+  // Container wirkt auf großen Bildschirmen sehr leer (Feedback: "auf PC
+  // ist sehr viel freie Fläche") - dann stattdessen die Personen-Karte
+  // volle Breite und die Ideen darin zweispaltig, statt die Spalte neben
+  // der einen Karte leer zu lassen.
+  const singlePerson = people.length === 1;
+
   return (
     <>
       <SiteHeader badge="Geteilte Ansicht · nur lesen" />
@@ -117,10 +124,16 @@ export default async function SharedViewPage({
           </p>
         </div>
 
-        {/* Nebeneinander ab lg: (Wireframe: 2 Spalten), darunter gestapelt.
-            Bei nur einer Person bleibt die zweite Spalte leer - Größe/
-            Zentrierung fuer den Einzelpersonen-Fall folgt noch. */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+        {/* Nebeneinander ab lg: (Wireframe: 2 Spalten), darunter gestapelt -
+            bei nur einer Person stattdessen volle Breite (siehe
+            singlePerson oben). */}
+        <div
+          className={
+            singlePerson
+              ? "flex flex-col gap-6"
+              : "grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start"
+          }
+        >
           {people.map((person) => {
             const birthday = formatBirthday(
               person.birthday_day,
@@ -153,7 +166,13 @@ export default async function SharedViewPage({
                     Noch keine Ideen.
                   </p>
                 ) : (
-                  <ul className="mt-4 flex flex-col gap-3">
+                  <ul
+                    className={
+                      singlePerson
+                        ? "mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2"
+                        : "mt-4 flex flex-col gap-3"
+                    }
+                  >
                     {gifts.map((gift) => (
                       <SharedGiftItem key={gift.id} gift={gift} />
                     ))}
