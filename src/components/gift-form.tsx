@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useRef, useEffect } from "react";
+import { ChevronDown } from "lucide-react";
 import { createGift, type GiftFormState } from "@/app/actions/gifts";
 
 type Option = { id: string; name: string };
@@ -64,21 +65,24 @@ export function GiftForm({
         ) : (
           <label className="flex flex-col gap-1 text-sm">
             Für wen? *
-            <select
-              name="personId"
-              required
-              defaultValue={state?.values?.personId ?? defaultPersonId ?? ""}
-              className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
-            >
-              <option value="" disabled>
-                Person auswählen
-              </option>
-              {people?.map((person) => (
-                <option key={person.id} value={person.id}>
-                  {person.name}
+            <div className="relative">
+              <select
+                name="personId"
+                required
+                defaultValue={state?.values?.personId ?? defaultPersonId ?? ""}
+                className="w-full appearance-none rounded-md border border-neutral-300 bg-transparent px-3 py-2 pr-9 text-base dark:border-neutral-600 sm:text-sm"
+              >
+                <option value="" disabled>
+                  Person auswählen
                 </option>
-              ))}
-            </select>
+                {people?.map((person) => (
+                  <option key={person.id} value={person.id}>
+                    {person.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+            </div>
           </label>
         )}
 
@@ -109,18 +113,21 @@ export function GiftForm({
 
         <label className="flex flex-col gap-1 text-sm">
           Anlass
-          <select
-            name="occasionId"
-            defaultValue={state?.values?.occasionId ?? ""}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
-          >
-            <option value="">Ohne Anlass</option>
-            {occasions.map((occasion) => (
-              <option key={occasion.id} value={occasion.id}>
-                {occasion.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              name="occasionId"
+              defaultValue={state?.values?.occasionId ?? ""}
+              className="w-full appearance-none rounded-md border border-neutral-300 bg-transparent px-3 py-2 pr-9 text-base dark:border-neutral-600 sm:text-sm"
+            >
+              <option value="">Ohne Anlass</option>
+              {occasions.map((occasion) => (
+                <option key={occasion.id} value={occasion.id}>
+                  {occasion.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+          </div>
         </label>
 
         <button
