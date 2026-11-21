@@ -20,14 +20,23 @@ export function IdeenCard({
 
   return (
     <div className="rounded-2xl border border-neutral-300 p-6 dark:border-neutral-700">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Ideen ({giftsCount})</h2>
+        {/* Gleicher Button-Stil wie "+ Idee erfassen" auf der Übersicht
+            (dashboard-overview.tsx) - gefuellt/farbig statt des neutralen
+            Bearbeiten-Toggles, weil es hier die primäre Aktion der Karte ist
+            (Feedback: "richtigen Button wie wir sie auch sonst haben, groß,
+            farbig ans Konzept angepasst"). */}
         <button
           type="button"
           onClick={() => {
             setAdding((value) => !value);
           }}
-          className="cursor-pointer rounded-full border border-neutral-300 px-3 py-1 text-xs whitespace-nowrap transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+          className={
+            adding
+              ? "h-11 cursor-pointer rounded-full border border-neutral-300 px-[22px] text-sm font-medium whitespace-nowrap transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+              : "h-11 cursor-pointer rounded-full bg-btn-bg px-[22px] text-sm font-semibold whitespace-nowrap text-btn-text transition hover:opacity-85 active:scale-95"
+          }
         >
           {adding ? "Fertig" : "+ Idee hinzufügen"}
         </button>
