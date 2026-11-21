@@ -36,26 +36,16 @@ export function QuickAddGiftForm({
     <div>
       <form ref={formRef} action={formAction} className="flex flex-col gap-2">
         <input type="hidden" name="personId" value={personId} />
-        {/* Stapelt auf Mobile statt nebeneinander - bei fester Button-/
-            Select-Breite ueberlagerte bzw. staucht es sonst auf schmalen
-            Bildschirmen (gleiches Problem wie zuvor bei GiftItem). */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-2.5">
-          <input
-            ref={titleRef}
-            type="text"
-            name="title"
-            required
-            placeholder="Neue Idee, z. B. Gartenschere …"
-            className="h-11 min-w-0 flex-1 rounded-md border border-neutral-300 bg-transparent px-3 text-base dark:border-neutral-600 sm:text-sm"
-          />
-          <button
-            type="submit"
-            disabled={isPending}
-            className="h-11 w-full shrink-0 cursor-pointer rounded-full bg-btn-bg text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-[120px]"
-          >
-            {isPending ? "…" : "Speichern"}
-          </button>
-        </div>
+        <input
+          ref={titleRef}
+          type="text"
+          name="title"
+          required
+          placeholder="Neue Idee, z. B. Gartenschere …"
+          className="h-11 min-w-0 rounded-md border border-neutral-300 bg-transparent px-3 text-base dark:border-neutral-600 sm:text-sm"
+        />
+        {/* Stapelt auf Mobile statt nebeneinander - bei fester Select-Breite
+            staucht es sonst auf schmalen Bildschirmen. */}
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <input
             type="url"
@@ -83,6 +73,17 @@ export function QuickAddGiftForm({
             <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-500" />
           </div>
         </div>
+        {/* Button unter den Feldern statt daneben (Feedback: "Button bitte
+            unter den Anlass") - auf Mobile ohnehin voll, ab sm: nur so breit
+            wie der Text braucht, wie der "Idee speichern"-Button in
+            GiftForm. */}
+        <button
+          type="submit"
+          disabled={isPending}
+          className="h-11 w-full cursor-pointer rounded-full bg-btn-bg px-5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:self-start"
+        >
+          {isPending ? "…" : "Speichern"}
+        </button>
       </form>
       {state?.error ? (
         <p className="mt-1 text-xs text-red-700 dark:text-red-400">
