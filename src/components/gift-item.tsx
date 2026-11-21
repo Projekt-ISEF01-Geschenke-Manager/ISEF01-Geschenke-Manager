@@ -140,28 +140,6 @@ export function GiftItem({
               <span className="rounded-full border border-neutral-300 px-2.5 py-0.5 text-xs dark:border-neutral-600">
                 {gift.occasion_name ?? "ohne Anlass"}
               </span>
-              {/* Eigener Button-Look (gefuellter Hintergrund + Icon) statt
-                  nur-Rahmen wie der Anlass-Chip daneben - sonst wirkt der
-                  Status wie ein reines Label statt einer klickbaren
-                  Umschaltung (Feedback: "sieht man nicht, dass man das
-                  anklicken kann"). */}
-              <button
-                type="button"
-                onClick={toggleStatus}
-                disabled={isPending}
-                className={`inline-flex cursor-pointer items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition active:scale-95 ${
-                  isPurchased
-                    ? "border-green-600 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-500 dark:bg-green-950 dark:text-green-400 dark:hover:bg-green-900"
-                    : "border-neutral-400 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:border-neutral-500 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
-                }`}
-              >
-                {isPurchased ? (
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                ) : (
-                  <Circle className="h-3.5 w-3.5 shrink-0" />
-                )}
-                {isPurchased ? "besorgt" : "offen"}
-              </button>
             </div>
             {gift.link && (
               <p className="mt-1.5 text-sm">
@@ -181,15 +159,39 @@ export function GiftItem({
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-2">
-          {/* Platzhalter - "Idee in Geschenk umwandeln" (Anlass/Datum-Dialog) folgt erst in Stufe 2 (#26). */}
-          <button
-            type="button"
-            disabled
-            title="Folgt in einer späteren Ausbaustufe (#26)"
-            className="cursor-not-allowed rounded-full border border-dashed border-neutral-300 px-3 py-1 text-xs whitespace-nowrap text-neutral-400 dark:border-neutral-600 dark:text-neutral-500"
-          >
-            Als Geschenk übernehmen
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Eigener Button-Look (gefuellter Hintergrund + Icon), jetzt bei
+                den uebrigen Aktions-Buttons rechts statt bei den reinen
+                Info-Chips (Anlass) links - sonst wirkt der Status wie ein
+                Label statt wie eine klickbare Umschaltung (Feedback:
+                "sieht man nicht, dass es ein Button ist"). */}
+            <button
+              type="button"
+              onClick={toggleStatus}
+              disabled={isPending}
+              className={`inline-flex cursor-pointer items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap transition active:scale-95 ${
+                isPurchased
+                  ? "border-green-600 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-500 dark:bg-green-950 dark:text-green-400 dark:hover:bg-green-900"
+                  : "border-neutral-400 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:border-neutral-500 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
+              }`}
+            >
+              {isPurchased ? (
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+              ) : (
+                <Circle className="h-3.5 w-3.5 shrink-0" />
+              )}
+              {isPurchased ? "besorgt" : "offen"}
+            </button>
+            {/* Platzhalter - "Idee in Geschenk umwandeln" (Anlass/Datum-Dialog) folgt erst in Stufe 2 (#26). */}
+            <button
+              type="button"
+              disabled
+              title="Folgt in einer späteren Ausbaustufe (#26)"
+              className="cursor-not-allowed rounded-full border border-dashed border-neutral-300 px-3 py-1 text-xs whitespace-nowrap text-neutral-400 dark:border-neutral-600 dark:text-neutral-500"
+            >
+              Als Geschenk übernehmen
+            </button>
+          </div>
           <div className="flex items-center gap-3">
             <button
               type="button"
