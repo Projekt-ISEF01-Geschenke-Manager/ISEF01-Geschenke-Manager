@@ -63,9 +63,15 @@ describe("QuickAddGiftForm", () => {
         ).value,
       ).toBe("");
     });
-    expect(document.activeElement).toBe(
-      screen.getByPlaceholderText(/neue idee, z\. b\. gartenschere/i),
-    );
+    // Eigener waitFor-Block statt direkt im Anschluss an den vorigen -
+    // Reset und Fokus passieren im selben Effect, liefen in CI aber
+    // offenbar nicht immer in derselben Microtask-Runde wie der
+    // Value-Check (dort schlug die Assertion sporadisch fehl, lokal nie).
+    await waitFor(() => {
+      expect(document.activeElement).toBe(
+        screen.getByPlaceholderText(/neue idee, z\. b\. gartenschere/i),
+      );
+    });
   });
 
   it("zeigt eine Fehlermeldung an, wenn das Speichern fehlschlägt", async () => {

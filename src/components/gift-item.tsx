@@ -116,7 +116,7 @@ export function GiftItem({
               onClick={() => {
                 setIsEditing(false);
               }}
-              className="cursor-pointer text-xs text-neutral-600 underline dark:text-neutral-400"
+              className="cursor-pointer rounded-full border border-neutral-300 px-3 py-1 text-xs transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
             >
               Abbrechen
             </button>
@@ -196,7 +196,7 @@ export function GiftItem({
               onClick={() => {
                 setIsEditing(true);
               }}
-              className="cursor-pointer text-xs text-neutral-600 underline dark:text-neutral-400"
+              className="cursor-pointer rounded-full border border-neutral-300 px-3 py-1 text-xs transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
             >
               Bearbeiten
             </button>
@@ -204,7 +204,7 @@ export function GiftItem({
               <button
                 type="submit"
                 disabled={isDeletePending}
-                className="cursor-pointer text-xs text-red-700 underline transition hover:text-red-900 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
+                className="cursor-pointer rounded-full border border-red-300 px-3 py-1 text-xs text-red-700 transition hover:bg-red-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
               >
                 {isDeletePending ? "Wird gelöscht …" : "Löschen"}
               </button>
