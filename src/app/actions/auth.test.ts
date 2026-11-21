@@ -309,7 +309,7 @@ describe("requestPasswordReset", () => {
     expect(resetPasswordForEmailMock).toHaveBeenCalledWith(
       "jakob@example.de",
       expect.objectContaining({
-        redirectTo: expect.stringContaining("/auth/confirm?next=/konto/neues-passwort"),
+        redirectTo: expect.stringMatching(/\/auth\/confirm$/),
       }),
     );
     expect(result).toEqual({ message: NEUTRAL_MESSAGE });
