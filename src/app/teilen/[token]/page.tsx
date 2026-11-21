@@ -174,7 +174,7 @@ export default async function SharedViewPage({
                     }
                   >
                     {gifts.map((gift) => (
-                      <SharedGiftItem key={gift.id} gift={gift} />
+                      <SharedGiftItem key={gift.id} gift={gift} token={token} />
                     ))}
                   </ul>
                 )}
