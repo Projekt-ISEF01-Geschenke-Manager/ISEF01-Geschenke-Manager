@@ -30,13 +30,19 @@ describe("NewPasswordForm", () => {
 
     render(<NewPasswordForm />);
 
-    fireEvent.change(document.querySelector('input[name="password"]')!, {
+    const passwordInput = document.querySelector('input[name="password"]');
+    const passwordRepeatInput = document.querySelector(
+      'input[name="passwordRepeat"]',
+    );
+    expect(passwordInput).not.toBeNull();
+    expect(passwordRepeatInput).not.toBeNull();
+
+    fireEvent.change(passwordInput as HTMLInputElement, {
       target: { value: "geheim123" },
     });
-    fireEvent.change(
-      document.querySelector('input[name="passwordRepeat"]')!,
-      { target: { value: "anders1234" } },
-    );
+    fireEvent.change(passwordRepeatInput as HTMLInputElement, {
+      target: { value: "anders1234" },
+    });
     fireEvent.click(screen.getByRole("button", { name: /passwort speichern/i }));
 
     await waitFor(() => {

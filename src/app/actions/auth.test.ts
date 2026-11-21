@@ -372,7 +372,7 @@ describe("setNewPassword", () => {
   it("lehnt nicht übereinstimmende Passwörter ab", async () => {
     const result = await setNewPassword(
       undefined,
-      formData({ password: "geheim123", passwordRepeat: "anders1234" }),
+      formData({ password: "geheim123", passwordRepeat: "anders1234" }), // gitleaks:allow (Testwert, kein echtes Secret)
     );
 
     expect(result?.error).toBe("Die Passwörter stimmen nicht überein.");
@@ -384,10 +384,10 @@ describe("setNewPassword", () => {
 
     const result = await setNewPassword(
       undefined,
-      formData({ password: "neuesPasswort1", passwordRepeat: "neuesPasswort1" }),
+      formData({ password: "neuesPasswort1", passwordRepeat: "neuesPasswort1" }), // gitleaks:allow (Testwert, kein echtes Secret)
     );
 
-    expect(updateUserMock).toHaveBeenCalledWith({ password: "neuesPasswort1" });
+    expect(updateUserMock).toHaveBeenCalledWith({ password: "neuesPasswort1" }); // gitleaks:allow (Testwert, kein echtes Secret)
     expect(redirectMock).toHaveBeenCalledWith("/dashboard");
     expect(result).toBeUndefined();
   });
