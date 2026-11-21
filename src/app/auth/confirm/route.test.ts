@@ -103,4 +103,33 @@ describe("GET /auth/confirm", () => {
 
     expect(verifyOtpMock).not.toHaveBeenCalled();
   });
+
+  it(
+    "leitet bei type=recovery ohne next-Parameter zu /konto/neues-passwort " +
+      "weiter (Supabase haengt bei Passwort-Reset-Links kein next an, " +
+      "siehe requestPasswordReset())",
+    async () => {
+      verifyOtpMock.mockResolvedValue({ error: null });
+
+      const response = await GET(
+        confirmRequest("?token_hash=abc&type=recovery"),
+      );
+
+      expect(response.headers.get("location")).toBe(
+        "https://gift-wise.de/konto/neues-passwort",
+      );
+    },
+  );
+
+  it("ein echter next-Parameter hat bei type=recovery weiterhin Vorrang", async () => {
+    verifyOtpMock.mockResolvedValue({ error: null });
+
+    const response = await GET(
+      confirmRequest("?token_hash=abc&type=recovery&next=/dashboard"),
+    );
+
+    expect(response.headers.get("location")).toBe(
+      "https://gift-wise.de/dashboard",
+    );
+  });
 });

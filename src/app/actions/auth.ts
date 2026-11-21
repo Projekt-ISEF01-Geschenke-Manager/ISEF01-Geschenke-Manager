@@ -153,8 +153,13 @@ export async function requestPasswordReset(
     const supabase = await createClient();
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+    // Bewusst ohne ?next=... im redirectTo: Supabase gibt einen
+    // Query-String im Link nicht zuverlaessig weiter, wenn die
+    // Redirect-URL-Konfiguration im Dashboard nur die Basis-URL erlaubt
+    // (beobachtet in Produktion). /auth/confirm entscheidet das Ziel
+    // stattdessen anhand von type=recovery selbst, siehe route.ts.
     await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${siteUrl}/auth/confirm?next=/konto/neues-passwort`,
+      redirectTo: `${siteUrl}/auth/confirm`,
     });
   }
 
