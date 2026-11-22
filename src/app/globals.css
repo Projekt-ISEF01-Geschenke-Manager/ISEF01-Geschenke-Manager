@@ -991,3 +991,52 @@ body {
     transition: none;
   }
 }
+
+/* Manueller Schalter "Bewegung reduzieren" (Issue #209, Einstellungen):
+   erzwingt denselben reduzierten Zustand wie oben, zusaetzlich zur
+   OS-Einstellung. Greift ueber dasselbe Attribut, das canAnimate() in
+   motion.ts prueft (data-reduce-motion auf <html>, gesetzt vom Inline-Script
+   in layout.tsx bzw. von ReduceMotionToggle) - dieselben Regeln wie die
+   @media (prefers-reduced-motion: reduce)-Bloecke oben, hier auf das
+   Attribut statt auf die Media Query angewendet. Scroll-Reveal (.reveal)
+   braucht keine eigene Regel: die Klasse reveal-ready wird bei aktivem
+   Schalter schon vom Inline-Script gar nicht erst gesetzt. */
+html[data-reduce-motion="true"] *,
+html[data-reduce-motion="true"] *::before,
+html[data-reduce-motion="true"] *::after {
+  transition-duration: 0.01ms !important;
+  animation-duration: 0.01ms !important;
+}
+html[data-reduce-motion="true"] .surface-interactive:hover,
+html[data-reduce-motion="true"] .btn:hover:not(:disabled) {
+  transform: none;
+}
+html[data-reduce-motion="true"] .status-done,
+html[data-reduce-motion="true"] .status-done svg,
+html[data-reduce-motion="true"] .status-undo,
+html[data-reduce-motion="true"] .status-undo svg {
+  animation: none;
+}
+html[data-reduce-motion="true"] .app-dialog,
+html[data-reduce-motion="true"] .app-dialog::backdrop {
+  transition: none;
+}
+html[data-reduce-motion="true"] .toast-in,
+html[data-reduce-motion="true"] .toast-out,
+html[data-reduce-motion="true"] .anim-in {
+  animation: none;
+}
+html[data-reduce-motion="true"] .form-out,
+html[data-reduce-motion="true"] .form-shake,
+html[data-reduce-motion="true"] .card-saved {
+  animation-duration: 1ms;
+}
+html[data-reduce-motion="true"] .form-stagger > * {
+  animation: none;
+}
+html[data-reduce-motion="true"] .skeleton::after {
+  animation: none;
+}
+html[data-reduce-motion="true"] .tabbar-glider {
+  transition: none;
+}

@@ -33,6 +33,8 @@ export const viewport: Viewport = {
 // System-Präferenz), damit die Seite nicht kurz im falschen Theme aufblitzt.
 // Aktualisiert dabei auch das theme-color-Meta-Tag (#208) - die Farbtabelle
 // kommt aus theme-color.ts, damit sie nicht doppelt gepflegt werden muss.
+// data-reduce-motion kommt aus dem manuellen Schalter in den Einstellungen
+// (ReduceMotionToggle) und zaehlt hier genauso wie die OS-Einstellung.
 const themeInitScript = `(function() {
   try {
     var colors = ${JSON.stringify(THEME_COLORS)};
@@ -40,7 +42,9 @@ const themeInitScript = `(function() {
     var stored = localStorage.getItem("theme");
     var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     document.documentElement.setAttribute("data-theme", theme);
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("reveal-ready");
+    var manualReduceMotion = localStorage.getItem("reduceMotion") === "true";
+    if (manualReduceMotion) document.documentElement.setAttribute("data-reduce-motion", "true");
+    if (!manualReduceMotion && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("reveal-ready");
     var storedPalette = localStorage.getItem("palette");
     if (storedPalette) document.documentElement.setAttribute("data-palette", storedPalette);
     var entry = colors[storedPalette] || colors[defaultPalette];
