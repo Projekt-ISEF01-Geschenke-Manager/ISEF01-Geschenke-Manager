@@ -36,18 +36,22 @@ function runMonthKey(now: Date): string {
 
 // Inline-gestyltes, tabellenbasiertes HTML (E-Mail-Clients unterstuetzen
 // kein externes/eingebettetes CSS zuverlaessig, siehe AGENTS.md
-// Design-System) - Farben sind die Hex-Werte der "rose"-Standardpalette
-// (globals.css), da E-Mail-Clients CSS-Variablen nicht aufloesen.
+// Design-System) - Farben sind die Hex-Werte der "klassisch"-Palette
+// (globals.css, [data-palette="klassisch"]), da E-Mail-Clients weder
+// CSS-Variablen noch die palette-Auswahl des Nutzergeraets (die nur in
+// localStorage, nicht am Konto haengt) kennen - "klassisch" ist fest
+// gewaehlt statt pro Konto dynamisch nachgebildet zu werden.
 const EMAIL_COLORS = {
-  bg: "#f5eeed",
+  bg: "#faf6f4",
   card: "#ffffff",
-  heading: "#1f1719",
+  heading: "#241b1d",
   muted: "#5f5254",
-  accent: "#8a3552",
-  accentSoft: "rgba(138, 53, 82, 0.09)",
-  success: "#3f6b4f",
-  successSoft: "rgba(63, 107, 79, 0.12)",
-  line: "#dccbc9",
+  accent: "#8a5a66",
+  accentSoft: "rgba(138, 90, 102, 0.09)",
+  btn: "#6f4a55",
+  success: "#067647",
+  successSoft: "#ecfdf3",
+  line: "#ddcfca",
 };
 
 function renderGiftsHtml(gifts: GiftRow[]): string {
@@ -124,7 +128,7 @@ function renderBirthdayEmailHtml(targetMonth: number, people: PersonWithGifts[])
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;">
                   <tr>
                     <td align="center">
-                      <a href="${settingsUrl}" style="display:inline-block; background-color:${EMAIL_COLORS.accent}; color:#ffffff; font-size:14px; font-weight:600; text-decoration:none; padding:12px 28px; border-radius:9999px;">Einstellungen ändern</a>
+                      <a href="${settingsUrl}" style="display:inline-block; background-color:${EMAIL_COLORS.btn}; color:#ffffff; font-size:14px; font-weight:600; text-decoration:none; padding:12px 28px; border-radius:9999px;">Einstellungen ändern</a>
                     </td>
                   </tr>
                 </table>
