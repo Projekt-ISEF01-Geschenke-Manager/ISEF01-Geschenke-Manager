@@ -41,3 +41,60 @@ Gespeichert wird pro Geraet in `localStorage` (`palette`).
 `.surface-interactive` (klickbare Karten): Hover hebt 2 px an, Akzent-Rand,
 staerkerer Schatten; `.surface-dashed` faerbt sich akzentweich. Nur bei
 Zeigergeraeten, 160 ms, ohne Bewegung bei `prefers-reduced-motion`.
+
+## Animationen
+Alle Animationen laufen zentral ueber CSS-Klassen aus `globals.css` bzw.
+kleine Hooks in `src/lib/`; es werden keine Einzelanimationen pro Komponente
+gebaut. Ueberall gilt: 150-350 ms, nur Opacity/Transform/Groesse, nie reine
+Farbe allein, und `prefers-reduced-motion` wird beachtet (globaler
+Reduced-Motion-Block in `globals.css` kappt alle Transition-/Animation-Dauern
+auf ~0; einzelne Hooks pruefen das zusaetzlich selbst ueber `canAnimate()`,
+`src/lib/motion.ts`).
+
+- **Scroll-Reveal** (`reveal`-Klasse, `src/components/scroll-reveal.tsx`):
+  Elemente blenden beim Hereinscrollen ein (Opacity + leichter Versatz nach
+  oben), leicht gestaffelt ueber einen `IntersectionObserver`; neu eingefuegte
+  Elemente (Routenwechsel, Listen) werden per `MutationObserver` nachtraeglich
+  erfasst. Alle `surface`-Elemente haben die Klasse bereits. Nur aktiv mit
+  `html.reveal-ready` (Inline-Script in `layout.tsx`, nicht bei Reduced
+  Motion/ohne JS - dann bleibt alles sofort sichtbar).
+- **Entfernen aus Listen** (`useRemoveAnimation`, `src/lib/use-remove-animation.ts`):
+  `start()` beim Absenden des Loeschens aufrufen - das Element schrumpft
+  (Hoehe, Innen-/Aussenabstand, Randbreite), blendet aus und zieht den
+  Listenabstand mit ein, damit nichts springt; `cancel()` bei Fehlschlag, dann
+  bleibt das Element wie vorher. Muster siehe `gift-item.tsx`/`person-card.tsx`.
+- **Popups**: `Modal` (`src/components/modal.tsx`, HTML `<dialog>` + Klasse
+  `app-dialog`) blendet beim Oeffnen/Schliessen ein/aus (Opacity + Skalierung,
+  inkl. Backdrop). Meldungen laufen ueber `Toast` (`src/components/toast.tsx`,
+  Klassen `toast-in`/`toast-out`).
+- **Statuswechsel** (`useStatusAnimation`, `src/lib/use-status-animation.ts`):
+  liefert beim Umschalten offen/besorgt kurz `status-done` bzw. `status-undo`
+  (z. B. Hakerl-Puls in `gift-item.tsx`), nicht beim ersten Rendern.
+- **Aufklappende Bereiche**: Klasse `anim-in` (z. B. Fehlermeldungen,
+  zusaetzliche Formularfelder).
+- **Formulare**: `form-stagger` auf dem Formular-Container staffelt das
+  Einblenden der Kind-Elemente; `form-out` fuer das Abbrechen/Schliessen ohne
+  Animation, wenn keine sinnvoll ist; `form-shake` auf Validierungsfehler;
+  `card-saved` kurz nach erfolgreichem Speichern. Muster siehe
+  `gift-item.tsx`/`person-card.tsx`.
+
+## Skeletons
+`loading.tsx`-Dateien bauen den echten Seitenaufbau nach (keine generische
+Spinner-Seite) mit Bausteinen aus `src/components/skeleton.tsx`
+(`SkeletonRegion`, `Skeleton`, Karten in `.surface`). Platzhalter-Flaechen
+nutzen die Klassen `skeleton`/`skeleton-round` (schimmernder Verlauf per
+`::after`) und blenden beim Nachladen der echten Inhalte sanft aus
+(`skeleton-fade`). Kein `animate-pulse`.
+
+## Navigation
+`DashboardNav` (`src/components/dashboard-nav.tsx`) zeigt die Dashboard-Bereiche
+als Header-Tabs mit Symbol; ab `sm`-Breite gleitet eine Markierung
+(`.nav-glider`) unter dem aktiven Tab mit, auf dem Handy wird daraus eine
+schwebende runde Tabbar am unteren Rand (`.tabbar`/`.tabbar-glider`, gleiches
+Gleit-Prinzip). Neue Dashboard-Bereiche werden dort in der `TABS`-Liste
+ergaenzt.
+
+## Verbindliche Kurzfassung
+Die kompakte, fuer neue UI verbindliche Fassung dieser Regeln (Tokens statt
+roher Farben, welche Klasse fuer was) steht in `AGENTS.md` unter
+"Design-System". Dieses Dokument hier ist die ausfuehrliche Referenz dazu.
