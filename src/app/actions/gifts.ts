@@ -164,43 +164,63 @@ export async function deleteGift(
   return { success: true };
 }
 
-export type ConvertGiftState = { error?: string; success?: boolean } | undefined;
+export type AddPastGiftState =
+  | {
+      error?: string;
+      success?: boolean;
+      values?: {
+        title: string;
+        occasionId: string;
+        giftDate: string;
+        description: string;
+      };
+    }
+  | undefined;
 
-// #26 (A9): wandelt eine Idee in ein dokumentiertes Geschenk um. Keine neue
-// Zeile, sondern ein Update derselben gifts-Zeile (siehe "Entscheidung" bei
-// gifts in docs/database-schema.md) - Idee und Geschenk sind derselbe
-// Datensatz, nur Status/Anlass/Datum/Beschreibung aendern sich. Die Idee
-// verschwindet dadurch automatisch aus der aktiven Ideen-Liste (die filtert
-// auf ACTIVE_GIFT_STATUSES) und taucht stattdessen unter "Frühere
-// Geschenke" auf (#21).
-export async function convertGiftToGiven(
-  giftId: string,
-  _prevState: ConvertGiftState,
+// #21: Geschenk direkt als "Frühere Geschenke"-Eintrag anlegen, ohne den
+// Umweg über eine Idee - fuer Geschenke, die schon vor der Nutzung der App
+// gegeben wurden, spontane Geschenke ohne vorherige Idee, oder Anlaesse
+// ohne festes Datum (eigene Anlaesse/"ohne Anlass"), die der taegliche
+// convert-past-gifts-Job nicht automatisch erfassen kann (siehe dort).
+export async function addPastGift(
+  personId: string,
+  _prevState: AddPastGiftState,
   formData: FormData,
-): Promise<ConvertGiftState> {
+): Promise<AddPastGiftState> {
+  const title = formString(formData.get("title"));
   const occasionId = formString(formData.get("occasionId"));
   const giftDate = formString(formData.get("giftDate"));
   const description = formString(formData.get("description"));
 
+  const values = { title, occasionId, giftDate, description };
+
+  if (!title) {
+    return { error: "Bitte gib einen Titel für das Geschenk ein.", values };
+  }
   if (!giftDate) {
-    return { error: "Bitte gib ein Datum an." };
+    return { error: "Bitte gib ein Datum an.", values };
   }
 
   const supabase = await createClient();
-  // RLS stellt sicher, dass nur die eigene Idee umgewandelt werden kann,
-  // auch falls giftId manipuliert wird.
-  const { error } = await supabase
-    .from("gifts")
-    .update({
-      status: "given",
-      occasion_id: occasionId || null,
-      gift_date: giftDate,
-      description: description || null,
-    })
-    .eq("id", giftId);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Bitte melde dich erneut an.", values };
+  }
+
+  const { error } = await supabase.from("gifts").insert({
+    user_id: user.id,
+    person_id: personId,
+    occasion_id: occasionId || null,
+    title,
+    status: "given",
+    gift_date: giftDate,
+    description: description || null,
+  });
 
   if (error) {
-    return { error: error.message };
+    return { error: error.message, values };
   }
 
   revalidatePath("/dashboard", "layout");

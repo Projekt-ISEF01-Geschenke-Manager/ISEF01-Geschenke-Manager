@@ -6,12 +6,10 @@ import { GiftItem, type Gift } from "./gift-item";
 const setGiftStatusMock = vi.fn();
 const deleteGiftMock = vi.fn();
 const updateGiftMock = vi.fn();
-const convertGiftToGivenMock = vi.fn();
 vi.mock("@/app/actions/gifts", () => ({
   setGiftStatus: (...args: unknown[]) => setGiftStatusMock(...args),
   deleteGift: (...args: unknown[]) => deleteGiftMock(...args),
   updateGift: (...args: unknown[]) => updateGiftMock(...args),
-  convertGiftToGiven: (...args: unknown[]) => convertGiftToGivenMock(...args),
 }));
 
 // jsdom implementiert <dialog> nur als normales Element, showModal()/close()
@@ -40,7 +38,6 @@ afterEach(() => {
   setGiftStatusMock.mockReset();
   deleteGiftMock.mockReset();
   updateGiftMock.mockReset();
-  convertGiftToGivenMock.mockReset();
 });
 
 const occasions = [
@@ -162,60 +159,12 @@ describe("GiftItem – Bearbeiten (Issue #154)", () => {
     expect(deleteGiftMock).not.toHaveBeenCalled();
   });
 
-  it("öffnet beim Klick auf 'Als Geschenk übernehmen' ein Popup mit Anlass/Datum statt direkt umzuwandeln", () => {
+  it("zeigt kein 'Als Geschenk übernehmen' mehr - läuft automatisch über den täglichen Cron-Job (#21/#26)", () => {
     render(<GiftItem gift={gift} occasions={occasions} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Als Geschenk übernehmen" }));
-
-    expect(showModalMock).toHaveBeenCalledTimes(1);
-    expect(convertGiftToGivenMock).not.toHaveBeenCalled();
-    const dialog = screen.getByRole("dialog", { name: "Als Geschenk übernehmen" });
     expect(
-      within(dialog).getByRole("option", { name: "Weihnachten" }).parentElement,
-    ).not.toBeNull();
-  });
-
-  it("wandelt die Idee mit Anlass und Datum aus dem Popup in ein Geschenk um", async () => {
-    convertGiftToGivenMock.mockResolvedValue({ success: true });
-    render(<GiftItem gift={gift} occasions={occasions} />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Als Geschenk übernehmen" }));
-    const dialog = screen.getByRole("dialog", { name: "Als Geschenk übernehmen" });
-    fireEvent.change(within(dialog).getByLabelText("Datum"), {
-      target: { value: "2026-12-24" },
-    });
-    fireEvent.click(within(dialog).getByRole("button", { name: "Übernehmen" }));
-
-    await waitFor(() => expect(convertGiftToGivenMock).toHaveBeenCalled());
-    const call = convertGiftToGivenMock.mock.calls[0];
-    expect(call[0]).toBe("gift-1");
-    const formData = call[2] as FormData;
-    expect(formData.get("giftDate")).toBe("2026-12-24");
-  });
-
-  it("schließt das Popup nach erfolgreichem Umwandeln wieder", async () => {
-    convertGiftToGivenMock.mockResolvedValue({ success: true });
-    render(<GiftItem gift={gift} occasions={occasions} />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Als Geschenk übernehmen" }));
-    const dialog = screen.getByRole("dialog", { name: "Als Geschenk übernehmen" });
-    fireEvent.click(within(dialog).getByRole("button", { name: "Übernehmen" }));
-
-    await waitFor(() => expect(closeMock).toHaveBeenCalledTimes(1));
-  });
-
-  it("zeigt einen Fehler im Popup an, wenn das Umwandeln fehlschlägt", async () => {
-    convertGiftToGivenMock.mockResolvedValue({ error: "Bitte gib ein Datum an." });
-    render(<GiftItem gift={gift} occasions={occasions} />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Als Geschenk übernehmen" }));
-    const dialog = screen.getByRole("dialog", { name: "Als Geschenk übernehmen" });
-    fireEvent.click(within(dialog).getByRole("button", { name: "Übernehmen" }));
-
-    await waitFor(() =>
-      expect(within(dialog).getByText("Bitte gib ein Datum an.")).not.toBeNull(),
-    );
-    expect(closeMock).not.toHaveBeenCalled();
+      screen.queryByRole("button", { name: "Als Geschenk übernehmen" }),
+    ).toBeNull();
   });
 
   it("zeigt einen Fehler an und bleibt im Bearbeiten-Modus, wenn das Speichern fehlschlägt", async () => {

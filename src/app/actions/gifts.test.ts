@@ -29,9 +29,8 @@ vi.mock("@/lib/supabase/server", () => ({
   }),
 }));
 
-const { createGift, updateGift, setGiftStatus, deleteGift } = await import(
-  "./gifts"
-);
+const { createGift, updateGift, setGiftStatus, deleteGift, addPastGift } =
+  await import("./gifts");
 
 function formData(fields: Record<string, string>) {
   const fd = new FormData();
@@ -211,7 +210,7 @@ describe("setGiftStatus", () => {
   it("lehnt einen ungültigen Status ab, ohne die Datenbank anzufassen", async () => {
     await expect(
       // @ts-expect-error -- bewusst ungültiger Wert für den Test. "given"
-      // zaehlt seit #26 als gueltiger Status (Idee -> Geschenk umwandeln),
+      // zaehlt seit #21/#26 als gueltiger Status (Fruehere Geschenke),
       // deshalb hier ein Wert, der nie gueltig ist.
       setGiftStatus("gift-1", "unbekannt"),
     ).rejects.toThrow("Ungültiger Status");
@@ -244,5 +243,109 @@ describe("deleteGift", () => {
 
     expect(result).toEqual({ error: "db down" });
     expect(revalidatePathMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("addPastGift", () => {
+  beforeEach(() => {
+    revalidatePathMock.mockClear();
+    insertMock.mockReset();
+    getUserMock.mockReset();
+    getUserMock.mockResolvedValue({ data: { user: { id: "user-1" } } });
+  });
+
+  const validPastGiftFields = {
+    title: "Kräutergarten-Set",
+    occasionId: "occasion-1",
+    giftDate: "2025-12-24",
+    description: "Hat sich sehr gefreut.",
+  };
+
+  it("lehnt einen fehlenden Titel ab", async () => {
+    const result = await addPastGift(
+      "person-1",
+      undefined,
+      formData({ ...validPastGiftFields, title: "" }),
+    );
+    expect(result?.error).toBe("Bitte gib einen Titel für das Geschenk ein.");
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+
+  it("lehnt ein fehlendes Datum ab", async () => {
+    const result = await addPastGift(
+      "person-1",
+      undefined,
+      formData({ ...validPastGiftFields, giftDate: "" }),
+    );
+    expect(result?.error).toBe("Bitte gib ein Datum an.");
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+
+  it("legt das Geschenk direkt mit status 'given' an, für die übergebene Person", async () => {
+    insertMock.mockResolvedValue({ error: null });
+
+    const result = await addPastGift(
+      "person-1",
+      undefined,
+      formData(validPastGiftFields),
+    );
+
+    expect(result).toEqual({ success: true });
+    expect(insertMock).toHaveBeenCalledWith("gifts", {
+      user_id: "user-1",
+      person_id: "person-1",
+      occasion_id: "occasion-1",
+      title: "Kräutergarten-Set",
+      status: "given",
+      gift_date: "2025-12-24",
+      description: "Hat sich sehr gefreut.",
+    });
+    expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard", "layout");
+  });
+
+  it("erlaubt ein Geschenk ohne Anlass und ohne Beschreibung", async () => {
+    insertMock.mockResolvedValue({ error: null });
+
+    const result = await addPastGift(
+      "person-1",
+      undefined,
+      formData({
+        title: "Gutschein",
+        occasionId: "",
+        giftDate: "2025-12-24",
+        description: "",
+      }),
+    );
+
+    expect(result).toEqual({ success: true });
+    expect(insertMock).toHaveBeenCalledWith(
+      "gifts",
+      expect.objectContaining({ occasion_id: null, description: null }),
+    );
+  });
+
+  it("gibt einen Fehler zurück, wenn niemand eingeloggt ist", async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } });
+
+    const result = await addPastGift(
+      "person-1",
+      undefined,
+      formData(validPastGiftFields),
+    );
+
+    expect(result?.error).toBe("Bitte melde dich erneut an.");
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+
+  it("gibt einen Fehler zurück, wenn das Anlegen fehlschlägt", async () => {
+    insertMock.mockResolvedValue({ error: { message: "db down" } });
+
+    const result = await addPastGift(
+      "person-1",
+      undefined,
+      formData(validPastGiftFields),
+    );
+
+    expect(result?.error).toBe("db down");
   });
 });

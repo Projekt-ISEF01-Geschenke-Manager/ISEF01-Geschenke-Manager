@@ -46,9 +46,10 @@ export default async function PersonPage({
     .eq("person_id", id)
     .order("created_at", { ascending: false });
 
-  // Eine Idee wird beim Umwandeln (#26) zum "gegebenen" Geschenk (status
-  // "given") - dieselbe Zeile taucht dann hier nicht mehr als aktive Idee
-  // auf, sondern unten unter "Fruehere Geschenke" (#21).
+  // status "given" (taeglicher convert-past-gifts-Job bei Geburtstag/
+  // Weihnachten, oder manuell per "+ Geschenk nachtragen") taucht hier
+  // nicht mehr als aktive Idee auf, sondern unten unter "Fruehere
+  // Geschenke" (#21).
   const gifts: Gift[] = (giftsData ?? [])
     .filter((gift) => gift.status !== "given")
     .map((gift) => ({
@@ -129,7 +130,12 @@ export default async function PersonPage({
         </IdeenCard>
 
         <div className="flex flex-col gap-6">
-          <PreviousGiftsCard personName={person.name} gifts={previousGifts} />
+          <PreviousGiftsCard
+            personId={person.id}
+            personName={person.name}
+            occasions={occasions ?? []}
+            gifts={previousGifts}
+          />
           <ComingSoonCard
             title={`Vorschläge für ${person.name}`}
             description="Passend zu Interessen und bisherigen Geschenken schlagen wir dir hier automatisch neue Ideen vor. Folgt in einer späteren Ausbaustufe (#85)."
