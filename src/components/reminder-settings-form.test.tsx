@@ -23,16 +23,11 @@ describe("ReminderSettingsForm", () => {
       />,
     );
     expect(
-      (screen.getByLabelText(/geburtstagserinnerung/i) as HTMLInputElement)
-        .checked,
-    ).toBe(false);
+      screen.getByRole("checkbox", { name: /geburtstagserinnerung/i }),
+    ).toHaveProperty("checked", false);
     expect(
-      (
-        screen.getByLabelText(
-          /weihnachts-statusübersicht/i,
-        ) as HTMLInputElement
-      ).checked,
-    ).toBe(true);
+      screen.getByRole("checkbox", { name: /weihnachts-statusübersicht/i }),
+    ).toHaveProperty("checked", true);
   });
 
   it("zeigt eine Erfolgsmeldung, wenn das Speichern erfolgreich war", async () => {

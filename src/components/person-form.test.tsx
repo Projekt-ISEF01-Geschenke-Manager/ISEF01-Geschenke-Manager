@@ -89,8 +89,8 @@ describe("PersonForm", () => {
   it("zeigt die Checkbox 'In Erinnerungen einschließen', per Default angehakt", () => {
     render(<PersonForm />);
     expect(
-      (screen.getByLabelText(/in erinnerungen einschließen/i) as HTMLInputElement).checked,
-    ).toBe(true);
+      screen.getByRole("checkbox", { name: /in erinnerungen einschließen/i }),
+    ).toHaveProperty("checked", true);
   });
 
   it(
@@ -117,12 +117,12 @@ describe("PersonForm", () => {
       render(<PersonForm />);
 
       fillRequiredFields();
-      const checkbox = screen.getByLabelText(
-        /in erinnerungen einschließen/i,
-      ) as HTMLInputElement;
-      expect(checkbox.checked).toBe(true);
+      const checkbox = screen.getByRole("checkbox", {
+        name: /in erinnerungen einschließen/i,
+      });
+      expect(checkbox).toHaveProperty("checked", true);
       fireEvent.click(checkbox);
-      expect(checkbox.checked).toBe(false);
+      expect(checkbox).toHaveProperty("checked", false);
 
       fireEvent.click(screen.getByRole("button", { name: "Person anlegen" }));
 
@@ -133,9 +133,8 @@ describe("PersonForm", () => {
       );
 
       expect(
-        (screen.getByLabelText(/in erinnerungen einschließen/i) as HTMLInputElement)
-          .checked,
-      ).toBe(false);
+        screen.getByRole("checkbox", { name: /in erinnerungen einschließen/i }),
+      ).toHaveProperty("checked", false);
     },
   );
 
