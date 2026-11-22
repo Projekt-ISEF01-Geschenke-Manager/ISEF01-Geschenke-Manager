@@ -12,7 +12,9 @@ jobs:
     # Nur bei einem echten PR-Merge (Commit-Message "Merge pull request #N
     # from ..."), nicht bei jedem Push - sonst wuerde auch der eigene
     # Changelog-Commit unten eine Endlosschleife ausloesen.
-    if: startsWith(github.event.head_commit.message, 'Merge pull request #')
+    # In Anfuehrungszeichen, weil " #" in YAML sonst als Kommentar zaehlt und
+    # die Bedingung abschneidet (Workflow wurde dadurch als ungueltig gewertet).
+    if: "startsWith(github.event.head_commit.message, 'Merge pull request #')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
