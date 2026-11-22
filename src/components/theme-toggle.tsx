@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Moon, Sun } from "lucide-react";
+import { applyThemeColor } from "@/lib/theme-color";
 
 // Schalter nach DESIGN-DARKMODE.md, verkleinert auf Nutzer-Feedback hin
 // (sollte dieselbe Höhe wie der Abmelden-Button im Header haben): 56x32px,
@@ -28,6 +29,7 @@ export function ThemeToggle() {
     const next = isDarkMode() ? "light" : "dark";
     root.setAttribute("data-theme", next);
     syncA11yAttributes(buttonRef.current, next === "dark");
+    applyThemeColor();
     try {
       localStorage.setItem("theme", next);
     } catch {
