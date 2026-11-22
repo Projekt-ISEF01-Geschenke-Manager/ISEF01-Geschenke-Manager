@@ -79,7 +79,7 @@ export function PalettePicker() {
         <div
           role="group"
           aria-label="Farbdesign"
-          className="surface absolute top-full right-0 z-50 mt-2 w-56 rounded-xl p-2 text-text shadow-pop"
+          className="surface fixed inset-x-4 z-50 mt-2 rounded-xl p-2 text-text shadow-pop sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:w-56"
         >
           <p className="px-2 pt-1 pb-2 text-xs font-semibold text-muted">Farbdesign</p>
           <ul className="flex flex-col">
