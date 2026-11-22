@@ -24,7 +24,7 @@ export function Modal({
       // greift das margin:auto-Zentrieren aus dem UA-Stylesheet von
       // dialog:modal nicht mehr (Dialog landet sonst oben links) - Position
       // daher explizit per fixed + translate statt margin:auto.
-      className="fixed top-1/2 left-1/2 max-h-[calc(100vh-2rem)] w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border-none bg-white p-0 text-neutral-900 shadow-xl backdrop:bg-black/50 dark:bg-neutral-900 dark:text-white"
+      className="fixed top-1/2 left-1/2 max-h-[calc(100vh-2rem)] w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border-none bg-card p-0 text-text shadow-pop backdrop:bg-black/50"
       onClick={(event) => {
         const dialog = dialogRef.current;
         if (dialog && event.target === dialog) {
@@ -32,13 +32,13 @@ export function Modal({
         }
       }}
     >
-      <div className="flex items-center justify-between border-b border-neutral-200 p-4 dark:border-neutral-800">
+      <div className="flex items-center justify-between border-b border-line p-4">
         <h2 className="text-lg font-semibold">{title}</h2>
         <button
           type="button"
           onClick={() => dialogRef.current?.close()}
           aria-label="Schließen"
-          className="cursor-pointer rounded-full p-1 text-neutral-500 transition hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          className="cursor-pointer rounded-full p-1 text-muted transition hover:bg-hover"
         >
           ✕
         </button>

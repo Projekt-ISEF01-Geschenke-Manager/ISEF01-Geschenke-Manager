@@ -82,7 +82,7 @@ export default async function Home({
       >
         <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-4 py-10">
           {error && (
-            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+            <p className="rounded-md border border-danger-line bg-danger-bg px-3 py-2 text-sm text-danger">
               {error}
             </p>
           )}
@@ -98,7 +98,7 @@ export default async function Home({
               </p>
               <Link
                 href="/register"
-                className="w-fit cursor-pointer rounded-full border border-accent px-5 py-3 text-sm font-medium text-accent transition hover:bg-accent/10 active:scale-95"
+                className="btn btn-outline w-fit"
               >
                 Kostenlos Konto erstellen
               </Link>
@@ -107,7 +107,7 @@ export default async function Home({
             <LoginForm />
           </div>
 
-          <div className="flex items-start gap-3 rounded-[12px] bg-tile p-5 text-sm">
+          <div className="flex items-start gap-3 surface rounded-[12px] p-5 text-sm">
             <span className="font-medium text-accent">Hinweis</span>
             <span className="text-muted">
               Dein Konto ist privat. Personen, Ideen und Geschenke siehst nur
@@ -121,7 +121,7 @@ export default async function Home({
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {features.map((feature) => (
-                <div key={feature.title} className="rounded-[14px] bg-tile p-5">
+                <div key={feature.title} className="surface rounded-[14px] p-5">
                   <h3 className="font-medium text-heading">{feature.title}</h3>
                   <p className="mt-2 text-sm text-muted">
                     {feature.description}

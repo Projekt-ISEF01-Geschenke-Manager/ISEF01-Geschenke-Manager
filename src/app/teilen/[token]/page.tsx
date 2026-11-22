@@ -106,9 +106,9 @@ export default async function SharedViewPage({
           max-w-2xl - Wireframe (geteilte-ansicht.html) nutzt --container:
           1140px fuer 2 Personen nebeneinander. */}
       <main className="mx-auto flex w-full max-w-[1140px] flex-1 flex-col gap-7 px-6 pt-8 pb-14 2xl:max-w-[1600px]">
-        <div className="rounded-2xl border border-neutral-300 bg-neutral-50 p-4 text-sm dark:border-neutral-700 dark:bg-neutral-900">
+        <div className="surface rounded-2xl bg-subtle p-4 text-sm">
           <p className="font-medium">Hinweis</p>
-          <p className="mt-1 text-neutral-600 dark:text-neutral-400">
+          <p className="mt-1 text-muted">
             {ownerName} hat diese Geschenkideen mit dir geteilt. Du brauchst
             kein Konto. {ownerName} kann den Link jederzeit widerrufen.
           </p>
@@ -118,7 +118,7 @@ export default async function SharedViewPage({
           <h1 className="text-[28px] font-semibold">
             Geschenkideen für {joinWithUnd(people.map((person) => person.name))}
           </h1>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+          <p className="text-sm text-muted">
             Stand: {today} · {totalGifts}{" "}
             {totalGifts === 1 ? "Idee" : "Ideen"}
           </p>
@@ -145,16 +145,16 @@ export default async function SharedViewPage({
             return (
               <div
                 key={person.id}
-                className="rounded-2xl border border-neutral-300 p-6 dark:border-neutral-700"
+                className="surface rounded-2xl p-6"
               >
-                <div className="flex items-center gap-3 border-b border-neutral-200 pb-4 dark:border-neutral-700">
+                <div className="flex items-center gap-3 border-b border-line pb-4">
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-avatar text-sm font-bold text-text">
                     {initials(person.name)}
                   </span>
                   <div>
                     <p className="font-semibold">{person.name}</p>
                     {birthday && (
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                      <p className="text-sm text-muted">
                         Geburtstag: {birthday}
                       </p>
                     )}
@@ -162,7 +162,7 @@ export default async function SharedViewPage({
                 </div>
 
                 {gifts.length === 0 ? (
-                  <p className="mt-4 text-sm text-neutral-600 dark:text-neutral-400">
+                  <p className="mt-4 text-sm text-muted">
                     Noch keine Ideen.
                   </p>
                 ) : (
@@ -183,7 +183,7 @@ export default async function SharedViewPage({
           })}
         </div>
 
-        <p className="text-center text-sm text-neutral-600 dark:text-neutral-400">
+        <p className="text-center text-sm text-muted">
           Du möchtest deine eigenen Geschenkideen festhalten?{" "}
           <Link href="/" className="underline">
             Geschenke-Manager kennenlernen

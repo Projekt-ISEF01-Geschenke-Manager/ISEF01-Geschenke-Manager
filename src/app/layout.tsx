@@ -30,6 +30,8 @@ const themeInitScript = `(function() {
     var stored = localStorage.getItem("theme");
     var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     document.documentElement.setAttribute("data-theme", theme);
+    var palette = localStorage.getItem("palette");
+    if (palette) document.documentElement.setAttribute("data-palette", palette);
   } catch (e) {}
 })();`;
 

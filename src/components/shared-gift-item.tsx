@@ -26,9 +26,9 @@ export type SharedGift = {
 const STATUS_BUTTON_CLASS =
   "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium whitespace-nowrap shadow-sm transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-60";
 const STATUS_BUTTON_PURCHASED_CLASS =
-  "border-green-600 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-500 dark:bg-green-950 dark:text-green-400 dark:hover:bg-green-900";
+  "border-success-line bg-success-bg text-success hover:brightness-95";
 const STATUS_BUTTON_IDEA_CLASS =
-  "border-neutral-400 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:border-neutral-500 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700";
+  "border-line bg-subtle text-lead hover:bg-hover";
 
 // Rein lesend bis auf den Status (A10) - kein Bearbeiten/Löschen, aber
 // besorgt/offen umschaltbar (Feedback: "sonst weiß niemand was schon
@@ -69,11 +69,11 @@ export function SharedGiftItem({
   const safeLink = gift.link && isValidHttpUrl(gift.link) ? gift.link : null;
 
   return (
-    <li className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700">
+    <li className="surface rounded-2xl p-4">
       <div className="flex items-start gap-3">
         {/* Bild-Platzhalter - Bild-Upload folgt erst in Stufe 3 (#95), wie
             bei GiftItem auf der Personenseite. */}
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-neutral-300 text-[11px] text-neutral-400 dark:border-neutral-600 dark:text-neutral-500">
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-line text-[11px] text-muted">
           Bild
         </span>
         <div className="min-w-0 flex-1">
@@ -102,12 +102,12 @@ export function SharedGiftItem({
             )}
           </div>
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-            <span className="rounded-full border border-neutral-300 px-2.5 py-0.5 text-xs dark:border-neutral-600">
+            <span className="rounded-full border border-line px-2.5 py-0.5 text-xs">
               {gift.occasion_name ?? "ohne Anlass"}
             </span>
           </div>
           {isPurchased && gift.purchased_by && (
-            <p className="mt-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+            <p className="mt-1.5 text-xs text-muted">
               {gift.purchased_by} hat das schon besorgt.
             </p>
           )}
@@ -125,7 +125,7 @@ export function SharedGiftItem({
             </p>
           )}
           {!isPurchased && state?.error && (
-            <p className="mt-1.5 text-xs text-red-700 dark:text-red-400">
+            <p className="mt-1.5 text-xs text-danger">
               {state.error}
             </p>
           )}
@@ -141,14 +141,14 @@ export function SharedGiftItem({
               name="purchasedBy"
               placeholder="z. B. Max"
               maxLength={80}
-              className="h-11 rounded-md border border-neutral-300 bg-transparent px-3 text-base dark:border-neutral-600 sm:text-sm"
+              className="h-11 rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-3 text-base sm:text-sm"
             />
           </label>
-          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+          <p className="mt-1 text-xs text-muted">
             Damit andere sehen, wer „{gift.title}“ schon besorgt hat.
           </p>
           {state?.error && (
-            <p className="mt-2 text-xs text-red-700 dark:text-red-400">
+            <p className="mt-2 text-xs text-danger">
               {state.error}
             </p>
           )}
@@ -156,14 +156,14 @@ export function SharedGiftItem({
             <button
               type="button"
               onClick={() => nameDialogRef.current?.close()}
-              className="cursor-pointer rounded-full border border-neutral-300 px-3 py-1.5 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+              className="btn btn-secondary btn-sm"
             >
               Abbrechen
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="cursor-pointer rounded-full bg-btn-bg px-3 py-1.5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="btn btn-primary btn-sm"
             >
               {isPending ? "…" : "Als besorgt markieren"}
             </button>

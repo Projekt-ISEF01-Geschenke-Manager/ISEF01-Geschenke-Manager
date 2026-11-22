@@ -66,7 +66,7 @@ export function PersonSearchList({
           <Link
             key={person.id}
             href={`/dashboard/personen/${person.id}`}
-            className="flex items-center gap-3 rounded-2xl bg-tile p-4 transition hover:opacity-85"
+            className="flex items-center gap-3 surface surface-interactive rounded-2xl p-4"
           >
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-avatar text-sm font-bold text-text">
               {initials(person.name)}
@@ -101,7 +101,7 @@ export function PersonSearchList({
         <button
           type="button"
           onClick={onAddPerson}
-          className="flex min-h-[90px] items-center justify-center rounded-2xl border border-dashed border-input-border p-4 text-sm font-medium text-accent transition hover:opacity-85"
+          className="flex min-h-[90px] items-center justify-center surface-dashed rounded-2xl p-4 text-sm font-medium text-accent"
         >
           + Person anlegen
         </button>

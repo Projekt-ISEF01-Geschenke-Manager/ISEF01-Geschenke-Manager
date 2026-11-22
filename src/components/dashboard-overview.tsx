@@ -79,7 +79,7 @@ export function DashboardOverview({
           <button
             type="button"
             onClick={openPersonModal}
-            className="h-11 cursor-pointer rounded-full border border-accent px-[22px] text-sm font-medium text-accent transition hover:opacity-85 active:scale-95"
+            className="btn btn-outline"
           >
             + Person anlegen
           </button>
@@ -87,7 +87,7 @@ export function DashboardOverview({
             <button
               type="button"
               onClick={openGiftModal}
-              className="h-11 cursor-pointer rounded-full bg-btn-bg px-[22px] text-sm font-semibold text-btn-text transition hover:opacity-85 active:scale-95"
+              className="btn btn-primary"
             >
               + Idee erfassen
             </button>
@@ -102,7 +102,7 @@ export function DashboardOverview({
         {showAnlaesseCard && (
           <section
             aria-labelledby="anlaesse"
-            className="flex min-w-0 flex-1 basis-[320px] flex-col gap-4 rounded-2xl bg-tile p-6 max-lg:max-w-full lg:max-w-[380px]"
+            className="flex min-w-0 flex-1 basis-[320px] flex-col gap-4 surface rounded-2xl p-6 max-lg:max-w-full lg:max-w-[380px]"
           >
             <h2 id="anlaesse" className="text-xl font-bold text-heading">
               Nächste Anlässe
@@ -115,7 +115,7 @@ export function DashboardOverview({
                     key={entry.key}
                     className="flex items-center gap-3 border-b border-rule py-3"
                   >
-                    <span className="flex h-[52px] w-[52px] shrink-0 flex-col items-center justify-center rounded-[10px] border border-tag-border text-xs text-text">
+                    <span className="flex h-[52px] w-[52px] shrink-0 flex-col items-center justify-center rounded-[10px] border border-tag-border bg-subtle text-xs text-text">
                       <span className="text-sm font-bold">{entry.day}.</span>
                       <span>{monthAbbreviation(entry.month)}</span>
                     </span>
@@ -157,7 +157,7 @@ export function DashboardOverview({
                 </div>
                 <a
                   href="#personen"
-                  className="text-sm text-accent underline transition hover:opacity-85"
+                  className="text-sm link-hover text-accent underline transition"
                 >
                   Status je Person ansehen
                 </a>

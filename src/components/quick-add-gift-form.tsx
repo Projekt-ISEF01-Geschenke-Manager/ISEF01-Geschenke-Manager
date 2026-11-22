@@ -42,7 +42,7 @@ export function QuickAddGiftForm({
           name="title"
           required
           placeholder="Neue Idee, z. B. Gartenschere …"
-          className="h-11 min-w-0 rounded-md border border-neutral-300 bg-transparent px-3 text-base dark:border-neutral-600 sm:text-sm"
+          className="h-11 min-w-0 rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-3 text-base sm:text-sm"
         />
         {/* Stapelt auf Mobile statt nebeneinander - bei fester Select-Breite
             staucht es sonst auf schmalen Bildschirmen. */}
@@ -51,7 +51,7 @@ export function QuickAddGiftForm({
             type="url"
             name="link"
             placeholder="Link (optional), z. B. https://…"
-            className="h-10 min-w-0 rounded-md border border-neutral-300 bg-transparent px-3 text-base dark:border-neutral-600 sm:min-w-[160px] sm:flex-1 sm:text-sm"
+            className="h-10 min-w-0 rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-3 text-base sm:min-w-[160px] sm:flex-1 sm:text-sm"
           />
           {/* appearance-none + eigenes Chevron-Icon statt des
               Browser-Pfeils - der sass bei rounded-md/px-3 zu nah am
@@ -61,7 +61,7 @@ export function QuickAddGiftForm({
             <select
               name="occasionId"
               defaultValue=""
-              className="h-10 w-full appearance-none rounded-md border border-neutral-300 bg-transparent px-3 pr-9 text-base dark:border-neutral-600 sm:text-sm"
+              className="h-10 w-full appearance-none rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-3 pr-9 text-base sm:text-sm"
             >
               <option value="">Ohne Anlass</option>
               {occasions.map((occasion) => (
@@ -70,7 +70,7 @@ export function QuickAddGiftForm({
                 </option>
               ))}
             </select>
-            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-muted" />
           </div>
         </div>
         {/* Button unter den Feldern statt daneben (Feedback: "Button bitte
@@ -80,17 +80,17 @@ export function QuickAddGiftForm({
         <button
           type="submit"
           disabled={isPending}
-          className="h-11 w-full cursor-pointer rounded-full bg-btn-bg px-5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:self-start"
+          className="btn btn-primary w-full sm:w-auto sm:self-start"
         >
           {isPending ? "…" : "Speichern"}
         </button>
       </form>
       {state?.error ? (
-        <p className="mt-1 text-xs text-red-700 dark:text-red-400">
+        <p className="mt-1 text-xs text-danger">
           {state.error}
         </p>
       ) : (
-        <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+        <p className="mt-1 text-xs text-muted">
           Bild ergänzt du danach – oder über „+ Idee erfassen“.
         </p>
       )}

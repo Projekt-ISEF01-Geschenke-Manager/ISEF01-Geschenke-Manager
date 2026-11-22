@@ -72,7 +72,7 @@ export function GiftItem({
 
   if (isEditing) {
     return (
-      <li className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700">
+      <li className="surface rounded-2xl p-4">
         <form action={updateAction} className="flex flex-col gap-2">
           <input
             type="text"
@@ -80,20 +80,20 @@ export function GiftItem({
             required
             placeholder="Titel der Idee"
             defaultValue={updateState?.values?.title}
-            className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-base dark:border-neutral-600 sm:text-sm"
+            className="rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-2.5 py-1.5 text-base sm:text-sm"
           />
           <input
             type="url"
             name="link"
             placeholder="https://…"
             defaultValue={updateState?.values?.link}
-            className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-base dark:border-neutral-600 sm:text-sm"
+            className="rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-2.5 py-1.5 text-base sm:text-sm"
           />
           <div className="relative">
             <select
               name="occasionId"
               defaultValue={updateState?.values?.occasionId ?? ""}
-              className="w-full appearance-none rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 pr-9 text-base dark:border-neutral-600 sm:text-sm"
+              className="w-full appearance-none rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-2.5 py-1.5 pr-9 text-base sm:text-sm"
             >
               <option value="">Ohne Anlass</option>
               {occasions.map((occasion) => (
@@ -102,17 +102,17 @@ export function GiftItem({
                 </option>
               ))}
             </select>
-            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-muted" />
           </div>
           {updateState?.error && (
-            <p className="text-xs text-red-700 dark:text-red-400">
+            <p className="text-xs text-danger">
               {updateState.error}
             </p>
           )}
           <div className="flex gap-3">
             <button
               type="submit"
-              className="cursor-pointer rounded-full bg-btn-bg px-3 py-1 text-xs font-medium text-btn-text transition hover:opacity-90 active:scale-95"
+              className="btn btn-primary btn-sm"
             >
               Speichern
             </button>
@@ -121,7 +121,7 @@ export function GiftItem({
               onClick={() => {
                 setIsEditing(false);
               }}
-              className="cursor-pointer rounded-full border border-neutral-300 px-3 py-1 text-xs transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+              className="btn btn-secondary btn-sm"
             >
               Abbrechen
             </button>
@@ -132,20 +132,20 @@ export function GiftItem({
   }
 
   return (
-    <li className="rounded-2xl border border-neutral-300 p-4 dark:border-neutral-700">
+    <li className="surface rounded-2xl p-4">
       {/* Stapelt auf Mobile (Bild+Titel oben, Aktions-Buttons darunter) statt
           nebeneinander - bei fixer Breite der Buttons (shrink-0) ueberlagerte
           sich das sonst auf schmalen Bildschirmen mit dem Titel. */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           {/* Bild-Platzhalter - Bild-Upload folgt erst in Stufe 3 (#95). */}
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-neutral-300 text-[11px] text-neutral-400 dark:border-neutral-600 dark:text-neutral-500">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-line text-[11px] text-muted">
             Bild
           </span>
           <div className="min-w-0">
             <p className="font-semibold">{gift.title}</p>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-              <span className="rounded-full border border-neutral-300 px-2.5 py-0.5 text-xs dark:border-neutral-600">
+              <span className="rounded-full border border-line px-2.5 py-0.5 text-xs">
                 {gift.occasion_name ?? "ohne Anlass"}
               </span>
             </div>
@@ -179,8 +179,8 @@ export function GiftItem({
               disabled={isPending}
               className={`inline-flex cursor-pointer items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap transition active:scale-95 ${
                 isPurchased
-                  ? "border-green-600 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-500 dark:bg-green-950 dark:text-green-400 dark:hover:bg-green-900"
-                  : "border-neutral-400 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:border-neutral-500 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                  ? "border-success-line bg-success-bg text-success hover:brightness-95"
+                  : "border-line bg-subtle text-lead hover:bg-hover"
               }`}
             >
               {isPurchased ? (
@@ -197,7 +197,7 @@ export function GiftItem({
               onClick={() => {
                 setIsEditing(true);
               }}
-              className="cursor-pointer rounded-full border border-neutral-300 px-3 py-1 text-xs transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+              className="btn btn-secondary btn-sm"
             >
               Bearbeiten
             </button>
@@ -208,7 +208,7 @@ export function GiftItem({
             <button
               type="button"
               onClick={() => deleteDialogRef.current?.showModal()}
-              className="cursor-pointer rounded-full border border-red-300 px-3 py-1 text-xs text-red-700 transition hover:bg-red-50 active:scale-95 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
+              className="btn btn-danger-outline btn-sm"
             >
               Löschen
             </button>
@@ -219,7 +219,7 @@ export function GiftItem({
       <Modal dialogRef={deleteDialogRef} title="Idee löschen">
         <p className="text-sm">„{gift.title}“ wirklich löschen?</p>
         {deleteState?.error && (
-          <p className="mt-2 text-xs text-red-700 dark:text-red-400">
+          <p className="mt-2 text-xs text-danger">
             {deleteState.error}
           </p>
         )}
@@ -227,7 +227,7 @@ export function GiftItem({
           <button
             type="button"
             onClick={() => deleteDialogRef.current?.close()}
-            className="cursor-pointer rounded-full border border-neutral-300 px-3 py-1.5 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+            className="btn btn-secondary btn-sm"
           >
             Abbrechen
           </button>
@@ -235,7 +235,7 @@ export function GiftItem({
             <button
               type="submit"
               disabled={isDeletePending}
-              className="cursor-pointer rounded-full bg-red-700 px-3 py-1.5 text-sm font-medium text-white transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="btn btn-danger btn-sm"
             >
               {isDeletePending ? "Wird gelöscht …" : "Löschen"}
             </button>
@@ -244,7 +244,7 @@ export function GiftItem({
       </Modal>
 
       {/* Aufgaben-Platzhalter - Checkliste folgt erst in Stufe 3 (#94). */}
-      <p className="mt-3 border-t border-dashed border-neutral-200 pt-3 text-xs text-neutral-400 dark:border-neutral-700 dark:text-neutral-500">
+      <p className="mt-3 border-t border-dashed border-line pt-3 text-xs text-muted">
         Aufgaben folgen in einer späteren Ausbaustufe (#94).
       </p>
     </li>

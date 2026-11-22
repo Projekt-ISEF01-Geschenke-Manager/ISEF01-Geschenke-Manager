@@ -16,7 +16,7 @@ export function PasswordResetRequestForm() {
   );
 
   return (
-    <div className="rounded-2xl border border-card-border bg-card p-6">
+    <div className="surface rounded-2xl p-6">
       <h2 className="text-xl font-semibold text-heading">Passwort vergessen</h2>
       <p className="mt-1 text-sm text-muted">
         Gib deine E-Mail-Adresse ein, wir schicken dir dann einen Link zum
@@ -24,7 +24,7 @@ export function PasswordResetRequestForm() {
       </p>
 
       {state?.message ? (
-        <p className="mt-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800 dark:bg-green-950 dark:text-green-300">
+        <p className="mt-4 rounded-lg border border-success-line bg-success-bg px-3 py-2 text-sm text-success">
           {state.message}
         </p>
       ) : (
@@ -42,7 +42,7 @@ export function PasswordResetRequestForm() {
           <button
             type="submit"
             disabled={isPending}
-            className="h-11 cursor-pointer self-start rounded-full bg-btn-bg px-5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn btn-primary self-start"
           >
             {isPending ? "Wird gesendet …" : "Link anfordern"}
           </button>

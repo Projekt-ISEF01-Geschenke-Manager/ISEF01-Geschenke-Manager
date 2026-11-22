@@ -20,7 +20,7 @@ export function PersonCard({
   const [editing, setEditing] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-neutral-300 p-6 dark:border-neutral-700">
+    <div className="surface rounded-2xl p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-5">
           <span className="flex h-[84px] w-[84px] shrink-0 items-center justify-center rounded-full bg-avatar text-xl font-bold text-text">
@@ -29,19 +29,19 @@ export function PersonCard({
           <div className="min-w-0">
             <h1 className="text-[28px] font-semibold">{person.name}</h1>
             {birthdayText && (
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              <p className="text-sm text-muted">
                 Geburtstag: {birthdayText}
               </p>
             )}
             {person.interests.length > 0 && (
               <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                <span className="text-sm text-neutral-600 dark:text-neutral-400">
+                <span className="text-sm text-muted">
                   Interessen:
                 </span>
                 {person.interests.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-neutral-300 px-2.5 py-0.5 text-xs dark:border-neutral-600"
+                    className="rounded-full border border-line px-2.5 py-0.5 text-xs"
                   >
                     {tag}
                   </span>
@@ -49,7 +49,7 @@ export function PersonCard({
               </div>
             )}
             {person.notes && (
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+              <p className="mt-2 text-sm text-muted">
                 Notiz: {person.notes}
               </p>
             )}
@@ -59,7 +59,7 @@ export function PersonCard({
         <div className="flex shrink-0 gap-2.5">
           <Link
             href={`/dashboard/teilen?person=${person.id}`}
-            className="flex h-11 w-[130px] cursor-pointer items-center justify-center rounded-full border border-neutral-300 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+            className="btn btn-secondary flex w-[130px]"
           >
             Ideen teilen
           </Link>
@@ -68,7 +68,7 @@ export function PersonCard({
             onClick={() => {
               setEditing((value) => !value);
             }}
-            className="h-11 w-[130px] cursor-pointer rounded-full border border-neutral-300 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+            className="btn btn-secondary w-[130px]"
           >
             {editing ? "Fertig" : "Bearbeiten"}
           </button>
@@ -76,7 +76,7 @@ export function PersonCard({
       </div>
 
       {editing && (
-        <div className="mt-5 flex flex-col gap-3 border-t border-neutral-200 pt-5 dark:border-neutral-700">
+        <div className="mt-5 flex flex-col gap-3 border-t border-line pt-5">
           <PersonForm person={person} />
           <DeletePersonButton
             personId={person.id}

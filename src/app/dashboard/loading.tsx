@@ -12,11 +12,11 @@ export default function DashboardLoading() {
       }}
     >
       <main className="mx-auto flex w-full max-w-[1140px] flex-1 animate-pulse flex-col gap-7 px-6 pt-8 pb-14 2xl:max-w-[1600px]">
-        <div className="h-9 w-56 rounded bg-neutral-200 dark:bg-neutral-800" />
+        <div className="h-9 w-56 rounded bg-track" />
 
         <div className="flex flex-wrap items-start gap-6">
-          <div className="h-48 min-w-0 flex-1 basis-[320px] rounded-2xl bg-neutral-200 max-lg:max-w-full lg:max-w-[380px] dark:bg-neutral-800" />
-          <div className="h-48 min-w-0 flex-[999] basis-[560px] rounded-2xl bg-neutral-200 dark:bg-neutral-800" />
+          <div className="h-48 min-w-0 flex-1 basis-[320px] rounded-2xl bg-track max-lg:max-w-full lg:max-w-[380px]" />
+          <div className="h-48 min-w-0 flex-[999] basis-[560px] rounded-2xl bg-track" />
         </div>
       </main>
     </div>

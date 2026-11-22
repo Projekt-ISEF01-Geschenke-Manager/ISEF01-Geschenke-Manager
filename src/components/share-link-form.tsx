@@ -34,7 +34,7 @@ export function ShareLinkForm({
       <div className="flex flex-col gap-2">
         <p className="text-sm">Dein Link:</p>
         <div className="flex flex-wrap items-center gap-2">
-          <code className="rounded-md bg-neutral-100 px-3 py-2 text-sm dark:bg-neutral-800">
+          <code className="rounded-md bg-subtle px-3 py-2 text-sm">
             /teilen/{token}
           </code>
           <button
@@ -42,7 +42,7 @@ export function ShareLinkForm({
             onClick={() => {
               copyLink(token);
             }}
-            className="cursor-pointer rounded-full border border-neutral-300 px-4 py-2 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+            className="btn btn-secondary"
           >
             {copied ? "Kopiert ✓" : "Kopieren"}
           </button>
@@ -56,7 +56,7 @@ export function ShareLinkForm({
             // "zurueck zum Formular") - einfachster Weg: Seite neu anfragen.
             window.location.reload();
           }}
-          className="w-fit cursor-pointer text-sm text-neutral-600 underline dark:text-neutral-400"
+          className="w-fit cursor-pointer text-sm text-muted underline"
         >
           Weiteren Link erstellen
         </button>
@@ -67,7 +67,7 @@ export function ShareLinkForm({
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-3">
       {state?.error && (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+        <p className="rounded-md border border-danger-line bg-danger-bg px-3 py-2 text-sm text-danger">
           {state.error}
         </p>
       )}
@@ -87,7 +87,7 @@ export function ShareLinkForm({
       </div>
       <button
         type="submit"
-        className="cursor-pointer self-start rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-700 active:scale-95 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+        className="btn btn-primary self-start"
       >
         Link erstellen
       </button>

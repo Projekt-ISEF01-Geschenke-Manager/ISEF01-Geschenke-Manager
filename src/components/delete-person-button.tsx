@@ -37,14 +37,14 @@ export function DeletePersonButton({
       }}
     >
       {state?.error && (
-        <p className="mb-1 text-xs text-red-700 dark:text-red-400">
+        <p className="mb-1 text-xs text-danger">
           {state.error}
         </p>
       )}
       <button
         type="submit"
         disabled={isPending}
-        className="cursor-pointer text-sm text-red-700 underline transition hover:text-red-900 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
+        className="cursor-pointer text-sm text-danger underline transition hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? "Wird gelöscht …" : "Löschen"}
       </button>

@@ -95,7 +95,7 @@ export default async function PersonPage({
     <main className="mx-auto flex w-full max-w-[1140px] flex-1 flex-col gap-7 px-6 pt-8 pb-14 2xl:max-w-[1600px]">
       <Link
         href="/dashboard"
-        className="w-fit text-sm text-neutral-600 hover:underline dark:text-neutral-400"
+        className="w-fit text-sm text-muted hover:underline"
       >
         ‹ Zurück zur Übersicht
       </Link>
@@ -113,7 +113,7 @@ export default async function PersonPage({
           occasions={occasions ?? []}
         >
           {gifts.length === 0 ? (
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            <p className="text-sm text-muted">
               Noch keine Ideen für {person.name}.
             </p>
           ) : (
