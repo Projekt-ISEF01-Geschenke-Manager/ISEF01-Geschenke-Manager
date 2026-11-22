@@ -17,7 +17,13 @@ jobs:
     if: "startsWith(github.event.head_commit.message, 'Merge pull request #')"
     runs-on: ubuntu-latest
     steps:
+      # Der Standard-"github.token" darf nicht direkt nach main pushen (Branch
+      # Protection verlangt PRs + Status-Checks) - CHANGELOG_PAT ist ein
+      # Fine-grained PAT eines Repo-Admins (Contents: Read & write), der main
+      # per enforce_admins-Ausnahme direkt beschreiben darf.
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CHANGELOG_PAT || github.token }}
 
       - name: PR-Titel ermitteln
         id: pr
