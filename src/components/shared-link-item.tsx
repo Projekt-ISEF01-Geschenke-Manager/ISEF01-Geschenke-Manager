@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { Check, Copy, Link2 } from "lucide-react";
 import { useRemoveAnimation } from "@/lib/use-remove-animation";
 import { deleteSharedLink } from "@/app/actions/shared-links";
 
@@ -41,53 +42,68 @@ export function SharedLinkItem({
   }
 
   return (
-    <li ref={removeRef} className="flex flex-wrap items-center justify-between gap-2 py-3">
-      <div>
-        <p className="font-medium">{peopleNames.join(", ")}</p>
-        <p className="text-sm text-muted">
+    <li
+      ref={removeRef}
+      className="surface reveal flex flex-wrap items-center gap-4 rounded-2xl p-4"
+    >
+      <span
+        aria-hidden="true"
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-avatar text-text"
+      >
+        <Link2 className="h-5 w-5" />
+      </span>
+      <div className="min-w-0 flex-1 basis-48">
+        <p className="text-base font-semibold text-heading">
+          {peopleNames.join(", ")}
+        </p>
+        <p className="text-xs text-muted">
           erstellt am{" "}
           {new Date(createdAt).toLocaleDateString("de-DE", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
-          })}{" "}
-          ·{" "}
-          <button
-            type="button"
-            onClick={copyLink}
-            className="cursor-pointer underline"
-          >
-            {copied ? "Kopiert ✓" : "Link kopieren"}
-          </button>
+          })}
         </p>
         {state?.error && (
-          <p className="mt-1 text-xs text-danger">
-            {state.error}
-          </p>
+          <p className="anim-in mt-1 text-xs text-danger">{state.error}</p>
         )}
       </div>
-      <form
-        action={formAction}
-        onSubmit={(event) => {
-          if (
-            !confirm(
-              "Diesen Link wirklich widerrufen? Er funktioniert danach nicht mehr.",
-            )
-          ) {
-            event.preventDefault();
-            return;
-          }
-          startRemove();
-        }}
-      >
+      <div className="flex flex-wrap items-center gap-1.5">
         <button
-          type="submit"
-          disabled={isPending}
-          className="cursor-pointer text-sm text-danger underline transition hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-60"
+          type="button"
+          onClick={copyLink}
+          className={`btn btn-sm ${copied ? "btn-success" : "btn-secondary"}`}
         >
-          {isPending ? "Wird widerrufen …" : "Widerrufen"}
+          {copied ? (
+            <Check className="h-3.5 w-3.5 shrink-0" />
+          ) : (
+            <Copy className="h-3.5 w-3.5 shrink-0" />
+          )}
+          {copied ? "Kopiert" : "Link kopieren"}
         </button>
-      </form>
+        <form
+          action={formAction}
+          onSubmit={(event) => {
+            if (
+              !confirm(
+                "Diesen Link wirklich widerrufen? Er funktioniert danach nicht mehr.",
+              )
+            ) {
+              event.preventDefault();
+              return;
+            }
+            startRemove();
+          }}
+        >
+          <button
+            type="submit"
+            disabled={isPending}
+            className="btn btn-danger-outline btn-sm"
+          >
+            {isPending ? "Wird widerrufen …" : "Widerrufen"}
+          </button>
+        </form>
+      </div>
     </li>
   );
 }
