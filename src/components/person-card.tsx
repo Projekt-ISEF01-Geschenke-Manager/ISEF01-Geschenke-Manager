@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { initials } from "@/lib/format";
+import { canAnimate } from "@/lib/motion";
 import { PersonForm, type EditablePerson } from "@/components/person-form";
 import { DeletePersonButton } from "@/components/delete-person-button";
 
@@ -68,7 +69,11 @@ export function PersonCard({
             type="button"
             onClick={() => {
               if (editing) {
-                setClosing(true);
+                if (canAnimate()) {
+                  setClosing(true);
+                } else {
+                  setEditing(false);
+                }
               } else {
                 setEditing(true);
               }

@@ -1,4 +1,5 @@
 import { useCallback, useRef } from "react";
+import { canAnimate } from "@/lib/motion";
 
 const DURATION_MS = 300;
 
@@ -14,7 +15,7 @@ export function useRemoveAnimation<T extends HTMLElement>() {
   const start = useCallback(() => {
     const element = ref.current;
     if (!element) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!canAnimate()) return;
 
     const gap = element.parentElement
       ? parseFloat(getComputedStyle(element.parentElement).rowGap)

@@ -3,6 +3,7 @@
 import { useTransition, useActionState, useState, useRef, useEffect } from "react";
 import { useRemoveAnimation } from "@/lib/use-remove-animation";
 import { GiftLink } from "@/components/gift-link";
+import { canAnimate } from "@/lib/motion";
 import { useStatusAnimation } from "@/lib/use-status-animation";
 import { Circle, CheckCircle2, ChevronDown, Undo2 } from "lucide-react";
 import {
@@ -151,7 +152,11 @@ export function GiftItem({
             <button
               type="button"
               onClick={() => {
-                setClosing(true);
+                if (canAnimate()) {
+                  setClosing(true);
+                } else {
+                  setIsEditing(false);
+                }
               }}
               className="btn btn-secondary btn-sm"
             >
