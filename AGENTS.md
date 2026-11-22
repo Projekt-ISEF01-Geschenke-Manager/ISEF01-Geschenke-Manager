@@ -20,3 +20,4 @@ Details und Werte: `DESIGN-DARKMODE.md`, Tokens und Komponenten in `src/app/glob
 - **Status-Hinweise:** `danger-*` / `success-*`-Tokens, nie nur Farbe (immer Text/Icon dazu).
 - **Header:** Hintergrund kommt aus `--header-bg` (einfarbig oder Verlauf je Palette).
 - Texte mindestens 4,5:1 Kontrast, in beiden Modi und jeder Palette.
+- **Scroll-Animation:** Boxen/Karten bekommen die Klasse `reveal` (alle `surface`-Elemente haben sie bereits). `ScrollReveal` blendet sie beim Hereinscrollen ein (350 ms, gestaffelt, nur Opacity/Transform) und beachtet `prefers-reduced-motion`. Keine eigenen Scroll-Animationen pro Komponente bauen.

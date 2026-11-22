@@ -10,7 +10,7 @@ export function LoginForm() {
   const [state, formAction] = useActionState(login, initialState);
 
   return (
-    <div className="surface rounded-2xl p-6">
+    <div className="surface reveal rounded-2xl p-6">
       <h2 className="text-xl font-semibold text-heading">Anmelden</h2>
 
       {state?.error && (

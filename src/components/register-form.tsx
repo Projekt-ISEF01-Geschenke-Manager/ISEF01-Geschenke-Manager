@@ -10,7 +10,7 @@ export function RegisterForm() {
   const [state, formAction] = useActionState(signup, initialState);
 
   return (
-    <div className="surface rounded-2xl p-6">
+    <div className="surface reveal rounded-2xl p-6">
       <h2 className="text-xl font-semibold text-heading">Konto erstellen</h2>
       <p className="mt-1 text-sm text-muted">
         Mit * markierte Felder sind Pflichtfelder.

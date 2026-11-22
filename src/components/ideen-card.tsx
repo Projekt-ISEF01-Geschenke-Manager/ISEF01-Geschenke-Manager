@@ -23,7 +23,7 @@ export function IdeenCard({
   const [adding, setAdding] = useState(false);
 
   return (
-    <div className="surface rounded-2xl p-6">
+    <div className="surface reveal rounded-2xl p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Ideen ({giftsCount})</h2>
         {/* Gleicher Button-Stil wie "+ Idee erfassen" auf der Übersicht

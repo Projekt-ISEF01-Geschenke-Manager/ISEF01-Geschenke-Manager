@@ -106,7 +106,7 @@ export default async function SharedViewPage({
           max-w-2xl - Wireframe (geteilte-ansicht.html) nutzt --container:
           1140px fuer 2 Personen nebeneinander. */}
       <main className="mx-auto flex w-full max-w-[1140px] flex-1 flex-col gap-7 px-6 pt-8 pb-14 2xl:max-w-[1600px]">
-        <div className="surface rounded-2xl bg-subtle p-4 text-sm">
+        <div className="surface reveal rounded-2xl bg-subtle p-4 text-sm">
           <p className="font-medium">Hinweis</p>
           <p className="mt-1 text-muted">
             {ownerName} hat diese Geschenkideen mit dir geteilt. Du brauchst
@@ -145,7 +145,7 @@ export default async function SharedViewPage({
             return (
               <div
                 key={person.id}
-                className="surface rounded-2xl p-6"
+                className="surface reveal rounded-2xl p-6"
               >
                 <div className="flex items-center gap-3 border-b border-line pb-4">
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-avatar text-sm font-bold text-text">

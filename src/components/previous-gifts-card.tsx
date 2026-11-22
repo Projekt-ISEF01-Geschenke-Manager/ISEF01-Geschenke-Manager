@@ -45,7 +45,7 @@ export function PreviousGiftsCard({
   }, [state]);
 
   return (
-    <div className="surface rounded-2xl p-6">
+    <div className="surface reveal rounded-2xl p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Frühere Geschenke</h2>
         <button
@@ -66,7 +66,7 @@ export function PreviousGiftsCard({
           {gifts.map((gift) => (
             <li
               key={gift.id}
-              className="surface rounded-2xl p-4"
+              className="surface reveal rounded-2xl p-4"
             >
               <p className="font-semibold">{gift.title}</p>
               <p className="mt-1 text-sm text-muted">

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ const themeInitScript = `(function() {
     var stored = localStorage.getItem("theme");
     var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     document.documentElement.setAttribute("data-theme", theme);
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("reveal-ready");
     var palette = localStorage.getItem("palette");
     if (palette) document.documentElement.setAttribute("data-palette", palette);
   } catch (e) {}
@@ -49,7 +51,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           dangerouslySetInnerHTML={{ __html: themeInitScript }}
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col"><ScrollReveal />
+        {children}
+      </body>
     </html>
   );
 }

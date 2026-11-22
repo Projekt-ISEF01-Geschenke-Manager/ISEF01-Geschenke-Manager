@@ -73,7 +73,7 @@ describe("GiftItem – Bearbeiten (Issue #154)", () => {
   it("zeigt den Status als klickbaren Button mit Icon statt als reines Label", () => {
     render(<GiftItem gift={gift} occasions={occasions} />);
 
-    const statusButton = screen.getByRole("button", { name: "offen" });
+    const statusButton = screen.getByRole("button", { name: "Als besorgt markieren" });
     fireEvent.click(statusButton);
 
     expect(setGiftStatusMock).toHaveBeenCalledWith("gift-1", "purchased");

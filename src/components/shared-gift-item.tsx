@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
-import { ExternalLink, Circle, CheckCircle2 } from "lucide-react";
+import { ExternalLink, Circle, CheckCircle2, Undo2 } from "lucide-react";
 import { isValidHttpUrl } from "@/lib/url";
 import type { GiftStatus } from "@/lib/gift-status";
 import { Modal } from "@/components/modal";
@@ -18,17 +18,6 @@ export type SharedGift = {
   purchased_by: string | null;
   occasion_name: string | null;
 };
-
-// Gleiche Größe wie Bearbeiten/Löschen (px-3 py-1 statt der kleineren
-// px-2.5 py-0.5 des Anlass-Chips) - sonst wirkt der Status trotz Füllfarbe
-// und Icon weiterhin wie ein Label statt wie ein echter Button (Feedback:
-// "sieht einfach nicht nach einem richtigen Button aus").
-const STATUS_BUTTON_CLASS =
-  "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium whitespace-nowrap shadow-sm transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-60";
-const STATUS_BUTTON_PURCHASED_CLASS =
-  "border-success-line bg-success-bg text-success hover:brightness-95";
-const STATUS_BUTTON_IDEA_CLASS =
-  "border-line bg-subtle text-lead hover:bg-hover";
 
 // Rein lesend bis auf den Status (A10) - kein Bearbeiten/Löschen, aber
 // besorgt/offen umschaltbar (Feedback: "sonst weiß niemand was schon
@@ -69,7 +58,7 @@ export function SharedGiftItem({
   const safeLink = gift.link && isValidHttpUrl(gift.link) ? gift.link : null;
 
   return (
-    <li className="surface rounded-2xl p-4">
+    <li className="surface reveal rounded-2xl p-4">
       <div className="flex items-start gap-3">
         {/* Bild-Platzhalter - Bild-Upload folgt erst in Stufe 3 (#95), wie
             bei GiftItem auf der Personenseite. */}
@@ -84,20 +73,25 @@ export function SharedGiftItem({
                 <button
                   type="submit"
                   disabled={isPending}
-                  className={`${STATUS_BUTTON_CLASS} ${STATUS_BUTTON_PURCHASED_CLASS}`}
+                  aria-label="Besorgt"
+                  title="Wieder auf offen setzen"
+                  className="group btn btn-sm btn-success"
                 >
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                  besorgt
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 group-hover:hidden" />
+                  <Undo2 className="hidden h-3.5 w-3.5 shrink-0 group-hover:block" />
+                  Besorgt
                 </button>
               </form>
             ) : (
               <button
                 type="button"
                 onClick={() => nameDialogRef.current?.showModal()}
-                className={`${STATUS_BUTTON_CLASS} ${STATUS_BUTTON_IDEA_CLASS}`}
+                title="Als besorgt markieren"
+                className="group btn btn-sm btn-secondary"
               >
-                <Circle className="h-3.5 w-3.5 shrink-0" />
-                offen
+                <Circle className="h-3.5 w-3.5 shrink-0 group-hover:hidden" />
+                <CheckCircle2 className="hidden h-3.5 w-3.5 shrink-0 group-hover:block" />
+                Als besorgt markieren
               </button>
             )}
           </div>

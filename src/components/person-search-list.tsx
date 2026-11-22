@@ -66,7 +66,7 @@ export function PersonSearchList({
           <Link
             key={person.id}
             href={`/dashboard/personen/${person.id}`}
-            className="flex items-center gap-3 surface surface-interactive rounded-2xl p-4"
+            className="flex items-center gap-3 surface reveal surface-interactive rounded-2xl p-4"
           >
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-avatar text-sm font-bold text-text">
               {initials(person.name)}

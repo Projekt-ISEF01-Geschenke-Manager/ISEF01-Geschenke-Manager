@@ -16,7 +16,7 @@ export function PasswordResetRequestForm() {
   );
 
   return (
-    <div className="surface rounded-2xl p-6">
+    <div className="surface reveal rounded-2xl p-6">
       <h2 className="text-xl font-semibold text-heading">Passwort vergessen</h2>
       <p className="mt-1 text-sm text-muted">
         Gib deine E-Mail-Adresse ein, wir schicken dir dann einen Link zum

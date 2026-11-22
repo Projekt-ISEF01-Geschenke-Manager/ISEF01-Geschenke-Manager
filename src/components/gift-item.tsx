@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition, useActionState, useState, useRef } from "react";
-import { ExternalLink, Circle, CheckCircle2, ChevronDown } from "lucide-react";
+import { ExternalLink, Circle, CheckCircle2, ChevronDown, Undo2 } from "lucide-react";
 import {
   setGiftStatus,
   deleteGift,
@@ -72,7 +72,7 @@ export function GiftItem({
 
   if (isEditing) {
     return (
-      <li className="surface rounded-2xl p-4">
+      <li className="surface reveal rounded-2xl p-4">
         <form action={updateAction} className="flex flex-col gap-2">
           <input
             type="text"
@@ -132,7 +132,7 @@ export function GiftItem({
   }
 
   return (
-    <li className="surface rounded-2xl p-4">
+    <li className="surface reveal rounded-2xl p-4">
       {/* Stapelt auf Mobile (Bild+Titel oben, Aktions-Buttons darunter) statt
           nebeneinander - bei fixer Breite der Buttons (shrink-0) ueberlagerte
           sich das sonst auf schmalen Bildschirmen mit dem Titel. */}
@@ -166,33 +166,32 @@ export function GiftItem({
           </div>
         </div>
 
-        <div className="flex flex-col items-start gap-2 sm:shrink-0 sm:items-end">
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Eigener Button-Look (gefuellter Hintergrund + Icon), jetzt bei
-                den uebrigen Aktions-Buttons rechts statt bei den reinen
-                Info-Chips (Anlass) links - sonst wirkt der Status wie ein
-                Label statt wie eine klickbare Umschaltung (Feedback:
-                "sieht man nicht, dass es ein Button ist"). */}
-            <button
-              type="button"
-              onClick={toggleStatus}
-              disabled={isPending}
-              className={`inline-flex cursor-pointer items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap transition active:scale-95 ${
-                isPurchased
-                  ? "border-success-line bg-success-bg text-success hover:brightness-95"
-                  : "border-line bg-subtle text-lead hover:bg-hover"
-              }`}
-            >
-              {isPurchased ? (
-                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-              ) : (
-                <Circle className="h-3.5 w-3.5 shrink-0" />
-              )}
-              {isPurchased ? "besorgt" : "offen"}
-            </button>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <button
+        <div className="flex flex-wrap items-center gap-1.5 sm:shrink-0 sm:justify-end">
+          {/* Status-Umschalter: gleiche Groesse/Form wie Bearbeiten und
+              Loeschen. Offen = Rahmen-Button, der beim Hover den Haken
+              zeigt (Vorschau auf "besorgt"); besorgt = gruen mit Haken. */}
+          <button
+            type="button"
+            onClick={toggleStatus}
+            disabled={isPending}
+            aria-label={isPurchased ? "Besorgt" : undefined}
+            title={isPurchased ? "Wieder auf offen setzen" : "Als besorgt markieren"}
+            className={`group btn btn-sm ${isPurchased ? "btn-success" : "btn-secondary"}`}
+          >
+            {isPurchased ? (
+              <>
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 group-hover:hidden" />
+                <Undo2 className="hidden h-3.5 w-3.5 shrink-0 group-hover:block" />
+              </>
+            ) : (
+              <>
+                <Circle className="h-3.5 w-3.5 shrink-0 group-hover:hidden" />
+                <CheckCircle2 className="hidden h-3.5 w-3.5 shrink-0 group-hover:block" />
+              </>
+            )}
+            {isPurchased ? "Besorgt" : "Als besorgt markieren"}
+          </button>
+          <button
               type="button"
               onClick={() => {
                 setIsEditing(true);
@@ -212,7 +211,6 @@ export function GiftItem({
             >
               Löschen
             </button>
-          </div>
         </div>
       </div>
 

@@ -20,7 +20,7 @@ export function PersonCard({
   const [editing, setEditing] = useState(false);
 
   return (
-    <div className="surface rounded-2xl p-6">
+    <div className="surface reveal rounded-2xl p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-5">
           <span className="flex h-[84px] w-[84px] shrink-0 items-center justify-center rounded-full bg-avatar text-xl font-bold text-text">

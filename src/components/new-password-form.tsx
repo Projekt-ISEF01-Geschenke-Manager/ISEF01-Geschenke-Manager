@@ -14,7 +14,7 @@ export function NewPasswordForm() {
 
   if (state?.success) {
     return (
-      <div className="surface rounded-2xl p-6">
+      <div className="surface reveal rounded-2xl p-6">
         <h2 className="text-xl font-semibold text-heading">
           Passwort geändert
         </h2>
@@ -32,7 +32,7 @@ export function NewPasswordForm() {
   }
 
   return (
-    <div className="surface rounded-2xl p-6">
+    <div className="surface reveal rounded-2xl p-6">
       <h2 className="text-xl font-semibold text-heading">
         Neues Passwort festlegen
       </h2>

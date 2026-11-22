@@ -107,7 +107,7 @@ export default async function Home({
             <LoginForm />
           </div>
 
-          <div className="flex items-start gap-3 surface rounded-[12px] p-5 text-sm">
+          <div className="flex items-start gap-3 surface reveal rounded-[12px] p-5 text-sm">
             <span className="font-medium text-accent">Hinweis</span>
             <span className="text-muted">
               Dein Konto ist privat. Personen, Ideen und Geschenke siehst nur
@@ -121,7 +121,7 @@ export default async function Home({
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {features.map((feature) => (
-                <div key={feature.title} className="surface rounded-[14px] p-5">
+                <div key={feature.title} className="surface reveal rounded-[14px] p-5">
                   <h3 className="font-medium text-heading">{feature.title}</h3>
                   <p className="mt-2 text-sm text-muted">
                     {feature.description}

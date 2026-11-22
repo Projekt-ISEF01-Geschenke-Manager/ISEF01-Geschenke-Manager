@@ -102,7 +102,7 @@ export function DashboardOverview({
         {showAnlaesseCard && (
           <section
             aria-labelledby="anlaesse"
-            className="flex min-w-0 flex-1 basis-[320px] flex-col gap-4 surface rounded-2xl p-6 max-lg:max-w-full lg:max-w-[380px]"
+            className="flex min-w-0 flex-1 basis-[320px] flex-col gap-4 surface reveal rounded-2xl p-6 max-lg:max-w-full lg:max-w-[380px]"
           >
             <h2 id="anlaesse" className="text-xl font-bold text-heading">
               Nächste Anlässe
