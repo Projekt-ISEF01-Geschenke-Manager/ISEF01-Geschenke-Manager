@@ -2,6 +2,9 @@
 
 import { useEffect } from "react";
 
+// Der Zustand steht in einem data-Attribut (nicht in der Klasse), weil React
+// className bei Re-Renders komplett neu setzt und den Zustand sonst loeschen
+// wuerde - das Element bliebe dann unsichtbar (z. B. Bearbeiten-Formular).
 // Blendet Elemente mit der Klasse "reveal" beim Hereinscrollen sanft ein
 // (siehe globals.css). Gleichzeitig sichtbar werdende Elemente laufen leicht
 // gestaffelt. Neu eingefuegte Elemente (Routenwechsel, Listen) werden per
@@ -16,8 +19,8 @@ export function ScrollReveal() {
     if (!root.classList.contains("reveal-ready")) return;
 
     function showAll() {
-      document.querySelectorAll(".reveal:not(.is-visible)").forEach((item) => {
-        item.classList.add("is-visible");
+      document.querySelectorAll(".reveal:not([data-revealed])").forEach((item) => {
+        item.setAttribute("data-revealed", "");
       });
     }
 
@@ -37,7 +40,7 @@ export function ScrollReveal() {
             "--reveal-delay",
             `${Math.min(index * STAGGER_MS, MAX_DELAY_MS)}ms`,
           );
-          target.classList.add("is-visible");
+          target.setAttribute("data-revealed", "");
           io.unobserve(target);
           index += 1;
         }
@@ -46,7 +49,7 @@ export function ScrollReveal() {
     );
 
     function observe(scope: ParentNode) {
-      scope.querySelectorAll(".reveal:not(.is-visible)").forEach((item) => {
+      scope.querySelectorAll(".reveal:not([data-revealed])").forEach((item) => {
         io.observe(item);
       });
     }
@@ -57,7 +60,7 @@ export function ScrollReveal() {
       for (const mutation of mutations) {
         mutation.addedNodes.forEach((node) => {
           if (!(node instanceof HTMLElement)) return;
-          if (node.classList.contains("reveal") && !node.classList.contains("is-visible")) {
+          if (node.classList.contains("reveal") && !node.hasAttribute("data-revealed")) {
             io.observe(node);
           }
           observe(node);
