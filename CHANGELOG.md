@@ -5,7 +5,23 @@ ergänzt der Workflow [`.github/workflows/changelog.yml`](.github/workflows/chan
 hier automatisch einen Eintrag mit PR-Titel und -Nummer. Kein manueller
 Schritt vor dem Merge nötig.
 
+## 2026-11-22
+- Feature: Design-Überarbeitung: Animationen, Skeleton-Loader, Navigation mit schwebender Tabbar am Handy und neue Seite Geteilte Links (#201)
+- Feature: Einheitliches Farbsystem mit wählbaren Paletten, Karten und Buttons (#200)
+- Fix: Geschenk-Workflow automatisiert statt manuellem "Als Geschenk übernehmen" (#198)
+- Chore: Mutation-Testing läuft jetzt bei jedem PR statt nur wöchentlich (#197)
+- Feature: Idee in Geschenk umwandeln + Frühere Geschenke anzeigen (#196)
+- Chore: Wöchentliches Mutation-Testing mit Stryker eingerichtet (#195)
+- Docs: README ausführlich aktualisiert (#193)
+- Feature: Besorgt/offen auf der geteilten Ansicht umschaltbar (#192)
+
 ## 2026-11-21
+- Feature: Geteilte Ansicht an Wireframe angepasst, Stufe 1 (#190)
+- Feature: Personenseite an Wireframe angepasst, Stufe 1 (#189)
+- Fix: Erfolgsmeldung nach Passwort-Reset statt stillem Redirect (#188)
+- Fix: Passwort-Reset-Link landete auf /dashboard statt bei neuem Passwort (#187)
+- Feature: Unbestätigte Konten nach 7 Tagen automatisch löschen (#186)
+- Feature: Passwort zurücksetzen umgesetzt (#185)
 - Chore: Automatisches Changelog eingerichtet (#184)
 - Chore: Repo-Sicherheitseinstellungen geschärft (#181)
 - Feature: Täglichen Zeitplaner für Cron-Jobs eingerichtet (#180)

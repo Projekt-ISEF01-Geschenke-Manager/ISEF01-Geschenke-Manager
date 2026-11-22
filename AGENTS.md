@@ -25,3 +25,7 @@ Details und Werte: `DESIGN-DARKMODE.md`, Tokens und Komponenten in `src/app/glob
 - **Formulare:** `form-stagger` für gestaffeltes Einblenden der Felder, Abbrechen mit `form-out`, Fehler mit `form-shake`, Speichern mit `card-saved` (Muster siehe `gift-item.tsx`/`person-card.tsx`). Fehlermeldungen mit `anim-in`.
 - **Skeletons:** `loading.tsx` baut den echten Seitenaufbau mit den Bausteinen aus `src/components/skeleton.tsx` (`SkeletonRegion`, `Skeleton`, Karten in `surface`); kein `animate-pulse`.
 - **Navigation:** `DashboardNav` (Header-Tabs mit Symbol und gleitender Markierung ab `sm`, schwebende runde Tabbar unten auf dem Handy). Neue Dashboard-Bereiche dort in `TABS` ergänzen.
+
+## Changelog und PR-Titel
+
+`CHANGELOG.md` wird automatisch gepflegt: Nach jedem Merge nach `main` trägt `.github/workflows/changelog.yml` den **PR-Titel** samt Nummer ein. Deshalb PR-Titel im Format `Feature: …`, `Fix: …`, `Chore: …` oder `Docs: …` schreiben (kurz, auf Deutsch, aus Sicht der Nutzer:innen), nicht `Design:` oder `CI:`. Den Changelog nicht von Hand bearbeiten; der Merge muss ein Merge-Commit sein ("Merge pull request #N"), kein Squash.
