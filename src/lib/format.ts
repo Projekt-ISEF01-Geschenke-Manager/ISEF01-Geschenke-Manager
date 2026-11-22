@@ -44,6 +44,15 @@ export function formatBirthday(
   return year ? `${base} ${year}` : base;
 }
 
+// Formatiert gifts.gift_date (ISO "YYYY-MM-DD") fuer "Fruehere Geschenke"
+// (#21), z. B. "14. November 2026". Manuell aus dem String zerlegt statt
+// new Date(isoDate) - das wuerde als UTC-Mitternacht geparst und koennte
+// sich in Zeitzonen westlich von UTC um einen Tag verschieben.
+export function formatGiftDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  return formatBirthday(day, month, year) ?? isoDate;
+}
+
 // "A", "A und B" oder "A, B und C" - fuer die Teilen-Ansicht ("Geschenkideen
 // für X und Y", A10).
 export function joinWithUnd(names: string[]): string {

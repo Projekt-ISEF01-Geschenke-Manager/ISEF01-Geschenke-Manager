@@ -163,3 +163,46 @@ export async function deleteGift(
   revalidatePath("/dashboard", "layout");
   return { success: true };
 }
+
+export type ConvertGiftState = { error?: string; success?: boolean } | undefined;
+
+// #26 (A9): wandelt eine Idee in ein dokumentiertes Geschenk um. Keine neue
+// Zeile, sondern ein Update derselben gifts-Zeile (siehe "Entscheidung" bei
+// gifts in docs/database-schema.md) - Idee und Geschenk sind derselbe
+// Datensatz, nur Status/Anlass/Datum/Beschreibung aendern sich. Die Idee
+// verschwindet dadurch automatisch aus der aktiven Ideen-Liste (die filtert
+// auf ACTIVE_GIFT_STATUSES) und taucht stattdessen unter "Frühere
+// Geschenke" auf (#21).
+export async function convertGiftToGiven(
+  giftId: string,
+  _prevState: ConvertGiftState,
+  formData: FormData,
+): Promise<ConvertGiftState> {
+  const occasionId = formString(formData.get("occasionId"));
+  const giftDate = formString(formData.get("giftDate"));
+  const description = formString(formData.get("description"));
+
+  if (!giftDate) {
+    return { error: "Bitte gib ein Datum an." };
+  }
+
+  const supabase = await createClient();
+  // RLS stellt sicher, dass nur die eigene Idee umgewandelt werden kann,
+  // auch falls giftId manipuliert wird.
+  const { error } = await supabase
+    .from("gifts")
+    .update({
+      status: "given",
+      occasion_id: occasionId || null,
+      gift_date: giftDate,
+      description: description || null,
+    })
+    .eq("id", giftId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/dashboard", "layout");
+  return { success: true };
+}

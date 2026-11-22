@@ -74,12 +74,29 @@ describe("toggleGiftStatusViaSharedLink", () => {
     giftUpdateEqMock.mockReset();
   });
 
-  it("lehnt einen ungültigen Status ab", async () => {
+  it(
+    "lehnt 'given' ab - das darf nur über die eingeloggte " +
+      "convertGiftToGiven-Aktion gesetzt werden, nie über den öffentlichen Link (#26)",
+    async () => {
+      const result = await toggleGiftStatusViaSharedLink(
+        "token-1",
+        "gift-1",
+        "given",
+        undefined,
+        formData(),
+      );
+
+      expect(result).toEqual({ error: "Ungültiger Status." });
+      expect(checkAndRecordAttemptMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it("lehnt einen völlig unbekannten Status ab", async () => {
     const result = await toggleGiftStatusViaSharedLink(
       "token-1",
       "gift-1",
       // @ts-expect-error - absichtlich ein ungültiger Wert für den Test
-      "given",
+      "unbekannt",
       undefined,
       formData(),
     );

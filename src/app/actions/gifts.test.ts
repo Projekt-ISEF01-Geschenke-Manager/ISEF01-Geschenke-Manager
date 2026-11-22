@@ -210,8 +210,10 @@ describe("setGiftStatus", () => {
 
   it("lehnt einen ungültigen Status ab, ohne die Datenbank anzufassen", async () => {
     await expect(
-      // @ts-expect-error -- bewusst ungültiger Wert für den Test
-      setGiftStatus("gift-1", "given"),
+      // @ts-expect-error -- bewusst ungültiger Wert für den Test. "given"
+      // zaehlt seit #26 als gueltiger Status (Idee -> Geschenk umwandeln),
+      // deshalb hier ein Wert, der nie gueltig ist.
+      setGiftStatus("gift-1", "unbekannt"),
     ).rejects.toThrow("Ungültiger Status");
     expect(updateMock).not.toHaveBeenCalled();
   });
