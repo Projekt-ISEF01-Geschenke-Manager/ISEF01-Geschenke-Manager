@@ -6,6 +6,10 @@ hier automatisch einen Eintrag mit PR-Titel und -Nummer. Kein manueller
 Schritt vor dem Merge nötig.
 
 ## 2026-11-22
+- Fix: Bearbeiten-Formular unsichtbar, Farbmenü und Header auf kleinen Handys (#205)
+- Doku: Design-System um Animationen, Skeletons und Navigation ergänzt (#204)
+- Fix: Changelog-Workflow lief nie, fehlende Einträge nachgetragen (#203)
+- Chore: Mutationstest inkrementell und ohne reine Darstellungsdateien (#202)
 - Feature: Design-Überarbeitung: Animationen, Skeleton-Loader, Navigation mit schwebender Tabbar am Handy und neue Seite Geteilte Links (#201)
 - Feature: Einheitliches Farbsystem mit wählbaren Paletten, Karten und Buttons (#200)
 - Fix: Geschenk-Workflow automatisiert statt manuellem "Als Geschenk übernehmen" (#198)
