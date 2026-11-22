@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { requireUser } from "@/lib/supabase/server";
 import { ShareLinkForm } from "@/components/share-link-form";
 import { SharedLinkItem } from "@/components/shared-link-item";
@@ -35,17 +36,30 @@ export default async function SharedLinksPage({
   }));
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 2xl:max-w-3xl">
-        <Link
-          href="/dashboard"
-          className="w-fit text-sm text-muted hover:underline"
+    <main className="mx-auto flex w-full max-w-[1140px] flex-1 flex-col gap-7 px-6 pt-8 pb-14 2xl:max-w-[1600px]">
+      <Link href="/dashboard" className="btn btn-secondary btn-sm w-fit">
+        <ChevronLeft className="h-3.5 w-3.5 shrink-0" />
+        Zurück zur Übersicht
+      </Link>
+
+      <div className="flex flex-col gap-1">
+        <h1 className="text-[34px] font-bold text-h1">Geteilte Links</h1>
+        <p className="max-w-xl text-sm text-muted">
+          Mit einem Link können andere die Ideen ausgewählter Personen ansehen
+          und markieren, was schon besorgt ist.
+        </p>
+      </div>
+
+      {/* Zwei Spalten wie auf der Übersicht: links der Erstellen-Bereich,
+          rechts die Liste der bestehenden Links. */}
+      <div className="flex flex-wrap items-start gap-6">
+        <section
+          aria-labelledby="neuer-link"
+          className="surface reveal flex min-w-0 flex-1 basis-[320px] flex-col gap-4 rounded-2xl p-6 max-lg:max-w-full lg:max-w-[380px]"
         >
-          ‹ Zurück zur Übersicht
-        </Link>
-
-        <h1 className="text-2xl font-semibold">Ideen teilen</h1>
-
-        <div className="rounded-2xl border-2 border-accent p-4">
+          <h2 id="neuer-link" className="text-xl font-bold text-heading">
+            Neuen Link erstellen
+          </h2>
           {!people || people.length === 0 ? (
             <p className="text-sm text-muted">
               Lege zuerst eine Person an, um Ideen teilen zu können.
@@ -56,16 +70,25 @@ export default async function SharedLinksPage({
               preselectedPersonId={preselectedPersonId}
             />
           )}
-        </div>
+        </section>
 
-        <div>
-          <h2 className="text-lg font-semibold">Geteilte Links</h2>
+        <section
+          aria-labelledby="bestehende-links"
+          className="surface reveal flex min-w-0 flex-[999] basis-[560px] flex-col gap-2 rounded-2xl p-6"
+        >
+          <h2 id="bestehende-links" className="text-xl font-bold text-heading">
+            Deine Links {links.length > 0 ? `(${links.length})` : ""}
+          </h2>
           {links.length === 0 ? (
-            <p className="mt-2 text-sm text-muted">
-              Noch keine Links erstellt.
-            </p>
+            <div className="mt-2 rounded-xl border border-dashed border-input-border p-5">
+              <p className="font-semibold text-heading">Noch keine Links erstellt</p>
+              <p className="mt-1 text-sm text-muted">
+                Wähle links eine oder mehrere Personen und erstelle deinen
+                ersten Link.
+              </p>
+            </div>
           ) : (
-            <ul className="mt-2 divide-y divide-line border-t border-line">
+            <ul className="divide-y divide-line">
               {links.map((link) => (
                 <SharedLinkItem
                   key={link.id}
@@ -77,7 +100,8 @@ export default async function SharedLinksPage({
               ))}
             </ul>
           )}
-        </div>
+        </section>
+      </div>
     </main>
   );
 }

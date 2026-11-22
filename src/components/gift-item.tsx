@@ -1,7 +1,11 @@
 "use client";
 
-import { useTransition, useActionState, useState, useRef } from "react";
-import { ExternalLink, Circle, CheckCircle2, ChevronDown, Undo2 } from "lucide-react";
+import { useTransition, useActionState, useState, useRef, useEffect } from "react";
+import { useRemoveAnimation } from "@/lib/use-remove-animation";
+import { GiftLink } from "@/components/gift-link";
+import { canAnimate } from "@/lib/motion";
+import { useStatusAnimation } from "@/lib/use-status-animation";
+import { Circle, CheckCircle2, ChevronDown, Undo2 } from "lucide-react";
 import {
   setGiftStatus,
   deleteGift,
@@ -9,7 +13,6 @@ import {
   type GiftStatus,
   type GiftFormState,
 } from "@/app/actions/gifts";
-import { shortLink } from "@/lib/url";
 import { Modal } from "@/components/modal";
 
 export type Gift = {
@@ -49,6 +52,18 @@ export function GiftItem({
     },
   );
   const isPurchased = gift.status === "purchased";
+  const statusAnimation = useStatusAnimation(isPurchased);
+  const [removeRef, startRemove, cancelRemove] = useRemoveAnimation<HTMLLIElement>();
+
+  // Schlaegt das Loeschen fehl: Karte kommt zurueck, Popup mit Fehlermeldung
+  // oeffnet sich wieder.
+  const deleteError = deleteState?.error;
+  useEffect(() => {
+    if (!deleteError) return;
+    cancelRemove();
+    const dialog = deleteDialogRef.current;
+    if (dialog && !dialog.open) dialog.showModal();
+  }, [deleteError, cancelRemove]);
 
   // Formular nach erfolgreichem Speichern wieder einklappen - zeigt dann
   // die aktualisierten Werte aus dem (neu geladenen) gift-Objekt an. Direkt
@@ -56,10 +71,16 @@ export function GiftItem({
   // "Adjusting state when a prop changes"), weil set-state-in-effect sonst
   // unnoetig eine zusaetzliche Render-Kaskade ausloest.
   const [lastUpdateState, setLastUpdateState] = useState(updateState);
+  const [closing, setClosing] = useState(false);
+  const [shake, setShake] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
   if (updateState !== lastUpdateState) {
     setLastUpdateState(updateState);
     if (updateState?.success && isEditing) {
       setIsEditing(false);
+      setSavedFlash(true);
+    } else if (updateState?.error) {
+      setShake(true);
     }
   }
 
@@ -73,7 +94,19 @@ export function GiftItem({
   if (isEditing) {
     return (
       <li className="surface reveal rounded-2xl p-4">
-        <form action={updateAction} className="flex flex-col gap-2">
+        <form
+          action={updateAction}
+          className={`form-stagger flex flex-col gap-2 ${closing ? "form-out" : ""} ${shake ? "form-shake" : ""}`}
+          onAnimationEnd={(event) => {
+            if (event.target !== event.currentTarget) return;
+            if (event.animationName === "form-out") {
+              setClosing(false);
+              setIsEditing(false);
+            } else if (event.animationName === "form-shake") {
+              setShake(false);
+            }
+          }}
+        >
           <input
             type="text"
             name="title"
@@ -105,7 +138,7 @@ export function GiftItem({
             <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-muted" />
           </div>
           {updateState?.error && (
-            <p className="text-xs text-danger">
+            <p className="anim-in text-xs text-danger">
               {updateState.error}
             </p>
           )}
@@ -119,7 +152,11 @@ export function GiftItem({
             <button
               type="button"
               onClick={() => {
-                setIsEditing(false);
+                if (canAnimate()) {
+                  setClosing(true);
+                } else {
+                  setIsEditing(false);
+                }
               }}
               className="btn btn-secondary btn-sm"
             >
@@ -132,7 +169,15 @@ export function GiftItem({
   }
 
   return (
-    <li className="surface reveal rounded-2xl p-4">
+    <li
+      ref={removeRef}
+      className={`surface reveal rounded-2xl p-4 ${savedFlash ? "card-saved" : ""}`}
+      onAnimationEnd={(event) => {
+        if (event.target === event.currentTarget && event.animationName === "card-saved") {
+          setSavedFlash(false);
+        }
+      }}
+    >
       {/* Stapelt auf Mobile (Bild+Titel oben, Aktions-Buttons darunter) statt
           nebeneinander - bei fixer Breite der Buttons (shrink-0) ueberlagerte
           sich das sonst auf schmalen Bildschirmen mit dem Titel. */}
@@ -150,18 +195,9 @@ export function GiftItem({
               </span>
             </div>
             {gift.link && (
-              <p className="mt-1.5 text-sm">
-                <a
-                  href={gift.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={gift.link}
-                  className="inline-flex items-center gap-1 underline"
-                >
-                  <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                  {shortLink(gift.link)}
-                </a>
-              </p>
+              <div className="mt-2">
+                <GiftLink href={gift.link} title={gift.link} />
+              </div>
             )}
           </div>
         </div>
@@ -176,7 +212,8 @@ export function GiftItem({
             disabled={isPending}
             aria-label={isPurchased ? "Besorgt" : undefined}
             title={isPurchased ? "Wieder auf offen setzen" : "Als besorgt markieren"}
-            className={`group btn btn-sm ${isPurchased ? "btn-success" : "btn-secondary"}`}
+            className={`group btn btn-sm ${isPurchased ? "btn-success" : "btn-secondary"} ${statusAnimation.className}`}
+            onAnimationEnd={statusAnimation.onAnimationEnd}
           >
             {isPurchased ? (
               <>
@@ -229,7 +266,13 @@ export function GiftItem({
           >
             Abbrechen
           </button>
-          <form action={deleteAction}>
+          <form
+            action={deleteAction}
+            onSubmit={() => {
+              deleteDialogRef.current?.close();
+              startRemove();
+            }}
+          >
             <button
               type="submit"
               disabled={isDeletePending}

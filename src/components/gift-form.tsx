@@ -54,12 +54,12 @@ export function GiftForm({
   return (
     <div>
       {state?.error && (
-        <p className="mb-3 rounded-lg border border-danger-line bg-danger-bg px-3 py-2 text-sm text-danger">
+        <p className="anim-in mb-3 rounded-lg border border-danger-line bg-danger-bg px-3 py-2 text-sm text-danger">
           {state.error}
         </p>
       )}
 
-      <form ref={formRef} action={formAction} className="flex flex-col gap-3">
+      <form ref={formRef} action={formAction} className="form-stagger flex flex-col gap-3">
         {lockedPersonName ? (
           <input type="hidden" name="personId" value={defaultPersonId} />
         ) : (
