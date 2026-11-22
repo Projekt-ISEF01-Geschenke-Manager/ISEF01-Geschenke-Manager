@@ -525,10 +525,8 @@ body {
       background-color var(--ease),
       border-color var(--ease),
       color var(--ease),
+      box-shadow var(--ease),
       transform var(--ease);
-  }
-  .btn:active:not(:disabled) {
-    transform: scale(0.98);
   }
   .btn:disabled {
     cursor: not-allowed;
@@ -566,6 +564,14 @@ body {
     color: #1a0505;
   }
   @media (hover: hover) {
+    /* Gleicher Hover wie bei den Karten: leicht anheben + Schatten. */
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: var(--elev-hover);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--accent);
+    }
     .btn-primary:hover:not(:disabled) {
       background: var(--btn-hover);
     }
@@ -581,6 +587,10 @@ body {
     .btn-danger-outline:hover:not(:disabled) {
       background: var(--danger-bg);
     }
+  }
+  .btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+    box-shadow: none;
   }
 }
 
@@ -636,7 +646,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .surface-interactive:hover {
+  .surface-interactive:hover,
+  .btn:hover:not(:disabled) {
     transform: none;
   }
 }
