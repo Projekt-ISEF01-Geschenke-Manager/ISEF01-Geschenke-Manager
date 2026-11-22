@@ -34,30 +34,113 @@ function runMonthKey(now: Date): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function renderBirthdayEmailHtml(targetMonth: number, people: PersonWithGifts[]): string {
-  const monthLabel = monthName(targetMonth);
-  const settingsUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/dashboard/einstellungen`;
+// Inline-gestyltes, tabellenbasiertes HTML (E-Mail-Clients unterstuetzen
+// kein externes/eingebettetes CSS zuverlaessig, siehe AGENTS.md
+// Design-System) - Farben sind die Hex-Werte der "rose"-Standardpalette
+// (globals.css), da E-Mail-Clients CSS-Variablen nicht aufloesen.
+const EMAIL_COLORS = {
+  bg: "#f5eeed",
+  card: "#ffffff",
+  heading: "#1f1719",
+  muted: "#5f5254",
+  accent: "#8a3552",
+  accentSoft: "rgba(138, 53, 82, 0.09)",
+  success: "#3f6b4f",
+  successSoft: "rgba(63, 107, 79, 0.12)",
+  line: "#dccbc9",
+};
 
-  const peopleHtml = people
-    .map((person) => {
-      const giftsHtml = person.gifts.length
-        ? `<ul>${person.gifts
-            .map(
-              (gift) =>
-                `<li>${gift.title} (${gift.status === "idea" ? "offen" : "besorgt"})</li>`,
-            )
-            .join("")}</ul>`
-        : "";
-      return `<p>${person.name} – ${person.birthday_day}. ${monthLabel}</p>${giftsHtml}`;
+function renderGiftsHtml(gifts: GiftRow[]): string {
+  if (gifts.length === 0) {
+    return `<p style="margin:10px 0 0; font-size:14px; color:${EMAIL_COLORS.muted};">Noch keine Geschenkideen eingetragen.</p>`;
+  }
+
+  const rows = gifts
+    .map((gift) => {
+      const isIdea = gift.status === "idea";
+      const statusColor = isIdea ? EMAIL_COLORS.accent : EMAIL_COLORS.success;
+      const statusBg = isIdea ? EMAIL_COLORS.accentSoft : EMAIL_COLORS.successSoft;
+      return `
+        <tr>
+          <td style="padding:4px 0; font-size:14px; color:${EMAIL_COLORS.heading};">
+            <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background-color:${EMAIL_COLORS.accent}; margin-right:10px;"></span>${gift.title}
+            <span style="display:inline-block; margin-left:8px; padding:2px 10px; font-size:11px; font-weight:600; color:${statusColor}; background-color:${statusBg}; border-radius:9999px;">${isIdea ? "offen" : "besorgt"}</span>
+          </td>
+        </tr>`;
     })
     .join("");
 
-  return [
-    "<p>Hallo,</p>",
-    `<p>im ${monthLabel} haben folgende Personen Geburtstag:</p>`,
-    peopleHtml,
-    `<p><a href="${settingsUrl}">Einstellungen ändern</a></p>`,
-  ].join("");
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px;">${rows}</table>`;
+}
+
+function renderPersonRow(person: PersonWithGifts, monthLabel: string): string {
+  return `
+    <tr>
+      <td style="padding-bottom:16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${EMAIL_COLORS.bg}; border-left:4px solid ${EMAIL_COLORS.accent}; border-radius:12px;">
+          <tr>
+            <td style="padding:16px 20px;">
+              <p style="margin:0; font-size:16px; font-weight:600; color:${EMAIL_COLORS.heading};">${person.name}<span style="font-weight:400; color:${EMAIL_COLORS.accent};"> – ${person.birthday_day}. ${monthLabel}</span></p>
+              ${renderGiftsHtml(person.gifts)}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>`;
+}
+
+function renderBirthdayEmailHtml(targetMonth: number, people: PersonWithGifts[]): string {
+  const monthLabel = monthName(targetMonth);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const settingsUrl = `${siteUrl}/dashboard/einstellungen`;
+  const logoUrl = `${siteUrl}/giftwise-symbol-transparent.png`;
+
+  const peopleHtml = people.map((person) => renderPersonRow(person, monthLabel)).join("");
+
+  return `<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Geburtstage im ${monthLabel}</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:${EMAIL_COLORS.bg}; -webkit-text-size-adjust:100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${EMAIL_COLORS.bg};">
+      <tr>
+        <td align="center" style="padding:32px 16px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px; background-color:${EMAIL_COLORS.card}; border-radius:20px; border:1px solid ${EMAIL_COLORS.line};">
+            <tr>
+              <td align="center" style="padding:32px 32px 24px; border-bottom:1px solid ${EMAIL_COLORS.line};">
+                <img src="${logoUrl}" width="48" height="48" alt="Giftwise" style="display:block; margin:0 auto 12px;" />
+                <div style="font-size:20px; font-weight:300; letter-spacing:0.18em; color:${EMAIL_COLORS.accent};">GIFTWISE</div>
+                <div style="font-size:12px; letter-spacing:0.08em; color:${EMAIL_COLORS.muted}; margin-top:4px;">Klug schenken</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:32px;">
+                <p style="margin:0 0 4px; font-size:16px; color:${EMAIL_COLORS.heading};">Hallo,</p>
+                <p style="margin:0 0 24px; font-size:16px; color:${EMAIL_COLORS.heading};">im <strong>${monthLabel}</strong> haben folgende Personen Geburtstag:</p>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${peopleHtml}</table>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;">
+                  <tr>
+                    <td align="center">
+                      <a href="${settingsUrl}" style="display:inline-block; background-color:${EMAIL_COLORS.accent}; color:#ffffff; font-size:14px; font-weight:600; text-decoration:none; padding:12px 28px; border-radius:9999px;">Einstellungen ändern</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding:20px 32px 28px; border-top:1px solid ${EMAIL_COLORS.line};">
+                <p style="margin:0; font-size:12px; color:${EMAIL_COLORS.muted};">Diese E-Mail wurde automatisch von Geschenke-Manager verschickt.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
 }
 
 async function processAccount(
