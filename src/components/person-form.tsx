@@ -142,7 +142,7 @@ export function PersonForm({
           <input
             type="checkbox"
             name="remindersEnabled"
-            defaultChecked={person ? person.reminders_enabled : true}
+            defaultChecked={state?.values?.remindersEnabled ?? true}
           />
           In Erinnerungen einschließen
         </label>

@@ -93,6 +93,52 @@ describe("PersonForm", () => {
     ).toBe(true);
   });
 
+  it(
+    "behaelt die abgewaehlte Erinnerungen-Checkbox bei fehlgeschlagener " +
+      "Validierung bei (statt auf den DB-Wert zurueckzuspringen)",
+    async () => {
+      // Name wird ausgefuellt, damit die native required-Validierung des
+      // Browsers die Übermittlung nicht blockiert - der (hier gemockte)
+      // Fehlschlag soll ein anderes Feld betreffen. Die zurueckgegebenen
+      // state.values spiegeln das wider: remindersEnabled bleibt false,
+      // so wie es der Nutzer in der Checkbox eingestellt hat.
+      createPersonMock.mockResolvedValue({
+        error: "Bitte gib ein gültiges Geburtsdatum ein.",
+        values: {
+          name: "Oma Erna",
+          birthdayDay: "99",
+          birthdayMonth: "",
+          birthdayYear: "",
+          interests: "",
+          notes: "",
+          remindersEnabled: false,
+        },
+      });
+      render(<PersonForm />);
+
+      fillRequiredFields();
+      const checkbox = screen.getByLabelText(
+        /in erinnerungen einschließen/i,
+      ) as HTMLInputElement;
+      expect(checkbox.checked).toBe(true);
+      fireEvent.click(checkbox);
+      expect(checkbox.checked).toBe(false);
+
+      fireEvent.click(screen.getByRole("button", { name: "Person anlegen" }));
+
+      await waitFor(() =>
+        expect(
+          screen.getByText("Bitte gib ein gültiges Geburtsdatum ein."),
+        ).not.toBeNull(),
+      );
+
+      expect(
+        (screen.getByLabelText(/in erinnerungen einschließen/i) as HTMLInputElement)
+          .checked,
+      ).toBe(false);
+    },
+  );
+
   it("übernimmt reminders_enabled=false einer bestehenden Person als nicht angehakt", () => {
     render(
       <PersonForm

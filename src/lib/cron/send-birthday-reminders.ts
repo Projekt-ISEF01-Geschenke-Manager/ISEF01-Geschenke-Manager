@@ -36,7 +36,7 @@ function runMonthKey(now: Date): string {
 
 function renderBirthdayEmailHtml(targetMonth: number, people: PersonWithGifts[]): string {
   const monthLabel = monthName(targetMonth);
-  const settingsUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/dashboard/einstellungen`;
+  const settingsUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/dashboard/einstellungen`;
 
   const peopleHtml = people
     .map((person) => {
