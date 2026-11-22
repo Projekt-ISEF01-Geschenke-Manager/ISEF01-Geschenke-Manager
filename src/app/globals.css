@@ -692,3 +692,302 @@ body {
     animation: none;
   }
 }
+
+/* Status-Feedback (besorgt / rueckgaengig): kurze Animation am Button, damit
+   die Aenderung auch auf Touch-Geraeten ohne Hover sichtbar ist. */
+@keyframes status-done {
+  0% {
+    transform: scale(0.92);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 45%, transparent);
+  }
+  40% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 12px color-mix(in srgb, var(--success) 0%, transparent);
+  }
+}
+@keyframes status-check {
+  0% {
+    transform: scale(0) rotate(-30deg);
+  }
+  60% {
+    transform: scale(1.35) rotate(8deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+@keyframes status-undo {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+}
+@keyframes status-spin {
+  from {
+    transform: rotate(-200deg) scale(0.6);
+  }
+  to {
+    transform: rotate(0) scale(1);
+  }
+}
+
+.status-done {
+  animation: status-done 520ms cubic-bezier(0.2, 0, 0, 1);
+}
+.status-done svg {
+  animation: status-check 460ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.status-undo {
+  animation: status-undo 300ms ease-out;
+}
+.status-undo svg {
+  animation: status-spin 340ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-done,
+  .status-done svg,
+  .status-undo,
+  .status-undo svg {
+    animation: none;
+  }
+}
+
+/* Weitere Uebergaenge: Popup (Ein-/Ausblenden), Toast, aufklappende Bereiche.
+   Popup-Ausblenden nutzt allow-discrete (neuere Browser); in aelteren
+   Browsern schliesst es ohne Animation. */
+.app-dialog {
+  opacity: 0;
+  scale: 0.96;
+  transition:
+    opacity 180ms ease-out,
+    scale 180ms ease-out,
+    overlay 180ms allow-discrete,
+    display 180ms allow-discrete;
+}
+.app-dialog[open] {
+  opacity: 1;
+  scale: 1;
+}
+.app-dialog::backdrop {
+  background: rgb(0 0 0 / 0);
+  transition:
+    background-color 180ms ease-out,
+    overlay 180ms allow-discrete,
+    display 180ms allow-discrete;
+}
+.app-dialog[open]::backdrop {
+  background: rgb(0 0 0 / 0.5);
+}
+@starting-style {
+  .app-dialog[open] {
+    opacity: 0;
+    scale: 0.96;
+  }
+  .app-dialog[open]::backdrop {
+    background: rgb(0 0 0 / 0);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+.toast-in {
+  animation: toast-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.toast-out {
+  animation: toast-out 200ms ease-in forwards;
+}
+
+@keyframes anim-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.anim-in {
+  animation: anim-in 240ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-dialog,
+  .app-dialog::backdrop {
+    transition: none;
+  }
+  .toast-in,
+  .toast-out,
+  .anim-in {
+    animation: none;
+  }
+}
+
+/* Formulare (Bearbeiten): Einblenden mit gestaffelten Feldern, Ausblenden
+   beim Abbrechen, Wackeln bei Fehlern, gruener Schimmer nach dem Speichern.
+   form-out/form-shake/card-saved werden per onAnimationEnd ausgewertet; bei
+   "Bewegung reduzieren" laufen sie in 1 ms, damit das Ende trotzdem feuert. */
+@keyframes form-out {
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+@keyframes form-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  60% {
+    transform: translateX(4px);
+  }
+}
+@keyframes card-saved {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 55%, transparent);
+    background-color: color-mix(in srgb, var(--success) 12%, var(--card));
+  }
+  100% {
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--success) 0%, transparent);
+    background-color: var(--card);
+  }
+}
+.form-out {
+  animation: form-out 160ms ease-in forwards;
+}
+.form-shake {
+  animation: form-shake 320ms ease-out;
+}
+.card-saved {
+  animation: card-saved 700ms ease-out;
+}
+.form-stagger > * {
+  animation: anim-in 260ms cubic-bezier(0.2, 0, 0, 1) backwards;
+}
+.form-stagger > :nth-child(2) {
+  animation-delay: 40ms;
+}
+.form-stagger > :nth-child(3) {
+  animation-delay: 80ms;
+}
+.form-stagger > :nth-child(4) {
+  animation-delay: 120ms;
+}
+.form-stagger > :nth-child(5) {
+  animation-delay: 160ms;
+}
+.form-stagger > :nth-child(n + 6) {
+  animation-delay: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .form-out,
+  .form-shake,
+  .card-saved {
+    animation-duration: 1ms;
+  }
+  .form-stagger > * {
+    animation: none;
+  }
+}
+
+/* Skeleton-Loader: Platzhalter in Karten-Optik mit weichem Lichtschimmer. */
+@keyframes skeleton-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--track);
+  border-radius: 0.5rem;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--card) 65%, transparent),
+    transparent
+  );
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+.skeleton-round {
+  border-radius: 9999px;
+}
+.skeleton-fade {
+  animation: anim-in 200ms ease-out backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}
+
+/* Navigation: Header-Tabs mit gleitender Markierung (Desktop) und feste
+   Leiste unten (Handy). Die Leiste reserviert Platz fuer die Sicherheitszone. */
+.nav-glider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 9999px;
+  background: rgb(0 0 0 / 0.22);
+  opacity: 0;
+  pointer-events: none;
+}
+.tabbar {
+  /* Schwebende, runde Leiste wie bei iOS: Abstand zum Rand und zur
+     Sicherheitszone, leicht durchscheinend mit Unschaerfe. */
+  bottom: max(0.75rem, env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+}
+.tabbar-glider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc(100% / 3);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  transform: translateX(calc(var(--tab-index, 0) * 100%));
+  transition: transform 300ms cubic-bezier(0.2, 0.9, 0.2, 1.1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tabbar-glider {
+    transition: none;
+  }
+}

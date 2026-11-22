@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 
 const AUTO_DISMISS_MS = 3000;
+const LEAVE_MS = 200;
 
 // Schlichte Erfolgsmeldung unten mittig, verschwindet von selbst - genutzt
 // als Bestätigung, wenn ein Popup nach erfolgreichem Speichern automatisch
@@ -39,16 +40,37 @@ export function Toast({
     };
   }, [message]);
 
-  if (!message) return null;
+  // Nach dem Wegnehmen der Nachricht bleibt der Toast noch kurz stehen und
+  // gleitet aus (State aus Props ableiten, direkt beim Rendern).
+  const [shown, setShown] = useState<string | null>(message);
+  const [leaving, setLeaving] = useState(false);
+  if (message) {
+    if (message !== shown) setShown(message);
+    if (leaving) setLeaving(false);
+  } else if (shown && !leaving) {
+    setLeaving(true);
+  }
+
+  useEffect(() => {
+    if (!leaving) return;
+    const timer = setTimeout(() => {
+      setShown(null);
+    }, LEAVE_MS);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [leaving]);
+
+  if (!shown) return null;
 
   return (
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-btn-bg px-5 py-3 text-sm font-medium text-btn-text shadow-lg"
+      className={`${leaving ? "toast-out" : "toast-in"} fixed bottom-28 left-1/2 z-50 sm:bottom-6 flex -translate-x-1/2 items-center gap-2 rounded-full bg-btn-bg px-5 py-3 text-sm font-medium text-btn-text shadow-lg`}
     >
       <CheckCircle2 className="h-5 w-5 shrink-0" />
-      {message}
+      {shown}
     </div>
   );
 }
