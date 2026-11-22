@@ -154,7 +154,7 @@ describe("PersonForm", () => {
       />,
     );
     expect(
-      (screen.getByLabelText(/in erinnerungen einschließen/i) as HTMLInputElement).checked,
-    ).toBe(false);
+      screen.getByRole("checkbox", { name: /in erinnerungen einschließen/i }),
+    ).toHaveProperty("checked", false);
   });
 });
