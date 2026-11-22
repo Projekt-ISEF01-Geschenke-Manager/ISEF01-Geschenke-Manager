@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { requireUser } from "@/lib/supabase/server";
 import { PersonCard } from "@/components/person-card";
 import { IdeenCard } from "@/components/ideen-card";
@@ -93,11 +94,9 @@ export default async function PersonPage({
 
   return (
     <main className="mx-auto flex w-full max-w-[1140px] flex-1 flex-col gap-7 px-6 pt-8 pb-14 2xl:max-w-[1600px]">
-      <Link
-        href="/dashboard"
-        className="w-fit text-sm text-muted hover:underline"
-      >
-        ‹ Zurück zur Übersicht
+      <Link href="/dashboard" className="btn btn-secondary btn-sm w-fit">
+        <ChevronLeft className="h-3.5 w-3.5 shrink-0" />
+        Zurück zur Übersicht
       </Link>
 
       <PersonCard person={person} birthdayText={birthdayText} />

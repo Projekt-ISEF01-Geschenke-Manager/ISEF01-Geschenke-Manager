@@ -24,7 +24,7 @@ export function Modal({
       // greift das margin:auto-Zentrieren aus dem UA-Stylesheet von
       // dialog:modal nicht mehr (Dialog landet sonst oben links) - Position
       // daher explizit per fixed + translate statt margin:auto.
-      className="fixed top-1/2 left-1/2 max-h-[calc(100vh-2rem)] w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border-none bg-card p-0 text-text shadow-pop backdrop:bg-black/50"
+      className="app-dialog fixed top-1/2 left-1/2 max-h-[calc(100vh-2rem)] w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border-none bg-card p-0 text-text shadow-pop"
       onClick={(event) => {
         const dialog = dialogRef.current;
         if (dialog && event.target === dialog) {

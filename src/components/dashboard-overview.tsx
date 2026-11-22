@@ -151,7 +151,7 @@ export function DashboardOverview({
                   className="h-2 overflow-hidden rounded-full bg-track"
                 >
                   <div
-                    className="h-full rounded-full bg-accent"
+                    className="h-full rounded-full bg-accent transition-[width] duration-500 ease-out"
                     style={{ width: `${weihnachtenPct}%` }}
                   />
                 </div>

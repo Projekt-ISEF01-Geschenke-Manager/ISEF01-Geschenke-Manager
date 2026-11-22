@@ -18,6 +18,7 @@ export function PersonCard({
   birthdayText: string | null;
 }) {
   const [editing, setEditing] = useState(false);
+  const [closing, setClosing] = useState(false);
 
   return (
     <div className="surface reveal rounded-2xl p-6">
@@ -66,7 +67,11 @@ export function PersonCard({
           <button
             type="button"
             onClick={() => {
-              setEditing((value) => !value);
+              if (editing) {
+                setClosing(true);
+              } else {
+                setEditing(true);
+              }
             }}
             className="btn btn-secondary w-[130px]"
           >
@@ -76,7 +81,15 @@ export function PersonCard({
       </div>
 
       {editing && (
-        <div className="mt-5 flex flex-col gap-3 border-t border-line pt-5">
+        <div
+          className={`${closing ? "form-out" : "anim-in"} mt-5 flex flex-col gap-3 border-t border-line pt-5`}
+          onAnimationEnd={(event) => {
+            if (event.target === event.currentTarget && event.animationName === "form-out") {
+              setClosing(false);
+              setEditing(false);
+            }
+          }}
+        >
           <PersonForm person={person} />
           <DeletePersonButton
             personId={person.id}

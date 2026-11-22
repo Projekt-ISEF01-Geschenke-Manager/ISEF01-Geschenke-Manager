@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { requireUser } from "@/lib/supabase/server";
 import { ShareLinkForm } from "@/components/share-link-form";
 import { SharedLinkItem } from "@/components/shared-link-item";
@@ -36,11 +37,9 @@ export default async function SharedLinksPage({
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 2xl:max-w-3xl">
-        <Link
-          href="/dashboard"
-          className="w-fit text-sm text-muted hover:underline"
-        >
-          ‹ Zurück zur Übersicht
+        <Link href="/dashboard" className="btn btn-secondary btn-sm w-fit">
+          <ChevronLeft className="h-3.5 w-3.5 shrink-0" />
+          Zurück zur Übersicht
         </Link>
 
         <h1 className="text-2xl font-semibold">Ideen teilen</h1>

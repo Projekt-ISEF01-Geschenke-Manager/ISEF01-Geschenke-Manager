@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { useRemoveAnimation } from "@/lib/use-remove-animation";
 import { deleteSharedLink } from "@/app/actions/shared-links";
 
 export function SharedLinkItem({
@@ -19,6 +20,13 @@ export function SharedLinkItem({
     undefined,
   );
   const [copied, setCopied] = useState(false);
+  const [removeRef, startRemove, cancelRemove] = useRemoveAnimation<HTMLLIElement>();
+
+  // Schlaegt das Widerrufen fehl, kommt der Eintrag wieder zurueck.
+  const error = state?.error;
+  useEffect(() => {
+    if (error) cancelRemove();
+  }, [error, cancelRemove]);
 
   function copyLink() {
     const url = `${window.location.origin}/teilen/${token}`;
@@ -33,7 +41,7 @@ export function SharedLinkItem({
   }
 
   return (
-    <li className="flex flex-wrap items-center justify-between gap-2 py-3">
+    <li ref={removeRef} className="flex flex-wrap items-center justify-between gap-2 py-3">
       <div>
         <p className="font-medium">{peopleNames.join(", ")}</p>
         <p className="text-sm text-muted">
@@ -67,7 +75,9 @@ export function SharedLinkItem({
             )
           ) {
             event.preventDefault();
+            return;
           }
+          startRemove();
         }}
       >
         <button

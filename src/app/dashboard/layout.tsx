@@ -31,6 +31,8 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
       <SiteHeader userName={firstName} nav={<DashboardNav />} />
       {children}
       <SiteFooter />
+      {/* Platz fuer die feste Navigationsleiste am unteren Rand (nur Handy). */}
+      <div aria-hidden="true" className="h-[calc(6rem+env(safe-area-inset-bottom))] sm:hidden" />
     </>
   );
 }

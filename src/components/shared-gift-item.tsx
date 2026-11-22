@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { ExternalLink, Circle, CheckCircle2, Undo2 } from "lucide-react";
+import { useStatusAnimation } from "@/lib/use-status-animation";
 import { isValidHttpUrl } from "@/lib/url";
 import type { GiftStatus } from "@/lib/gift-status";
 import { Modal } from "@/components/modal";
@@ -33,6 +34,7 @@ export function SharedGiftItem({
   token: string;
 }) {
   const isPurchased = gift.status === "purchased";
+  const statusAnimation = useStatusAnimation(isPurchased);
   const nextStatus: GiftStatus = isPurchased ? "idea" : "purchased";
   const [state, toggleAction, isPending] = useActionState<
     SharedGiftStatusState,
@@ -75,7 +77,8 @@ export function SharedGiftItem({
                   disabled={isPending}
                   aria-label="Besorgt"
                   title="Wieder auf offen setzen"
-                  className="group btn btn-sm btn-success"
+                  className={`group btn btn-sm btn-success ${statusAnimation.className}`}
+                  onAnimationEnd={statusAnimation.onAnimationEnd}
                 >
                   <CheckCircle2 className="h-3.5 w-3.5 shrink-0 group-hover:hidden" />
                   <Undo2 className="hidden h-3.5 w-3.5 shrink-0 group-hover:block" />
@@ -87,7 +90,8 @@ export function SharedGiftItem({
                 type="button"
                 onClick={() => nameDialogRef.current?.showModal()}
                 title="Als besorgt markieren"
-                className="group btn btn-sm btn-secondary"
+                className={`group btn btn-sm btn-secondary ${statusAnimation.className}`}
+                onAnimationEnd={statusAnimation.onAnimationEnd}
               >
                 <Circle className="h-3.5 w-3.5 shrink-0 group-hover:hidden" />
                 <CheckCircle2 className="hidden h-3.5 w-3.5 shrink-0 group-hover:block" />
