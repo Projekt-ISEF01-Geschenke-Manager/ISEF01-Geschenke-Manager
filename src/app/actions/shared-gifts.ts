@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/service";
 import { checkAndRecordAttempt, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
-import { GIFT_STATUSES, type GiftStatus } from "@/lib/gift-status";
+import { ACTIVE_GIFT_STATUSES, type GiftStatus } from "@/lib/gift-status";
 
 export type SharedGiftStatusState = { error?: string; success?: boolean } | undefined;
 
@@ -31,7 +31,11 @@ export async function toggleGiftStatusViaSharedLink(
   _prevState: SharedGiftStatusState,
   formData: FormData,
 ): Promise<SharedGiftStatusState> {
-  if (!GIFT_STATUSES.includes(nextStatus)) {
+  // Nicht GIFT_STATUSES (enthaelt seit #26 auch "given") - "given" ist eine
+  // private, dokumentierte Geschenke-Historie und darf nur ueber die
+  // eingeloggte convertGiftToGiven-Aktion gesetzt werden, niemals ueber den
+  // oeffentlichen, unauthentifizierten Link.
+  if (!ACTIVE_GIFT_STATUSES.includes(nextStatus as (typeof ACTIVE_GIFT_STATUSES)[number])) {
     return { error: "Ungültiger Status." };
   }
 

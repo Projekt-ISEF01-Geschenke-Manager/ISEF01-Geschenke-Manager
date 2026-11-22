@@ -1,13 +1,15 @@
 "use client";
 
-import { useTransition, useActionState, useState, useRef } from "react";
+import { useTransition, useActionState, useState, useRef, useEffect } from "react";
 import { ExternalLink, Circle, CheckCircle2, ChevronDown } from "lucide-react";
 import {
   setGiftStatus,
   deleteGift,
   updateGift,
+  convertGiftToGiven,
   type GiftStatus,
   type GiftFormState,
+  type ConvertGiftState,
 } from "@/app/actions/gifts";
 import { shortLink } from "@/lib/url";
 import { Modal } from "@/components/modal";
@@ -37,6 +39,17 @@ export function GiftItem({
     deleteGift.bind(null, gift.id),
     undefined,
   );
+  const convertDialogRef = useRef<HTMLDialogElement>(null);
+  const [convertState, convertAction, isConvertPending] = useActionState<
+    ConvertGiftState,
+    FormData
+  >(convertGiftToGiven.bind(null, gift.id), undefined);
+
+  useEffect(() => {
+    if (convertState?.success) {
+      convertDialogRef.current?.close();
+    }
+  }, [convertState]);
   const [updateState, updateAction] = useActionState<GiftFormState, FormData>(
     updateGift.bind(null, gift.id),
     {
@@ -190,12 +203,12 @@ export function GiftItem({
               )}
               {isPurchased ? "besorgt" : "offen"}
             </button>
-            {/* Platzhalter - "Idee in Geschenk umwandeln" (Anlass/Datum-Dialog) folgt erst in Stufe 2 (#26). */}
+            {/* "Idee in Geschenk umwandeln" (#26) - Anlass/Datum-Dialog statt
+                des bisherigen deaktivierten Platzhalters. */}
             <button
               type="button"
-              disabled
-              title="Folgt in einer späteren Ausbaustufe (#26)"
-              className="cursor-not-allowed rounded-full border border-dashed border-neutral-300 px-3 py-1 text-xs whitespace-nowrap text-neutral-400 dark:border-neutral-600 dark:text-neutral-500"
+              onClick={() => convertDialogRef.current?.showModal()}
+              className="cursor-pointer rounded-full border border-neutral-300 px-3 py-1 text-xs whitespace-nowrap transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
             >
               Als Geschenk übernehmen
             </button>
@@ -250,6 +263,69 @@ export function GiftItem({
             </button>
           </form>
         </div>
+      </Modal>
+
+      <Modal dialogRef={convertDialogRef} title="Als Geschenk übernehmen">
+        <form action={convertAction} className="flex flex-col gap-3">
+          <label className="flex flex-col gap-1 text-sm">
+            Anlass
+            <div className="relative">
+              <select
+                name="occasionId"
+                defaultValue={gift.occasion_id ?? ""}
+                className="w-full appearance-none rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 pr-9 text-base dark:border-neutral-600 sm:text-sm"
+              >
+                <option value="">Ohne Anlass</option>
+                {occasions.map((occasion) => (
+                  <option key={occasion.id} value={occasion.id}>
+                    {occasion.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+            </div>
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
+            Datum
+            <input
+              type="date"
+              name="giftDate"
+              required
+              defaultValue={new Date().toISOString().slice(0, 10)}
+              className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-base dark:border-neutral-600 sm:text-sm"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
+            Notiz (optional)
+            <textarea
+              name="description"
+              rows={2}
+              placeholder="z. B. hat sich sehr gefreut"
+              className="rounded-md border border-neutral-300 bg-transparent px-2.5 py-1.5 text-base dark:border-neutral-600 sm:text-sm"
+            />
+          </label>
+          {convertState?.error && (
+            <p className="text-xs text-red-700 dark:text-red-400">
+              {convertState.error}
+            </p>
+          )}
+          <div className="mt-1 flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => convertDialogRef.current?.close()}
+              className="cursor-pointer rounded-full border border-neutral-300 px-3 py-1.5 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
+            >
+              Abbrechen
+            </button>
+            <button
+              type="submit"
+              disabled={isConvertPending}
+              className="cursor-pointer rounded-full bg-btn-bg px-3 py-1.5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isConvertPending ? "…" : "Übernehmen"}
+            </button>
+          </div>
+        </form>
       </Modal>
 
       {/* Aufgaben-Platzhalter - Checkliste folgt erst in Stufe 3 (#94). */}

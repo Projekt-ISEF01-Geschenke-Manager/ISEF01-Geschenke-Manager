@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   formatBirthday,
+  formatGiftDate,
   initials,
   joinWithUnd,
   monthAbbreviation,
@@ -51,6 +52,16 @@ describe("initials", () => {
 
   it("ignoriert mehrfache Leerzeichen und weitere Wörter", () => {
     expect(initials("Oma  Erna  Müller")).toBe("OE");
+  });
+});
+
+describe("formatGiftDate", () => {
+  it("formatiert ein ISO-Datum wie formatBirthday mit Jahr", () => {
+    expect(formatGiftDate("2026-11-14")).toBe("14. November 2026");
+  });
+
+  it("entfernt die führende Null bei einstelligen Tagen", () => {
+    expect(formatGiftDate("2026-01-09")).toBe("9. Januar 2026");
   });
 });
 
