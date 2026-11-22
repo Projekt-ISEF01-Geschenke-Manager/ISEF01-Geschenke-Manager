@@ -7,7 +7,14 @@ const MAX_ATTEMPTS = 5;
 // "reset" ist schon vorbereitet, wird aber erst mit der Passwort-Reset-
 // Funktion selbst verdrahtet (Stufe 2, aktuell nur Platzhalter unter
 // /passwort-vergessen).
-export type RateLimitAction = "login" | "register" | "reset";
+// "shared-status-toggle": Abhaken auf der geteilten Ansicht (A10, kein
+// Konto noetig) - identifier ist dort der Freigabe-Token statt einer
+// E-Mail, da kein Nutzer-Login existiert, ueber den man zaehlen koennte.
+export type RateLimitAction =
+  | "login"
+  | "register"
+  | "reset"
+  | "shared-status-toggle";
 
 export type RateLimitResult =
   | { limited: true; attemptId: null }
@@ -24,6 +31,11 @@ export type RateLimitResult =
 export async function checkAndRecordAttempt(
   action: RateLimitAction,
   identifier: string,
+  // Login/Registrierung/Reset nutzen bewusst denselben strengen
+  // Standard-Rahmen (QA5). "shared-status-toggle" braucht ein grosszuegigeres
+  // Limit - ein Besucher der geteilten Ansicht hakt im selben Besuch
+  // realistisch mehrere Ideen hintereinander ab, das ist kein Angriffsmuster.
+  options?: { windowMinutes?: number; maxAttempts?: number },
 ): Promise<RateLimitResult> {
   const supabase = createServiceClient();
 
@@ -31,8 +43,8 @@ export async function checkAndRecordAttempt(
     .rpc("check_and_record_rate_limit", {
       p_action: action,
       p_identifier: identifier,
-      p_window_minutes: WINDOW_MINUTES,
-      p_max_attempts: MAX_ATTEMPTS,
+      p_window_minutes: options?.windowMinutes ?? WINDOW_MINUTES,
+      p_max_attempts: options?.maxAttempts ?? MAX_ATTEMPTS,
     })
     .single();
 
