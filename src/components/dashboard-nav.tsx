@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, ListChecks, Share2 } from "lucide-react";
+import { LayoutGrid, ListChecks, Settings, Share2 } from "lucide-react";
 
 // Hauptnavigation des Dashboards. Ermittelt den aktiven Tab selbst ueber
 // usePathname(), statt einen active-Prop von jeder Seite zu verlangen.
@@ -26,16 +26,26 @@ const TABS = [
   { key: "teilen", href: "/dashboard/teilen", label: "Geteilte Links", Icon: Share2 },
 ] as const;
 
+// Einstellungen: auf Desktop kein Haupt-Tab (eigenes Icon im Header,
+// siehe site-header.tsx), auf Mobile aber vierter Eintrag der unteren
+// Tabbar - deshalb eigene Konstante statt in TABS.
+const SETTINGS_TAB = { key: "einstellungen", href: "/dashboard/einstellungen", label: "Einstellungen", Icon: Settings };
+const MOBILE_TABS = [...TABS, SETTINGS_TAB];
+
 function activeKey(pathname: string) {
   if (pathname === "/dashboard") return "uebersicht";
   if (pathname.startsWith("/dashboard/teilen")) return "teilen";
+  if (pathname.startsWith("/dashboard/einstellungen")) return "einstellungen";
   return null;
 }
 
 export function DashboardNav() {
   const pathname = usePathname();
   const active = activeKey(pathname);
-  const activeIndex = TABS.findIndex((tab) => tab.key === active);
+  // Fuer die mobile Tabbar (4 Eintraege inkl. Einstellungen) - der Desktop-
+  // nav-glider ermittelt seine Position stattdessen direkt per DOM
+  // (aria-current), siehe place() unten.
+  const activeIndex = MOBILE_TABS.findIndex((tab) => tab.key === active);
 
   const navRef = useRef<HTMLElement>(null);
   const gliderRef = useRef<HTMLSpanElement>(null);
@@ -112,7 +122,7 @@ export function DashboardNav() {
         aria-label="Hauptnavigation"
         className="tabbar surface fixed inset-x-4 z-40 rounded-full p-1.5 shadow-pop sm:hidden"
       >
-        <div className="relative grid grid-cols-3">
+        <div className="relative grid grid-cols-4">
           {activeIndex >= 0 && (
             <span
               aria-hidden="true"
@@ -120,7 +130,7 @@ export function DashboardNav() {
               style={{ "--tab-index": activeIndex } as React.CSSProperties}
             />
           )}
-          {TABS.map(({ key, href, label, Icon }) =>
+          {MOBILE_TABS.map(({ key, href, label, Icon }) =>
             href ? (
               <Link
                 key={key}
