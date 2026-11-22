@@ -5,6 +5,7 @@ import { PersonCard } from "@/components/person-card";
 import { IdeenCard } from "@/components/ideen-card";
 import { GiftItem, type Gift } from "@/components/gift-item";
 import { ComingSoonCard } from "@/components/coming-soon-card";
+import { PreviousGiftsCard, type PreviousGift } from "@/components/previous-gifts-card";
 import { formatBirthday } from "@/lib/format";
 import { daysUntilNextOccurrence, formatDaysUntil } from "@/lib/upcoming";
 
@@ -39,19 +40,41 @@ export default async function PersonPage({
 
   const { data: giftsData } = await supabase
     .from("gifts")
-    .select("id, title, link, status, occasion_id, occasions(name)")
+    .select(
+      "id, title, link, status, occasion_id, gift_date, description, occasions(name)",
+    )
     .eq("person_id", id)
     .order("created_at", { ascending: false });
 
-  const gifts: Gift[] = (giftsData ?? []).map((gift) => ({
-    id: gift.id,
-    title: gift.title,
-    link: gift.link,
-    status: gift.status,
-    occasion_id: gift.occasion_id,
-    occasion_name:
-      (gift.occasions as unknown as { name: string } | null)?.name ?? null,
-  }));
+  // Eine Idee wird beim Umwandeln (#26) zum "gegebenen" Geschenk (status
+  // "given") - dieselbe Zeile taucht dann hier nicht mehr als aktive Idee
+  // auf, sondern unten unter "Fruehere Geschenke" (#21).
+  const gifts: Gift[] = (giftsData ?? [])
+    .filter((gift) => gift.status !== "given")
+    .map((gift) => ({
+      id: gift.id,
+      title: gift.title,
+      link: gift.link,
+      status: gift.status,
+      occasion_id: gift.occasion_id,
+      occasion_name:
+        (gift.occasions as unknown as { name: string } | null)?.name ?? null,
+    }));
+
+  const previousGifts: PreviousGift[] = (giftsData ?? [])
+    .filter(
+      (gift): gift is typeof gift & { gift_date: string } =>
+        gift.status === "given" && gift.gift_date !== null,
+    )
+    .map((gift) => ({
+      id: gift.id,
+      title: gift.title,
+      description: gift.description,
+      occasion_name:
+        (gift.occasions as unknown as { name: string } | null)?.name ?? null,
+      gift_date: gift.gift_date,
+    }))
+    .sort((a, b) => b.gift_date.localeCompare(a.gift_date));
 
   // Countdown nur, wenn Tag UND Monat gesetzt sind (Jahr bleibt optional,
   // siehe formatBirthday) - Personenseite-Wireframe: "Geburtstag: 14.
@@ -79,9 +102,9 @@ export default async function PersonPage({
       <PersonCard person={person} birthdayText={birthdayText} />
 
       {/* Zweispaltig wie im Wireframe (Kernansicht 2): Ideen links, Fruehere
-          Geschenke + Vorschlaege rechts daneben. Die rechte Spalte ist
-          bisher nur Platzhalter (#21, #85) - noch keine echten Daten/
-          Funktionen dahinter. */}
+          Geschenke + Vorschlaege rechts daneben. "Vorschlaege" ist weiterhin
+          nur Platzhalter (#85 - regelbasierte Ideenvorschlaege, eigenes
+          Issue, noch keins angelegt). */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
         <IdeenCard
           personId={person.id}
@@ -106,10 +129,7 @@ export default async function PersonPage({
         </IdeenCard>
 
         <div className="flex flex-col gap-6">
-          <ComingSoonCard
-            title="Frühere Geschenke"
-            description={`Hier siehst du bald, was du ${person.name} schon geschenkt hast – inkl. Anlass und Datum. Folgt in einer späteren Ausbaustufe (#21).`}
-          />
+          <PreviousGiftsCard personName={person.name} gifts={previousGifts} />
           <ComingSoonCard
             title={`Vorschläge für ${person.name}`}
             description="Passend zu Interessen und bisherigen Geschenken schlagen wir dir hier automatisch neue Ideen vor. Folgt in einer späteren Ausbaustufe (#85)."

@@ -1,6 +1,11 @@
-// Zentrale Liste der aktuell gueltigen Gift-Status-Werte (A4: offen/besorgt).
-// "given" (ueberreicht, Stufe 2/A9) kommt separat dazu - wenn der Status
-// ergaenzt wird, muss hier UND in der oeffentlichen Teilen-Route (A10)
-// bewusst entschieden werden, ob er mit auftaucht (Codacy-Review-Hinweis).
-export const GIFT_STATUSES = ["idea", "purchased"] as const;
+// Zentrale Liste der gueltigen Gift-Status-Werte.
+export const GIFT_STATUSES = ["idea", "purchased", "given"] as const;
 export type GiftStatus = (typeof GIFT_STATUSES)[number];
+
+// "given" (ueberreicht/dokumentiertes Geschenk, A2/A9, #21/#26) ist private
+// Geschenke-Historie - taucht bewusst weder in der aktiven Ideen-Liste
+// (Personenseite) noch in der geteilten Ansicht auf (dort wuerde es sonst
+// verraten, was schon verschenkt wurde, ohne dass das Absicht ist - QA6/
+// Datensparsamkeit). Beide Stellen filtern deshalb auf diese Teilmenge
+// statt auf GIFT_STATUSES.
+export const ACTIVE_GIFT_STATUSES = ["idea", "purchased"] as const;

@@ -129,4 +129,54 @@ describe("PersonPage", () => {
     // Rendert ohne zu werfen und liefert ein React-Element zurück.
     expect(element).toBeTruthy();
   });
+
+  it("trennt bereits übergebene Geschenke (status 'given') von den aktiven Ideen, ohne zu werfen", async () => {
+    requireUserMock.mockResolvedValue({
+      supabase: fakeSupabase(),
+      user: { id: "user-1" },
+    });
+    personSingleMock.mockResolvedValue({
+      data: {
+        id: "person-1",
+        name: "Oma Erna",
+        birthday_day: 14,
+        birthday_month: 11,
+        birthday_year: 1960,
+        interests: [],
+        notes: null,
+      },
+    });
+    occasionsOrderMock.mockResolvedValue({
+      data: [{ id: "occasion-1", name: "Weihnachten" }],
+    });
+    giftsOrderMock.mockResolvedValue({
+      data: [
+        {
+          id: "gift-1",
+          title: "Noch offene Idee",
+          link: null,
+          status: "idea",
+          occasion_id: null,
+          gift_date: null,
+          description: null,
+          occasions: null,
+        },
+        {
+          id: "gift-2",
+          title: "Kräutergarten-Set",
+          link: null,
+          status: "given",
+          occasion_id: "occasion-1",
+          gift_date: "2025-12-24",
+          description: "Hat sich sehr gefreut.",
+          occasions: { name: "Weihnachten" },
+        },
+      ],
+    });
+
+    const element = await PersonPage({ params: params("person-1") });
+
+    expect(notFoundMock).not.toHaveBeenCalled();
+    expect(element).toBeTruthy();
+  });
 });
