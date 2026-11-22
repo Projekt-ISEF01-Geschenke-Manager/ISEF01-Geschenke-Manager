@@ -77,11 +77,39 @@ describe("PersonForm", () => {
       birthday_year: null,
       interests: [],
       notes: null,
+      reminders_enabled: true,
     };
     render(<PersonForm person={person} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Speichern" }));
 
     await waitFor(() => expect(updatePersonMock).toHaveBeenCalled());
+  });
+
+  it("zeigt die Checkbox 'In Erinnerungen einschließen', per Default angehakt", () => {
+    render(<PersonForm />);
+    expect(
+      (screen.getByLabelText(/in erinnerungen einschließen/i) as HTMLInputElement).checked,
+    ).toBe(true);
+  });
+
+  it("übernimmt reminders_enabled=false einer bestehenden Person als nicht angehakt", () => {
+    render(
+      <PersonForm
+        person={{
+          id: "1",
+          name: "Oma Erna",
+          birthday_day: null,
+          birthday_month: null,
+          birthday_year: null,
+          interests: [],
+          notes: null,
+          reminders_enabled: false,
+        }}
+      />,
+    );
+    expect(
+      (screen.getByLabelText(/in erinnerungen einschließen/i) as HTMLInputElement).checked,
+    ).toBe(false);
   });
 });
