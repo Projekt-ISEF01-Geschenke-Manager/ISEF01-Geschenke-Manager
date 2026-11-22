@@ -6,6 +6,7 @@ hier automatisch einen Eintrag mit PR-Titel und -Nummer. Kein manueller
 Schritt vor dem Merge nötig.
 
 ## 2026-11-22
+- Feature: Monatliche Geburtstagserinnerung per E-Mail und Einstellungsseite (#210)
 - Fix: Changelog-Workflow kann nicht nach main pushen (Branch Protection) (#206)
 - Fix: Bearbeiten-Formular unsichtbar, Farbmenü und Header auf kleinen Handys (#205)
 - Doku: Design-System um Animationen, Skeletons und Navigation ergänzt (#204)
