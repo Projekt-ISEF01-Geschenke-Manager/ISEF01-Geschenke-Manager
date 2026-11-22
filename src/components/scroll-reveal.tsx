@@ -16,8 +16,8 @@ export function ScrollReveal() {
     if (!root.classList.contains("reveal-ready")) return;
 
     function showAll() {
-      document.querySelectorAll(".reveal:not(.is-visible)").forEach((element) => {
-        element.classList.add("is-visible");
+      document.querySelectorAll(".reveal:not(.is-visible)").forEach((item) => {
+        item.classList.add("is-visible");
       });
     }
 
@@ -31,13 +31,14 @@ export function ScrollReveal() {
         let index = 0;
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-          const element = entry.target as HTMLElement;
-          element.style.setProperty(
+          const target = entry.target;
+          if (!(target instanceof HTMLElement)) continue;
+          target.style.setProperty(
             "--reveal-delay",
             `${Math.min(index * STAGGER_MS, MAX_DELAY_MS)}ms`,
           );
-          element.classList.add("is-visible");
-          io.unobserve(element);
+          target.classList.add("is-visible");
+          io.unobserve(target);
           index += 1;
         }
       },
@@ -45,8 +46,8 @@ export function ScrollReveal() {
     );
 
     function observe(scope: ParentNode) {
-      scope.querySelectorAll(".reveal:not(.is-visible)").forEach((element) => {
-        io.observe(element);
+      scope.querySelectorAll(".reveal:not(.is-visible)").forEach((item) => {
+        io.observe(item);
       });
     }
 
