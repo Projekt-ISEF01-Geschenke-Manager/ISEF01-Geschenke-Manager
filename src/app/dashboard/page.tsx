@@ -140,7 +140,7 @@ export default async function DashboardPage() {
       >
         <main className="mx-auto flex w-full max-w-[1140px] flex-1 flex-col gap-7 px-6 pt-8 pb-14 2xl:max-w-[1600px]">
           {!user.email_confirmed_at && (
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-tile px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 surface reveal rounded-xl px-4 py-3">
               <div className="flex items-center gap-3 text-sm text-text">
                 <Mail className="h-5 w-5 shrink-0 text-accent" strokeWidth={2} />
                 <span>
@@ -151,7 +151,7 @@ export default async function DashboardPage() {
               <form action={resendConfirmation}>
                 <button
                   type="submit"
-                  className="h-10 cursor-pointer rounded-full border border-accent px-[18px] text-sm font-medium text-accent transition hover:opacity-85 active:scale-95"
+                  className="btn btn-outline"
                 >
                   Erneut senden
                 </button>

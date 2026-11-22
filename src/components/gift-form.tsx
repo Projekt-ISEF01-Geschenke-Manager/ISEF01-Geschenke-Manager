@@ -54,7 +54,7 @@ export function GiftForm({
   return (
     <div>
       {state?.error && (
-        <p className="mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+        <p className="mb-3 rounded-lg border border-danger-line bg-danger-bg px-3 py-2 text-sm text-danger">
           {state.error}
         </p>
       )}
@@ -70,7 +70,7 @@ export function GiftForm({
                 name="personId"
                 required
                 defaultValue={state?.values?.personId ?? defaultPersonId ?? ""}
-                className="w-full appearance-none rounded-md border border-neutral-300 bg-transparent px-3 py-2 pr-9 text-base dark:border-neutral-600 sm:text-sm"
+                className="w-full appearance-none rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-3 py-2 pr-9 text-base sm:text-sm"
               >
                 <option value="" disabled>
                   Person auswählen
@@ -81,7 +81,7 @@ export function GiftForm({
                   </option>
                 ))}
               </select>
-              <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+              <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-muted" />
             </div>
           </label>
         )}
@@ -96,7 +96,7 @@ export function GiftForm({
             autoFocus={!!lockedPersonName}
             placeholder="z. B. Kräutergarten-Set"
             defaultValue={state?.values?.title}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
+            className="rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-3 py-2 text-base sm:text-sm"
           />
         </label>
 
@@ -107,7 +107,7 @@ export function GiftForm({
             name="link"
             placeholder="https://…"
             defaultValue={state?.values?.link}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-base dark:border-neutral-600 sm:text-sm"
+            className="rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-3 py-2 text-base sm:text-sm"
           />
         </label>
 
@@ -117,7 +117,7 @@ export function GiftForm({
             <select
               name="occasionId"
               defaultValue={state?.values?.occasionId ?? ""}
-              className="w-full appearance-none rounded-md border border-neutral-300 bg-transparent px-3 py-2 pr-9 text-base dark:border-neutral-600 sm:text-sm"
+              className="w-full appearance-none rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-3 py-2 pr-9 text-base sm:text-sm"
             >
               <option value="">Ohne Anlass</option>
               {occasions.map((occasion) => (
@@ -126,14 +126,14 @@ export function GiftForm({
                 </option>
               ))}
             </select>
-            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-muted" />
           </div>
         </label>
 
         <button
           type="submit"
           disabled={isPending}
-          className="cursor-pointer self-start rounded-full bg-btn-bg px-5 py-2.5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn btn-primary self-start"
         >
           {isPending ? "Wird gespeichert …" : "Idee speichern"}
         </button>

@@ -38,16 +38,16 @@ export default async function SharedLinksPage({
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 2xl:max-w-3xl">
         <Link
           href="/dashboard"
-          className="w-fit text-sm text-neutral-600 hover:underline dark:text-neutral-400"
+          className="w-fit text-sm text-muted hover:underline"
         >
           ‹ Zurück zur Übersicht
         </Link>
 
         <h1 className="text-2xl font-semibold">Ideen teilen</h1>
 
-        <div className="rounded-2xl border-2 border-neutral-900 p-4 dark:border-white">
+        <div className="rounded-2xl border-2 border-accent p-4">
           {!people || people.length === 0 ? (
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            <p className="text-sm text-muted">
               Lege zuerst eine Person an, um Ideen teilen zu können.
             </p>
           ) : (
@@ -61,11 +61,11 @@ export default async function SharedLinksPage({
         <div>
           <h2 className="text-lg font-semibold">Geteilte Links</h2>
           {links.length === 0 ? (
-            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+            <p className="mt-2 text-sm text-muted">
               Noch keine Links erstellt.
             </p>
           ) : (
-            <ul className="mt-2 divide-y divide-neutral-200 border-t border-neutral-200 dark:divide-neutral-700 dark:border-neutral-700">
+            <ul className="mt-2 divide-y divide-line border-t border-line">
               {links.map((link) => (
                 <SharedLinkItem
                   key={link.id}

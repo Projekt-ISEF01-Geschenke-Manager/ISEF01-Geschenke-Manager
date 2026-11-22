@@ -5,75 +5,444 @@
    konsistent funktioniert und es keinen Hell/Dunkel-Flackereffekt gibt. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/* Siehe DESIGN-DARKMODE.md - abgestimmte Design-Spezifikation fuer
-   Startseite/Login/Registrierung (Hell- und Dunkelmodus). Der Header
-   (SiteHeader) ist bewusst nicht Teil dieses Farbsystems. */
+/* Siehe DESIGN-DARKMODE.md - zentrales Farb- und Komponentensystem.
+   Farbpaletten (data-palette) x Modus (data-theme) setzen dieselben Tokens;
+   Komponenten nutzen nur Tokens. Gemeinsame Status-/Layout-Tokens: */
 :root {
-  /* Hellmodus (Standard) */
+  --danger: #b42318;
+  --danger-bg: #fef3f2;
+  --danger-line: #fda29b;
+  --danger-solid: #b42318;
+  --danger-solid-hover: #912018;
+  --success: #067647;
+  --success-bg: #ecfdf3;
+  --success-line: #75e0a7;
+  --elev-card: 0 1px 2px rgba(30, 20, 25, 0.06), 0 4px 14px rgba(30, 20, 25, 0.06);
+  --elev-hover: 0 2px 4px rgba(30, 20, 25, 0.08), 0 12px 28px rgba(30, 20, 25, 0.14);
+  --elev-pop: 0 8px 24px rgba(19, 18, 22, 0.14);
+  --ease: 160ms cubic-bezier(0.2, 0, 0, 1);
+  --on-header: #ffffff;
+  --on-header-btn-border: rgba(255, 255, 255, 0.7);
+  --on-header-btn-bg: rgba(255, 255, 255, 0.16);
+  --switch-track-bg: rgba(255, 255, 255, 0.2);
+  --switch-thumb: #ffffff;
+  --switch-thumb-shadow: rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] {
+  --danger: #f97066;
+  --danger-bg: #2c1517;
+  --danger-line: #7a2a2a;
+  --danger-solid: #f97066;
+  --danger-solid-hover: #fb8a82;
+  --success: #47cd89;
+  --success-bg: #0f2a1d;
+  --success-line: #1e5c3c;
+  --elev-card: 0 1px 0 rgba(255, 255, 255, 0.03), 0 2px 8px rgba(0, 0, 0, 0.35);
+  --elev-hover: 0 12px 30px rgba(0, 0, 0, 0.55);
+  --elev-pop: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+/* Palette: rose */
+:root, [data-palette="rose"] {
+  --bg: #f5eeed;
+  --card: #ffffff;
+  --card-border: #e4d3d1;
+  --input-border: #a8979a;
+  --text: #2a2123;
+  --heading: #1f1719;
+  --lead: #4f4244;
+  --muted: #5f5254;
+  --accent: #8a3552;
+  --btn-bg: #8a3552;
+  --btn-hover: #702a43;
+  --btn-text: #ffffff;
+  --tag-text: #6b3a4a;
+  --tag-border: #dcc3c8;
+  --line: #dccbc9;
+  --hover: #f2e4e3;
+  --subtle: #f3eaea;
+  --focus-ring: #c0728c;
+  --avatar: #ecd6da;
+  --header-bg: #7a4a58;
+  --h1: #1f1719;
+  --tile: #ffffff;
+  --bg-fade-top: #f5eeed;
+  --input-bg: #ffffff;
+  --rule: #e4d3d1;
+  --inner: #ffffff;
+  --inner-border: #e4d3d1;
+  --track: #dccbc9;
+  --accent-soft: rgba(138, 53, 82, 0.09);
+  --switch-thumb-icon: #7a4a58;
+}
+
+[data-theme="dark"], [data-theme="dark"][data-palette="rose"] {
+  --bg: #141113;
+  --card: #1f1b1d;
+  --card-border: #3d3438;
+  --input-border: #6a6063;
+  --text: #f3eeed;
+  --heading: #fbf7f5;
+  --lead: #d0c4c1;
+  --muted: #b9adb0;
+  --accent: #e3a5b8;
+  --btn-bg: #d98aa4;
+  --btn-hover: #e6a1b6;
+  --btn-text: #2a1119;
+  --tag-text: #efc3d0;
+  --tag-border: #5a464e;
+  --line: #483f43;
+  --hover: #2b2427;
+  --subtle: #272124;
+  --focus-ring: #e3a5b8;
+  --avatar: #3b2a31;
+  --header-bg: #2a1b21;
+  --h1: #fbf7f5;
+  --tile: #1f1b1d;
+  --bg-fade-top: #141113;
+  --input-bg: #141113;
+  --rule: #3d3438;
+  --inner: #1f1b1d;
+  --inner-border: #3d3438;
+  --track: #483f43;
+  --accent-soft: rgba(227, 165, 184, 0.16);
+  --switch-thumb-icon: #2a1b21;
+}
+
+/* Palette: beere */
+[data-palette="beere"] {
+  --bg: #f5eff3;
+  --card: #ffffff;
+  --card-border: #e3d6de;
+  --input-border: #aaa6b3;
+  --text: #1c1b20;
+  --heading: #131216;
+  --lead: #46434d;
+  --muted: #5d5967;
+  --accent: #9b1d52;
+  --btn-bg: #9b1d52;
+  --btn-hover: #80173f;
+  --btn-text: #ffffff;
+  --tag-text: #6e2a4a;
+  --tag-border: #e0d2da;
+  --line: #d9cdd5;
+  --hover: #efe4ea;
+  --subtle: #f1eaee;
+  --focus-ring: #c2467c;
+  --avatar: #f3e1ea;
+  --header-bg: #7d1a4a;
+  --h1: #131216;
+  --tile: #ffffff;
+  --bg-fade-top: #f5eff3;
+  --input-bg: #ffffff;
+  --rule: #e3d6de;
+  --inner: #ffffff;
+  --inner-border: #e3d6de;
+  --track: #d9cdd5;
+  --accent-soft: rgba(155, 29, 82, 0.09);
+  --switch-thumb-icon: #7d1a4a;
+}
+
+[data-theme="dark"][data-palette="beere"] {
+  --bg: #0f0e11;
+  --card: #1c1b21;
+  --card-border: #34323c;
+  --input-border: #5e5b69;
+  --text: #f1eff4;
+  --heading: #ffffff;
+  --lead: #cfcbd8;
+  --muted: #aaa6b5;
+  --accent: #f08db5;
+  --btn-bg: #ec7aa6;
+  --btn-hover: #f292b7;
+  --btn-text: #1a0b12;
+  --tag-text: #f2bad1;
+  --tag-border: #4d3a45;
+  --line: #3d3b46;
+  --hover: #2a2831;
+  --subtle: #24222a;
+  --focus-ring: #f08db5;
+  --avatar: #3a2631;
+  --header-bg: #24141c;
+  --h1: #ffffff;
+  --tile: #1c1b21;
+  --bg-fade-top: #0f0e11;
+  --input-bg: #0f0e11;
+  --rule: #34323c;
+  --inner: #1c1b21;
+  --inner-border: #34323c;
+  --track: #3d3b46;
+  --accent-soft: rgba(240, 141, 181, 0.16);
+  --switch-thumb-icon: #24141c;
+}
+
+/* Palette: ozean */
+[data-palette="ozean"] {
+  --bg: #eef3f8;
+  --card: #ffffff;
+  --card-border: #d5e0ea;
+  --input-border: #8fa0b2;
+  --text: #1b2229;
+  --heading: #111820;
+  --lead: #3f4a56;
+  --muted: #55606c;
+  --accent: #1f5f99;
+  --btn-bg: #1f5f99;
+  --btn-hover: #174a79;
+  --btn-text: #ffffff;
+  --tag-text: #1f4d7a;
+  --tag-border: #c5d6e6;
+  --line: #c9d6e2;
+  --hover: #e4edf6;
+  --subtle: #eaf0f6;
+  --focus-ring: #5b9bd5;
+  --avatar: #dce9f5;
+  --header-bg: #1d4f7c;
+  --h1: #111820;
+  --tile: #ffffff;
+  --bg-fade-top: #eef3f8;
+  --input-bg: #ffffff;
+  --rule: #d5e0ea;
+  --inner: #ffffff;
+  --inner-border: #d5e0ea;
+  --track: #c9d6e2;
+  --accent-soft: rgba(31, 95, 153, 0.09);
+  --switch-thumb-icon: #1d4f7c;
+}
+
+[data-theme="dark"][data-palette="ozean"] {
+  --bg: #0e1217;
+  --card: #172029;
+  --card-border: #2d3b49;
+  --input-border: #566a7e;
+  --text: #eef3f8;
+  --heading: #ffffff;
+  --lead: #c4d0dc;
+  --muted: #a4b2c0;
+  --accent: #7db6ea;
+  --btn-bg: #6aa8e4;
+  --btn-hover: #8bbcec;
+  --btn-text: #08131f;
+  --tag-text: #b5d6f5;
+  --tag-border: #3b5268;
+  --line: #364656;
+  --hover: #213040;
+  --subtle: #1d2935;
+  --focus-ring: #7db6ea;
+  --avatar: #22364a;
+  --header-bg: #14212e;
+  --h1: #ffffff;
+  --tile: #172029;
+  --bg-fade-top: #0e1217;
+  --input-bg: #0e1217;
+  --rule: #2d3b49;
+  --inner: #172029;
+  --inner-border: #2d3b49;
+  --track: #364656;
+  --accent-soft: rgba(125, 182, 234, 0.16);
+  --switch-thumb-icon: #14212e;
+}
+
+/* Palette: salbei */
+[data-palette="salbei"] {
+  --bg: #eff4f0;
+  --card: #ffffff;
+  --card-border: #d6e2d8;
+  --input-border: #8fa496;
+  --text: #1b221d;
+  --heading: #111813;
+  --lead: #404d44;
+  --muted: #56635a;
+  --accent: #2f6b4a;
+  --btn-bg: #2f6b4a;
+  --btn-hover: #245439;
+  --btn-text: #ffffff;
+  --tag-text: #2b5a3f;
+  --tag-border: #c6dbcb;
+  --line: #cad8cd;
+  --hover: #e4eee6;
+  --subtle: #ebf2ec;
+  --focus-ring: #5fa27c;
+  --avatar: #dcecdf;
+  --header-bg: #2a5d41;
+  --h1: #111813;
+  --tile: #ffffff;
+  --bg-fade-top: #eff4f0;
+  --input-bg: #ffffff;
+  --rule: #d6e2d8;
+  --inner: #ffffff;
+  --inner-border: #d6e2d8;
+  --track: #cad8cd;
+  --accent-soft: rgba(47, 107, 74, 0.09);
+  --switch-thumb-icon: #2a5d41;
+}
+
+[data-theme="dark"][data-palette="salbei"] {
+  --bg: #0f1411;
+  --card: #18201b;
+  --card-border: #2e3c33;
+  --input-border: #566b5c;
+  --text: #eef3ef;
+  --heading: #ffffff;
+  --lead: #c5d2c9;
+  --muted: #a5b5aa;
+  --accent: #86c9a0;
+  --btn-bg: #73bd90;
+  --btn-hover: #92cdaa;
+  --btn-text: #08150d;
+  --tag-text: #bfe5cd;
+  --tag-border: #3d5446;
+  --line: #384a3e;
+  --hover: #223028;
+  --subtle: #1e2a23;
+  --focus-ring: #86c9a0;
+  --avatar: #23382b;
+  --header-bg: #15241b;
+  --h1: #ffffff;
+  --tile: #18201b;
+  --bg-fade-top: #0f1411;
+  --input-bg: #0f1411;
+  --rule: #2e3c33;
+  --inner: #18201b;
+  --inner-border: #2e3c33;
+  --track: #384a3e;
+  --accent-soft: rgba(134, 201, 160, 0.16);
+  --switch-thumb-icon: #15241b;
+}
+
+/* Palette: graphit */
+[data-palette="graphit"] {
+  --bg: #efeff1;
+  --card: #ffffff;
+  --card-border: #dcdce0;
+  --input-border: #9a9aa6;
+  --text: #1c1c20;
+  --heading: #121214;
+  --lead: #46464e;
+  --muted: #5a5a63;
+  --accent: #2b2b33;
+  --btn-bg: #2b2b33;
+  --btn-hover: #111116;
+  --btn-text: #ffffff;
+  --tag-text: #3a3a44;
+  --tag-border: #d0d0d8;
+  --line: #cfcfd5;
+  --hover: #e7e7ea;
+  --subtle: #ececef;
+  --focus-ring: #6a6a80;
+  --avatar: #e3e3e8;
+  --header-bg: #26262d;
+  --h1: #121214;
+  --tile: #ffffff;
+  --bg-fade-top: #efeff1;
+  --input-bg: #ffffff;
+  --rule: #dcdce0;
+  --inner: #ffffff;
+  --inner-border: #dcdce0;
+  --track: #cfcfd5;
+  --accent-soft: rgba(43, 43, 51, 0.09);
+  --switch-thumb-icon: #26262d;
+}
+
+[data-theme="dark"][data-palette="graphit"] {
+  --bg: #101012;
+  --card: #1b1b1f;
+  --card-border: #35353c;
+  --input-border: #62626e;
+  --text: #f1f1f4;
+  --heading: #ffffff;
+  --lead: #cdcdd6;
+  --muted: #adadb8;
+  --accent: #d7d7e0;
+  --btn-bg: #e4e4ec;
+  --btn-hover: #ffffff;
+  --btn-text: #141418;
+  --tag-text: #dcdce6;
+  --tag-border: #4a4a54;
+  --line: #3f3f47;
+  --hover: #2a2a30;
+  --subtle: #25252b;
+  --focus-ring: #d7d7e0;
+  --avatar: #2e2e36;
+  --header-bg: #1a1a1f;
+  --h1: #ffffff;
+  --tile: #1b1b1f;
+  --bg-fade-top: #101012;
+  --input-bg: #101012;
+  --rule: #35353c;
+  --inner: #1b1b1f;
+  --inner-border: #35353c;
+  --track: #3f3f47;
+  --accent-soft: rgba(215, 215, 224, 0.16);
+  --switch-thumb-icon: #1a1a1f;
+}
+
+/* Palette: klassisch (frueheres Design, Farbverlauf im Header) */
+[data-palette="klassisch"] {
   --bg: #faf6f4;
-  --bg-fade-top: #eddfda;
-  --tile: #f1e8e4;
   --card: #ffffff;
   --card-border: #dccfca;
-  --input-bg: #ffffff;
   --input-border: #a8979a;
   --text: #2a2123;
   --heading: #241b1d;
-  --h1: #1f1719;
   --lead: #4f4244;
   --muted: #5f5254;
   --accent: #8a5a66;
   --btn-bg: #6f4a55;
+  --btn-hover: #5a3b45;
   --btn-text: #ffffff;
   --tag-text: #6b4d55;
   --tag-border: #cdbab5;
-  --rule: #ddcfca;
+  --line: #ddcfca;
+  --hover: #f1e8e4;
+  --subtle: #f1e8e4;
   --focus-ring: #c08a9a;
   --avatar: #e6d5cf;
+  --header-bg: linear-gradient(110deg, #a57878 0%, #d9b9ad 50%, #86666d 100%);
+  --h1: #241b1d;
+  --tile: #ffffff;
+  --bg-fade-top: #eddfda;
+  --input-bg: #ffffff;
+  --rule: #dccfca;
   --inner: #ffffff;
-  --inner-border: #e3d6d2;
+  --inner-border: #dccfca;
   --track: #ddcfca;
+  --accent-soft: rgba(138, 90, 102, 0.09);
+  --switch-thumb-icon: #6f5459;
 }
 
-[data-theme="dark"] {
+[data-theme="dark"][data-palette="klassisch"] {
   --bg: #121113;
-  --bg-fade-top: #261f21;
-  --tile: #1a1819;
   --card: #221e1f;
   --card-border: #4a4244;
-  --input-bg: #121113;
   --input-border: #6a6063;
   --text: #f3eeed;
   --heading: #f8f3f1;
-  --h1: #fbf7f5;
   --lead: #d0c4c1;
   --muted: #c2b8b6;
   --accent: #d5b9ac;
   --btn-bg: #d5b9ac;
+  --btn-hover: #e3cbc0;
   --btn-text: #231a1c;
   --tag-text: #dcc6bc;
   --tag-border: #5c5255;
-  --rule: #3a3335;
+  --line: #3a3335;
+  --hover: #2b2527;
+  --subtle: #262122;
   --focus-ring: #c08a9a;
   --avatar: #2f282a;
+  --header-bg: linear-gradient(110deg, #a57878 0%, #d9b9ad 50%, #86666d 100%);
+  --h1: #f8f3f1;
+  --tile: #221e1f;
+  --bg-fade-top: #261f21;
+  --input-bg: #121113;
+  --rule: #4a4244;
   --inner: #221e1f;
-  --inner-border: #383234;
-  --track: #342d2f;
-}
-
-/* Gilt in beiden Modi unveraendert (Header-Branding) - siehe
-   DESIGN-DARKMODE.md. Der Header selbst (SiteHeader) bleibt in dieser
-   Iteration bewusst unangetastet; nur der Hell/Dunkel-Schalter darin nutzt
-   die switch- und on-header-Tokens. */
-:root {
-  --header-gradient: linear-gradient(90deg, #a88b8c 0%, #d5b9ac 50%, #876a71 100%);
-  --on-header: #ffffff;
-  --on-header-btn-border: rgba(255, 255, 255, 0.8);
-  --on-header-btn-bg: rgba(255, 255, 255, 0.14);
-  --switch-track-bg: rgba(255, 255, 255, 0.2);
-  --switch-thumb: #ffffff;
+  --inner-border: #4a4244;
+  --track: #3a3335;
+  --accent-soft: rgba(213, 185, 172, 0.16);
   --switch-thumb-icon: #6f5459;
-  --switch-thumb-shadow: rgba(0, 0, 0, 0.25);
 }
 
 @theme inline {
@@ -90,28 +459,236 @@
   --color-lead: var(--lead);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
   --color-btn-bg: var(--btn-bg);
   --color-btn-text: var(--btn-text);
   --color-tag-text: var(--tag-text);
   --color-tag-border: var(--tag-border);
   --color-rule: var(--rule);
+  --color-line: var(--line);
+  --color-hover: var(--hover);
+  --color-subtle: var(--subtle);
   --color-focus-ring: var(--focus-ring);
   --color-avatar: var(--avatar);
   --color-inner: var(--inner);
   --color-inner-border: var(--inner-border);
   --color-track: var(--track);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-line: var(--danger-line);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-success-line: var(--success-line);
+  --color-header-bg: var(--header-bg);
   --color-on-header: var(--on-header);
   --color-on-header-btn-border: var(--on-header-btn-border);
   --color-on-header-btn-bg: var(--on-header-btn-bg);
   --color-switch-track-bg: var(--switch-track-bg);
   --color-switch-thumb: var(--switch-thumb);
   --color-switch-thumb-icon: var(--switch-thumb-icon);
-  --font-sans: var(--font-geist-sans);
+  --shadow-card: var(--elev-card);
+  --shadow-pop: var(--elev-pop);
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+/* Einheitlicher Tastaturfokus fuer alle interaktiven Elemente. */
+:where(a, button, summary, [role="button"]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Einheitliche Komponenten: Buttons (Hover/Fokus/Aktiv/Deaktiviert zentral). */
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 2.75rem;
+    padding-inline: 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color var(--ease),
+      border-color var(--ease),
+      color var(--ease),
+      box-shadow var(--ease),
+      transform var(--ease);
+  }
+  .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+  .btn-sm {
+    height: 1.75rem;
+    padding-inline: 0.625rem;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+  }
+  .btn-primary {
+    background: var(--btn-bg);
+    color: var(--btn-text);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--line);
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .btn-danger {
+    background: var(--danger-solid);
+    color: #ffffff;
+  }
+  .btn-danger-outline {
+    background: transparent;
+    color: var(--danger);
+    border-color: var(--danger-line);
+  }
+  .btn-success {
+    background: color-mix(in srgb, var(--success) 16%, var(--card));
+    color: var(--success);
+    border-color: var(--success);
+    font-weight: 600;
+  }
+  [data-theme="dark"] .btn-danger {
+    color: #1a0505;
+  }
+  @media (hover: hover) {
+    /* Gleicher Hover wie bei den Karten: leicht anheben + Schatten. */
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: var(--elev-hover);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--accent);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--btn-hover);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--hover);
+    }
+    .btn-outline:hover:not(:disabled) {
+      background: var(--accent-soft);
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: var(--danger-solid-hover);
+    }
+    .btn-danger-outline:hover:not(:disabled) {
+      background: var(--danger-bg);
+    }
+    .btn-success:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--success) 26%, var(--card));
+    }
+  }
+  .btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Einheitliche Flaechen: Karten heben sich per Rand + Schatten vom Grund ab,
+   klickbare Karten (.surface-interactive) bekommen einen gemeinsamen Hover. */
+@layer components {
+  .surface {
+    background: var(--card);
+    border: 1px solid color-mix(in srgb, var(--text) 18%, var(--card));
+    box-shadow: var(--elev-card);
+  }
+  .surface-interactive {
+    transition:
+      transform var(--ease),
+      box-shadow var(--ease),
+      border-color var(--ease),
+      background-color var(--ease);
+  }
+  .surface-interactive:active {
+    transform: translateY(0);
+    box-shadow: var(--elev-card);
+  }
+  .surface-dashed {
+    border: 1px dashed color-mix(in srgb, var(--text) 35%, var(--card));
+    transition:
+      background-color var(--ease),
+      border-color var(--ease),
+      transform var(--ease);
+  }
+  @media (hover: hover) {
+    .surface-interactive:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: var(--elev-hover);
+    }
+    .surface-dashed:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+    .link-hover:hover {
+      color: var(--btn-hover);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface-interactive:hover,
+  .btn:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* Scroll-Reveal: Elemente mit .reveal gleiten beim Hereinscrollen sanft ein.
+   Nur aktiv mit html.reveal-ready (Inline-Script, nicht bei Reduced Motion).
+   Nach der Animation gelten wieder die normalen Styles (Hover bleibt intakt). */
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reveal-ready .reveal:not(.is-visible) {
+  opacity: 0;
+}
+
+.reveal-ready .reveal.is-visible {
+  animation: reveal-in 350ms cubic-bezier(0.2, 0, 0, 1) var(--reveal-delay, 0ms) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-ready .reveal:not(.is-visible) {
+    opacity: 1;
+  }
+  .reveal-ready .reveal.is-visible {
+    animation: none;
+  }
 }

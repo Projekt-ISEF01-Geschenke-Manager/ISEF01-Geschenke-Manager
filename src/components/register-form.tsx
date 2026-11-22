@@ -10,14 +10,14 @@ export function RegisterForm() {
   const [state, formAction] = useActionState(signup, initialState);
 
   return (
-    <div className="rounded-2xl border border-card-border bg-card p-6">
+    <div className="surface reveal rounded-2xl p-6">
       <h2 className="text-xl font-semibold text-heading">Konto erstellen</h2>
       <p className="mt-1 text-sm text-muted">
         Mit * markierte Felder sind Pflichtfelder.
       </p>
 
       {state?.error && (
-        <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+        <p className="mt-3 rounded-lg border border-danger-line bg-danger-bg px-3 py-2 text-sm text-danger">
           {state.error}
         </p>
       )}
@@ -88,7 +88,7 @@ export function RegisterForm() {
 
         <button
           type="submit"
-          className="h-11 cursor-pointer rounded-full bg-btn-bg px-5 text-sm font-medium text-btn-text transition hover:opacity-90 active:scale-95"
+          className="btn btn-primary"
         >
           Konto erstellen
         </button>

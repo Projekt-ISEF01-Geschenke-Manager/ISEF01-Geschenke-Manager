@@ -1,96 +1,43 @@
-# Dark-/Light-Mode-Design: Startseite/Login
+# Design-System: Farben, Komponenten, Hell-/Dunkelmodus
 
-Abgestimmte Spezifikation (Design-Team, 30.10.2026) für den Hell-/Dunkelmodus
-der Startseite (`/`, Landingpage + Login) und der Registrierungsseite. Der
-Header (`SiteHeader`, Giftwise-Branding) ist davon **nicht** betroffen und
-bleibt unverändert.
+Stand: Redesign (moderner, klarer, einheitlich). Alle Werte stehen als
+CSS-Variablen in `src/app/globals.css` und sind in Tailwind als Farben
+verfuegbar (`bg-card`, `text-muted`, `border-line`, ...). Rohe
+`neutral-*`/`red-*`/`green-*`-Klassen und `dark:`-Farbpaare werden nicht mehr
+verwendet - der Dunkelmodus wechselt allein ueber die Tokens
+(`[data-theme="dark"]`).
 
-Auf Nutzerwunsch (31.10.2026) erweitert auf die Übersicht/Dashboard-Seite:
-Hintergrund-Verlauf unter dem Header und die Akzentfarben (`--accent`,
-`--btn-bg`) für Buttons/Popups gelten dort genauso, damit sich Dashboard und
-Startseite/Login nicht mehr stilistisch widersprechen.
+## Richtung
+Kuehle Neutraltoene als Flaeche, ein einziger Beeren-Akzent (`--accent`,
+`--btn-bg`), klare Linien (`--line`), Geist als Schrift. Kontrast Text/Flaeche
+mindestens 4,5:1, in beiden Modi getrennt abgestimmt.
 
-## CSS-Variablen
+## Tokens
+- Flaechen: `bg`, `card`, `tile`, `subtle`, `hover`, `input-bg`
+- Linien: `line`, `card-border`, `input-border`, `rule`
+- Text: `text`, `heading`, `lead`, `muted`, `accent`
+- Status: `danger` / `danger-bg` / `danger-line`, `success` / `success-bg` / `success-line`
+- Header: `header-bg`, `on-header*` (gleiche Struktur in beiden Modi)
 
-```css
-:root {
-  /* Hellmodus (Standard) */
-  --bg: #faf6f4;
-  --bg-fade-top: #eddfda;
-  --tile: #f1e8e4;
-  --card: #ffffff;
-  --card-border: #dccfca;
-  --input-bg: #ffffff;
-  --input-border: #a8979a;
-  --text: #2a2123;
-  --heading: #241b1d;
-  --h1: #1f1719;
-  --lead: #4f4244;
-  --muted: #5f5254;
-  --accent: #8a5a66;
-  --btn-bg: #6f4a55;
-  --btn-text: #ffffff;
-  --tag-text: #6b4d55;
-  --tag-border: #cdbab5;
-  --rule: #e3d6d2;
-}
+## Buttons (einheitlich, zentral in globals.css)
+`btn` + Variante `btn-primary | btn-secondary | btn-outline | btn-danger |
+btn-danger-outline`, optional `btn-sm`. Hover (nur bei Zeigergeraeten), Aktiv
+(leichtes Eindruecken), Deaktiviert und sichtbarer Tastaturfokus sind fuer
+alle identisch; Uebergang 150 ms, `prefers-reduced-motion` wird beachtet.
 
-[data-theme="dark"] {
-  --bg: #121113;
-  --bg-fade-top: #261f21;      /* Verlauf unter dem Header, laeuft ueber die
-                                   volle Hoehe des Seiteninhalts aus */
-  --tile: #1a1819;             /* Feature-Karten, Hinweis-Box */
-  --card: #221e1f;             /* Login-/Registrierungs-Karte */
-  --card-border: #4a4244;
-  --input-bg: #121113;
-  --input-border: #6a6063;
-  --text: #f3eeed;
-  --heading: #f8f3f1;
-  --h1: #fbf7f5;
-  --lead: #d0c4c1;
-  --muted: #c2b8b6;
-  --accent: #d5b9ac;           /* Links, Outline-Button, "Hinweis" */
-  --btn-bg: #d5b9ac;
-  --btn-text: #231a1c;
-  --tag-text: #dcc6bc;
-  --tag-border: #5c5255;
-  --rule: #4a4244;
-}
+## Formularfelder und Hinweise
+Felder: `rounded-lg border border-input-border bg-input-bg` mit Fokusring.
+Fehler-/Erfolgshinweise nutzen `*-bg`, `*-line` und die Textfarbe des Status.
 
-/* Header bleibt in beiden Modi gleich (unveraendert) */
---header-gradient: linear-gradient(90deg, #a88b8c 0%, #d5b9ac 50%, #876a71 100%);
---focus-ring: #c08a9a;
-```
+## Farbpaletten (Auswahl im Header)
+Sechs Paletten (`rose` = Standard, `klassisch` = frueheres Design mit Header-Farbverlauf, `beere`, `ozean`, `salbei`, `graphit`), je mit
+eigenem Hell- und Dunkelmodus. Sie setzen alle dieselben Tokens ueber
+`data-palette` (+ `data-theme`) auf `<html>`; neue Palette = ein Block in
+`globals.css` plus ein Eintrag in `PALETTES` (`palette-picker.tsx`).
+Gespeichert wird pro Geraet in `localStorage` (`palette`).
 
-## Struktur (Startseite/Login)
-
-- **Hintergrund:** Unter dem Header läuft die Seite per
-  `linear-gradient(180deg, var(--bg-fade-top) 0%, var(--bg) 100%)` aus, auf
-  einem vollbreiten Wrapper um `<main>` (nicht auf `<main>` selbst, das durch
-  `max-w-5xl` nur eine schmale, zentrierte Box ist) und über die volle Höhe
-  des Seiteninhalts bis zum Seitenende vor dem Footer - nicht nur über den
-  Hero-Bereich. (Feedback nach zwei Zwischenständen: erst ein fester
-  300px-Wert, dann `clamp(220px, 35vh, 520px)` - beide wirkten wie ein
-  harter Block statt eines durchgehenden Verlaufs über die ganze Seite.)
-- **Hero:** Keine Box mehr um "Nie wieder Last-Minute-Geschenke" - Überschrift
-  38px, Fließtext 16px, direkt auf dem Seitenhintergrund.
-- **Karten:** Feature-Karten und die "Hinweis"-Box **ohne Rahmen**, Radius
-  14px (Hinweis: 12px), Padding 20px, Hintergrund `--tile`. Die
-  Login-/Registrierungs-Karte hat einen 1px-Rahmen (`--card-border`) und
-  Radius 16px, Hintergrund `--card`.
-- **Buttons & Inputs:** Buttons pill-förmig (Radius 999px, min. 44px hoch).
-  Inputs 44px hoch, Radius 8px.
-- **Schalter (ersetzt den bisherigen Mond-Icon-Button):** 56×32px, Pill mit
-  weißem 1px-Rahmen und `rgba(255,255,255,0.2)` Hintergrund. Weiße Kugel
-  (24px) steht im Dunkelmodus rechts, im Hellmodus links, mit Sonne/Mond-Icon
-  je nach aktivem Modus darin; ein schwaches Sonnen-Icon links und
-  Mond-Icon rechts im Track dahinter (Feedback nach erster Umsetzung: reine
-  Kugel ohne Icons wirkte zu groß/leer). `role="switch"` + `aria-label`.
-  Speichert die Wahl in `localStorage` (Standard: `prefers-color-scheme`,
-  bestehendes Verhalten bleibt).
-
-## Umsetzungs-Hinweis
-
-Die Farben laufen über CSS-Variablen im bestehenden Theme
-(`src/app/globals.css`, `data-theme`-Attribut), nicht hartkodiert in
-einzelnen Komponenten - vermeidet ein zweites, paralleles Farbsystem.
+## Flaechen und Hover
+`.surface` = Karte mit Rand und Schatten auf getoenetem Seitengrund.
+`.surface-interactive` (klickbare Karten): Hover hebt 2 px an, Akzent-Rand,
+staerkerer Schatten; `.surface-dashed` faerbt sich akzentweich. Nur bei
+Zeigergeraeten, 160 ms, ohne Bewegung bei `prefers-reduced-motion`.

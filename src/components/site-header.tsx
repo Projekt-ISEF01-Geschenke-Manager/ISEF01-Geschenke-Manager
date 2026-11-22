@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
+import { PalettePicker } from "./palette-picker";
 import { signout } from "@/app/actions/auth";
 
 // Gleiche Kopfzeile auf allen Seiten (Wireframe-Annotation "Allgemein").
@@ -25,12 +26,7 @@ export function SiteHeader({
   nav?: ReactNode;
 }) {
   return (
-    <header
-      className="text-white"
-      style={{
-        background: "linear-gradient(110deg, #A57878 0%, #D9B9AD 50%, #86666D 100%)",
-      }}
-    >
+    <header className="text-on-header" style={{ background: "var(--header-bg)" }}>
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-4 sm:gap-x-6 sm:py-5 2xl:max-w-[1600px]">
         <Link href="/" className="flex min-w-0 shrink-0 items-center gap-3 sm:gap-4">
           <img
@@ -59,13 +55,14 @@ export function SiteHeader({
               <form action={signout}>
                 <button
                   type="submit"
-                  className="inline-flex h-8 cursor-pointer items-center rounded-full border border-white/70 px-3 text-sm text-white transition hover:bg-white/10 active:scale-95 sm:px-4"
+                  className="inline-flex h-8 cursor-pointer items-center rounded-full border border-on-header-btn-border px-3 text-sm text-on-header transition duration-150 hover:bg-on-header-btn-bg active:scale-95 sm:px-4"
                 >
                   Abmelden
                 </button>
               </form>
             </>
           )}
+          <PalettePicker />
           <ThemeToggle />
         </div>
       </div>

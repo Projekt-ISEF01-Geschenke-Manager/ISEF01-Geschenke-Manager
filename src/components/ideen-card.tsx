@@ -23,7 +23,7 @@ export function IdeenCard({
   const [adding, setAdding] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-neutral-300 p-6 dark:border-neutral-700">
+    <div className="surface reveal rounded-2xl p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Ideen ({giftsCount})</h2>
         {/* Gleicher Button-Stil wie "+ Idee erfassen" auf der Übersicht
@@ -38,8 +38,8 @@ export function IdeenCard({
           }}
           className={
             adding
-              ? "h-11 cursor-pointer rounded-full border border-neutral-300 px-[22px] text-sm font-medium whitespace-nowrap transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-600 dark:hover:bg-neutral-800"
-              : "h-11 cursor-pointer rounded-full bg-btn-bg px-[22px] text-sm font-semibold whitespace-nowrap text-btn-text transition hover:opacity-85 active:scale-95"
+              ? "btn btn-secondary"
+              : "btn btn-primary"
           }
         >
           {adding ? "Fertig" : "+ Idee hinzufügen"}
@@ -47,7 +47,7 @@ export function IdeenCard({
       </div>
 
       {adding && (
-        <div className="mt-3 border-t border-neutral-200 pt-3 dark:border-neutral-700">
+        <div className="mt-3 border-t border-line pt-3">
           <QuickAddGiftForm personId={personId} occasions={occasions} />
         </div>
       )}

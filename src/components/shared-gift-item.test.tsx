@@ -95,7 +95,7 @@ describe("SharedGiftItem", () => {
       </ul>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "offen" }));
+    fireEvent.click(screen.getByRole("button", { name: "Als besorgt markieren" }));
 
     expect(showModalMock).toHaveBeenCalledTimes(1);
     expect(toggleGiftStatusViaSharedLinkMock).not.toHaveBeenCalled();
@@ -112,7 +112,7 @@ describe("SharedGiftItem", () => {
       </ul>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "offen" }));
+    fireEvent.click(screen.getByRole("button", { name: "Als besorgt markieren" }));
     const dialog = screen.getByRole("dialog", { name: "Als besorgt markieren" });
     fireEvent.change(within(dialog).getByPlaceholderText("z. B. Max"), {
       target: { value: "Max" },
@@ -138,7 +138,7 @@ describe("SharedGiftItem", () => {
       </ul>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "offen" }));
+    fireEvent.click(screen.getByRole("button", { name: "Als besorgt markieren" }));
     const dialog = screen.getByRole("dialog", { name: "Als besorgt markieren" });
     fireEvent.click(
       within(dialog).getByRole("button", { name: "Als besorgt markieren" }),
@@ -157,7 +157,7 @@ describe("SharedGiftItem", () => {
       </ul>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "offen" }));
+    fireEvent.click(screen.getByRole("button", { name: "Als besorgt markieren" }));
     const dialog = screen.getByRole("dialog", { name: "Als besorgt markieren" });
     fireEvent.click(
       within(dialog).getByRole("button", { name: "Als besorgt markieren" }),
@@ -181,7 +181,7 @@ describe("SharedGiftItem", () => {
       </ul>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "besorgt" }));
+    fireEvent.click(screen.getByRole("button", { name: "Besorgt" }));
 
     expect(showModalMock).not.toHaveBeenCalled();
     await waitFor(() =>

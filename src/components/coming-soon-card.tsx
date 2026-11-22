@@ -11,9 +11,9 @@ export function ComingSoonCard({
   description: string;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-neutral-300 p-6 dark:border-neutral-700">
+    <div className="rounded-2xl border border-dashed border-input-border p-6">
       <h2 className="text-lg font-semibold">{title}</h2>
-      <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+      <p className="mt-2 text-sm text-muted">
         {description}
       </p>
     </div>

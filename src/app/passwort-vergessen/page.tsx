@@ -11,7 +11,7 @@ export default function PasswortVergessenPage() {
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 py-10">
         <Link
           href="/"
-          className="w-fit text-sm text-neutral-600 hover:underline dark:text-neutral-400"
+          className="w-fit text-sm text-muted hover:underline"
         >
           ‹ Zurück zur Startseite
         </Link>
