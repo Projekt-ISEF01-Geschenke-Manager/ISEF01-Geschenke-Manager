@@ -28,11 +28,11 @@ export default async function EinstellungenPage() {
       </div>
 
       <section
-        aria-labelledby="erinnerungen"
+        aria-labelledby="einstellungen-karte"
         className="surface reveal flex min-w-0 max-w-[480px] flex-col gap-4 rounded-2xl p-6"
       >
-        <h2 id="erinnerungen" className="text-xl font-bold text-heading">
-          Erinnerungen
+        <h2 id="einstellungen-karte" className="text-xl font-bold text-heading">
+          Einstellungen
         </h2>
         <ReminderSettingsForm
           initialRemindBirthdays={remindBirthdays}
