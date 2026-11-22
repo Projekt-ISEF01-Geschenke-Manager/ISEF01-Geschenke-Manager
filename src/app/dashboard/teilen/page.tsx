@@ -74,13 +74,13 @@ export default async function SharedLinksPage({
 
         <section
           aria-labelledby="bestehende-links"
-          className="flex min-w-0 flex-[999] basis-[560px] flex-col gap-4"
+          className="surface reveal flex min-w-0 flex-[999] basis-[560px] flex-col gap-2 rounded-2xl p-6"
         >
           <h2 id="bestehende-links" className="text-xl font-bold text-heading">
             Deine Links {links.length > 0 ? `(${links.length})` : ""}
           </h2>
           {links.length === 0 ? (
-            <div className="reveal rounded-2xl border border-dashed border-input-border p-6">
+            <div className="mt-2 rounded-xl border border-dashed border-input-border p-5">
               <p className="font-semibold text-heading">Noch keine Links erstellt</p>
               <p className="mt-1 text-sm text-muted">
                 Wähle links eine oder mehrere Personen und erstelle deinen
@@ -88,7 +88,7 @@ export default async function SharedLinksPage({
               </p>
             </div>
           ) : (
-            <ul className="flex flex-col gap-3">
+            <ul className="divide-y divide-line">
               {links.map((link) => (
                 <SharedLinkItem
                   key={link.id}

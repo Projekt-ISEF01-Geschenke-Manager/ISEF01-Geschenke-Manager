@@ -1,8 +1,9 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
-import { ExternalLink, Circle, CheckCircle2, Undo2 } from "lucide-react";
+import { Circle, CheckCircle2, Undo2 } from "lucide-react";
 import { useStatusAnimation } from "@/lib/use-status-animation";
+import { GiftLink } from "@/components/gift-link";
 import { isValidHttpUrl } from "@/lib/url";
 import type { GiftStatus } from "@/lib/gift-status";
 import { Modal } from "@/components/modal";
@@ -110,17 +111,9 @@ export function SharedGiftItem({
             </p>
           )}
           {safeLink && (
-            <p className="mt-1.5 text-sm">
-              <a
-                href={safeLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 underline"
-              >
-                <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                Zum Angebot ↗
-              </a>
-            </p>
+            <div className="mt-2">
+              <GiftLink href={safeLink} label="Zum Angebot" />
+            </div>
           )}
           {!isPurchased && state?.error && (
             <p className="mt-1.5 text-xs text-danger">

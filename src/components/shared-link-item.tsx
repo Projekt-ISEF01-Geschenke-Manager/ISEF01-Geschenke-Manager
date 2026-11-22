@@ -44,7 +44,7 @@ export function SharedLinkItem({
   return (
     <li
       ref={removeRef}
-      className="surface reveal flex flex-wrap items-center gap-4 rounded-2xl p-4"
+      className="flex flex-wrap items-center gap-4 py-4 first:pt-3 last:pb-0"
     >
       <span
         aria-hidden="true"

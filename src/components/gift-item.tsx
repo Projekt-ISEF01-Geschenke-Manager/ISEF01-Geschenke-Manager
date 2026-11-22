@@ -2,8 +2,9 @@
 
 import { useTransition, useActionState, useState, useRef, useEffect } from "react";
 import { useRemoveAnimation } from "@/lib/use-remove-animation";
+import { GiftLink } from "@/components/gift-link";
 import { useStatusAnimation } from "@/lib/use-status-animation";
-import { ExternalLink, Circle, CheckCircle2, ChevronDown, Undo2 } from "lucide-react";
+import { Circle, CheckCircle2, ChevronDown, Undo2 } from "lucide-react";
 import {
   setGiftStatus,
   deleteGift,
@@ -11,7 +12,6 @@ import {
   type GiftStatus,
   type GiftFormState,
 } from "@/app/actions/gifts";
-import { shortLink } from "@/lib/url";
 import { Modal } from "@/components/modal";
 
 export type Gift = {
@@ -190,18 +190,9 @@ export function GiftItem({
               </span>
             </div>
             {gift.link && (
-              <p className="mt-1.5 text-sm">
-                <a
-                  href={gift.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={gift.link}
-                  className="inline-flex items-center gap-1 underline"
-                >
-                  <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                  {shortLink(gift.link)}
-                </a>
-              </p>
+              <div className="mt-2">
+                <GiftLink href={gift.link} title={gift.link} />
+              </div>
             )}
           </div>
         </div>
