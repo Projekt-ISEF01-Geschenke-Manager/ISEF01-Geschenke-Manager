@@ -13,6 +13,10 @@
 # testing
 /coverage
 
+# Stryker Mutation-Testing (siehe stryker.config.json) - generierter Report
+/reports
+.stryker-tmp
+
 # next.js
 /.next/
 /out/

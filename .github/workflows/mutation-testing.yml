@@ -1,0 +1,35 @@
+name: Mutation Testing
+
+# Laeuft bewusst NICHT bei jedem Pull Request (siehe Issue #194) - ein voller
+# Stryker-Lauf dauert deutlich laenger als der normale Testlauf, deshalb
+# woechentlich statt pro PR. "workflow_dispatch" erlaubt zusaetzlich einen
+# manuellen Lauf, z. B. um nach groesseren Aenderungen gezielt nachzuschauen,
+# ohne auf den naechsten Montag zu warten.
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+jobs:
+  mutation-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Mutation-Tests
+        run: npm run test:mutation
+
+      - name: Report hochladen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report
+          path: reports/mutation
+          retention-days: 30
