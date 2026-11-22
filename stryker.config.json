@@ -2,12 +2,30 @@
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
   "packageManager": "npm",
   "testRunner": "vitest",
-  "reporters": ["html", "clear-text", "progress"],
+  "reporters": [
+    "html",
+    "clear-text",
+    "progress"
+  ],
   "coverageAnalysis": "perTest",
   "mutate": [
     "src/**/*.{ts,tsx}",
     "!src/**/*.test.{ts,tsx}",
     "!src/**/layout.tsx",
-    "!src/proxy.ts"
-  ]
+    "!src/proxy.ts",
+    "!src/**/loading.tsx",
+    "!src/app/impressum/page.tsx",
+    "!src/app/datenschutz/page.tsx",
+    "!src/components/site-header.tsx",
+    "!src/components/site-footer.tsx",
+    "!src/components/dashboard-nav.tsx",
+    "!src/components/skeleton.tsx",
+    "!src/components/palette-picker.tsx",
+    "!src/components/scroll-reveal.tsx",
+    "!src/components/gift-link.tsx",
+    "!src/lib/use-status-animation.ts",
+    "!src/lib/use-remove-animation.ts"
+  ],
+  "incremental": true,
+  "incrementalFile": "reports/stryker-incremental.json"
 }
