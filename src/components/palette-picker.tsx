@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Check, Palette } from "lucide-react";
+import { applyThemeColor } from "@/lib/theme-color";
 
 // Farbpaletten-Auswahl im Header. Setzt data-palette auf <html> (die Tokens
 // dazu stehen in globals.css) und merkt sich die Wahl in localStorage. Das
@@ -50,6 +51,7 @@ export function PalettePicker() {
   function choose(id: PaletteId) {
     document.documentElement.setAttribute("data-palette", id);
     setActive(id);
+    applyThemeColor();
     try {
       localStorage.setItem("palette", id);
     } catch {
