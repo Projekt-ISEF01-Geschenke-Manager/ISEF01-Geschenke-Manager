@@ -23,7 +23,7 @@ export default async function PersonPage({
   const { data: person } = await supabase
     .from("people")
     .select(
-      "id, name, birthday_day, birthday_month, birthday_year, interests, notes",
+      "id, name, birthday_day, birthday_month, birthday_year, interests, notes, reminders_enabled",
     )
     .eq("id", id)
     .single();

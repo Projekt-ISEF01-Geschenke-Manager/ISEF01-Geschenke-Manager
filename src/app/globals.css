@@ -980,7 +980,7 @@ body {
   top: 0;
   bottom: 0;
   left: 0;
-  width: calc(100% / 3);
+  width: calc(100% / 4);
   border-radius: 9999px;
   background: color-mix(in srgb, var(--accent) 16%, transparent);
   transform: translateX(calc(var(--tab-index, 0) * 100%));

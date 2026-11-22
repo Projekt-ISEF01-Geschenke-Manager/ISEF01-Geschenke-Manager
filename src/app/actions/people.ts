@@ -25,6 +25,7 @@ export type PersonFormState =
         birthdayYear: string;
         interests: string;
         notes: string;
+        remindersEnabled: boolean;
       };
     }
   | undefined;
@@ -36,6 +37,7 @@ type ParsedPerson = {
   birthdayYear: number | null;
   interests: string[];
   notes: string | null;
+  remindersEnabled: boolean;
 };
 
 function parsePersonFields(formData: FormData):
@@ -47,6 +49,10 @@ function parsePersonFields(formData: FormData):
   const birthdayYearRaw = formString(formData.get("birthdayYear"));
   const interestsRaw = formString(formData.get("interests"));
   const notes = formString(formData.get("notes"));
+  // Unangehakte Checkboxen werden von Browsern gar nicht erst in die
+  // FormData aufgenommen - formData.has() statt formData.get(), da ein
+  // leerer/"off"-Wert hier nicht vorkommt (siehe Checkbox in PersonForm).
+  const remindersEnabled = formData.has("remindersEnabled");
 
   const values = {
     name,
@@ -55,6 +61,7 @@ function parsePersonFields(formData: FormData):
     birthdayYear: birthdayYearRaw,
     interests: interestsRaw,
     notes,
+    remindersEnabled,
   };
 
   if (!name) {
@@ -110,6 +117,7 @@ function parsePersonFields(formData: FormData):
       birthdayYear,
       interests,
       notes: notes || null,
+      remindersEnabled,
     },
   };
 }
@@ -124,6 +132,7 @@ function toPersonRecord(data: ParsedPerson) {
     birthday_year: data.birthdayYear,
     interests: data.interests,
     notes: data.notes,
+    reminders_enabled: data.remindersEnabled,
   };
 }
 

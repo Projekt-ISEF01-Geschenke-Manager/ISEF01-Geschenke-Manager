@@ -33,6 +33,7 @@ erDiagram
         smallint birthday_year
         text_array interests
         text notes
+        boolean reminders_enabled
     }
     occasions {
         uuid id PK
@@ -79,6 +80,7 @@ erDiagram
 | `birthday_year` | smallint | Geburtsjahr, optional (Datensparsamkeit, A1/QA7) |
 | `interests` | text[] | Interessen als freie Tags, Grundlage für Vorschläge (A12) |
 | `notes` | text | Freitext, "weitere Infos zur Person" |
+| `reminders_enabled` | boolean | Ob die Person in E-Mail-Erinnerungen (A6/A7) auftaucht; Default `true`, damit sich für bestehende Personen nichts automatisch ändert |
 | `created_at` / `updated_at` | timestamptz | Zeitstempel |
 
 **Entscheidung Geburtstag:** `date` kann kein "Jahr optional" abbilden (ein SQL-`date` braucht immer ein Jahr). Deshalb drei Spalten statt einer; `birthday_day`/`birthday_month` sind über einen Check-Constraint an eine gemeinsame Pflicht gekoppelt (beide gesetzt oder beide `null`), `birthday_year` bleibt unabhängig nullable.
@@ -174,7 +176,7 @@ Zwei Datenbank-Trigger:
 | Bild-Upload (A8, Stufe 3) | `gifts.image_url` vorbereitet, Storage-Bucket fehlt noch |
 | Umwandlung Idee → Geschenk (A9, Stufe 2) | Update von `status`, `occasion_id`, `gift_date` |
 | Teilen von Geschenkideen per Link, mehrere Personen/Links (A10, MVP) | `shared_links`, `shared_link_people` |
-| Automatische Erinnerungen (A6/A7, Stufe 2) | *noch nicht Teil des Schemas* – wird über den geplanten Cron Job (Vercel) + Query auf `people.birthday_*`/`occasions` umgesetzt |
+| Automatische Erinnerungen (A6/A7, Stufe 2) | Pro-Person-Schalter `people.reminders_enabled` (boolean, Default `true`); der Versand selbst läuft über den geplanten Cron Job (Vercel) + Query auf `people.birthday_*`/`occasions` |
 | Automatische Generierung weiterer Ideen (A12, Stufe 3) | *bewusst nicht im MVP-Schema* – spätere Erweiterung, siehe Abschnitt 6 |
 | Begrenzte Versuche bei Login, Registrierung und Reset (QA5, MVP) | `rate_limit_attempts`; Reset folgt mit der Passwort-Reset-Funktion (Stufe 2) |
 
