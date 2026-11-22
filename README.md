@@ -127,6 +127,7 @@ src/
 supabase/
   migrations/             SQL-Migrationen (per Supabase-CLI oder Dashboard-SQL-Editor anzuwenden)
 docs/                     Hintergrund zu Schema (database-schema.md) und Auth-Flow (auth-flow.md)
+DESIGN-DARKMODE.md        Design-System: Farb-Tokens, Paletten, Komponenten, Animationen
 CHANGELOG.md              Automatisch bei jedem gemergten PR aktualisiert
 SECURITY.md               Private Vulnerability Reporting (GitHub)
 ```
