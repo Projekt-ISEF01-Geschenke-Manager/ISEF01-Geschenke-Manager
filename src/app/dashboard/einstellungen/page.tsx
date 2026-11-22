@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { requireUser } from "@/lib/supabase/server";
 import { ReminderSettingsForm } from "@/components/reminder-settings-form";
+import { ReduceMotionToggle } from "@/components/reduce-motion-toggle";
 
 export const instant = false;
 
@@ -38,6 +39,19 @@ export default async function EinstellungenPage() {
           initialRemindBirthdays={remindBirthdays}
           initialRemindChristmas={remindChristmas}
         />
+      </section>
+
+      <section
+        aria-labelledby="einstellungen-darstellung"
+        className="surface reveal flex min-w-0 max-w-[480px] flex-col gap-4 rounded-2xl p-6"
+      >
+        <h2 id="einstellungen-darstellung" className="text-xl font-bold text-heading">
+          Darstellung
+        </h2>
+        <p className="text-sm text-muted">
+          Reduziert Animationen unabhängig von der Betriebssystem-Einstellung.
+        </p>
+        <ReduceMotionToggle />
       </section>
     </main>
   );
