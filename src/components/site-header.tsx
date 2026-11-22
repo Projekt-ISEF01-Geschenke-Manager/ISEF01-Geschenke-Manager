@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { PalettePicker } from "./palette-picker";
 import { signout } from "@/app/actions/auth";
@@ -62,6 +62,13 @@ export function SiteHeader({
                   <span className="sr-only sm:not-sr-only">Abmelden</span>
                 </button>
               </form>
+              <Link
+                href="/dashboard/einstellungen"
+                aria-label="Einstellungen"
+                className="hidden h-8 w-8 items-center justify-center rounded-full border border-on-header-btn-border text-on-header transition duration-150 hover:bg-on-header-btn-bg active:scale-95 sm:inline-flex"
+              >
+                <Settings aria-hidden="true" className="h-4 w-4" />
+              </Link>
             </>
           )}
           <PalettePicker />

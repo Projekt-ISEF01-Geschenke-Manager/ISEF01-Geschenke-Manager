@@ -21,6 +21,7 @@ const person = {
   birthday_year: 1960,
   interests: ["Garten", "Kochen"],
   notes: "Mag keine Süßigkeiten mehr, Lieblingsfarbe Grün.",
+  reminders_enabled: true,
 };
 
 describe("PersonCard", () => {

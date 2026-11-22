@@ -163,6 +163,7 @@ describe("createPerson", () => {
       birthday_year: 1960,
       interests: ["Garten", "Kochen"],
       notes: "Mag keine Süßigkeiten mehr.",
+      reminders_enabled: false,
     });
     expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard", "layout");
   });
@@ -180,6 +181,25 @@ describe("createPerson", () => {
     const result = await createPerson(undefined, formData(validFields));
     expect(result?.error).toBe("db down");
     expect(revalidatePathMock).not.toHaveBeenCalled();
+  });
+
+  it("speichert reminders_enabled=false, wenn die Checkbox nicht angehakt ist", async () => {
+    insertMock.mockResolvedValue({ error: null });
+    // "remindersEnabled" bewusst nicht in den Feldern (unangehakte Checkbox)
+    await createPerson(undefined, formData(validFields));
+    expect(insertMock).toHaveBeenCalledWith(
+      "people",
+      expect.objectContaining({ reminders_enabled: false }),
+    );
+  });
+
+  it("speichert reminders_enabled=true, wenn die Checkbox angehakt ist", async () => {
+    insertMock.mockResolvedValue({ error: null });
+    await createPerson(undefined, formData({ ...validFields, remindersEnabled: "on" }));
+    expect(insertMock).toHaveBeenCalledWith(
+      "people",
+      expect.objectContaining({ reminders_enabled: true }),
+    );
   });
 });
 

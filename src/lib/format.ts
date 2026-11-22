@@ -34,6 +34,12 @@ export function monthAbbreviation(month: number): string {
   return MONTH_NAMES_SHORT[month - 1];
 }
 
+// Voller Monatsname (1 = Januar ... 12 = Dezember), z. B. fuer den Betreff
+// der Geburtstagserinnerungs-Mail ("Geburtstage im Januar").
+export function monthName(month: number): string {
+  return MONTH_NAMES[month - 1];
+}
+
 export function formatBirthday(
   day: number | null,
   month: number | null,

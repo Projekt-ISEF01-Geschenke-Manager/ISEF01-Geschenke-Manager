@@ -15,6 +15,7 @@ export type EditablePerson = {
   birthday_year: number | null;
   interests: string[];
   notes: string | null;
+  reminders_enabled: boolean;
 };
 
 export function PersonForm({
@@ -37,6 +38,7 @@ export function PersonForm({
           birthdayYear: person.birthday_year?.toString() ?? "",
           interests: person.interests.join(", "),
           notes: person.notes ?? "",
+          remindersEnabled: person.reminders_enabled,
         },
       }
     : undefined;
@@ -134,6 +136,15 @@ export function PersonForm({
             defaultValue={state?.values?.notes}
             className="rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-3 py-2 text-base sm:text-sm"
           />
+        </label>
+
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            name="remindersEnabled"
+            defaultChecked={state?.values?.remindersEnabled ?? true}
+          />
+          In Erinnerungen einschließen
         </label>
 
         <button
