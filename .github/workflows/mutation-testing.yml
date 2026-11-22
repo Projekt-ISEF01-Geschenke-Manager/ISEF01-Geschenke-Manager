@@ -1,11 +1,14 @@
 name: Mutation Testing
 
-# Laeuft bewusst NICHT bei jedem Pull Request (siehe Issue #194) - ein voller
-# Stryker-Lauf dauert deutlich laenger als der normale Testlauf, deshalb
-# woechentlich statt pro PR. "workflow_dispatch" erlaubt zusaetzlich einen
-# manuellen Lauf, z. B. um nach groesseren Aenderungen gezielt nachzuschauen,
-# ohne auf den naechsten Montag zu warten.
+# Laeuft jetzt auch bei jedem Pull Request (siehe Issue #194) - ein voller
+# Stryker-Lauf dauert bei der aktuellen Codebase-Groesse nur rund 4 Minuten,
+# das ist als zusaetzlicher PR-Check vertretbar. Der woechentliche Cron-Lauf
+# bleibt als Sicherheitsnetz bestehen (faengt z. B. Drift durch Abhaengigkeits-
+# Updates ab, die ohne eigenen PR-Code-Diff durchrutschen wuerden).
+# "workflow_dispatch" erlaubt zusaetzlich einen manuellen Lauf.
 on:
+  pull_request:
+    branches: [main]
   schedule:
     - cron: "0 3 * * 1"
   workflow_dispatch:

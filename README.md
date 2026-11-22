@@ -72,9 +72,9 @@ Siehe [CHANGELOG.md](CHANGELOG.md) für die chronologische Liste gemergter Ände
 und das [GitHub-Projekt](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/milestones)
 für den aktuellen Stand je Meilenstein.
 
-210 automatisierte Vitest-Tests (`npm test`), CI (Lint + Build), Codacy und CodeQL
-laufen auf jedem Pull Request. Mutation-Testing (Stryker, `npm run test:mutation`)
-läuft wöchentlich statt pro PR, siehe
+210 automatisierte Vitest-Tests (`npm test`), CI (Lint + Build), Codacy, CodeQL und
+Mutation-Testing (Stryker, `npm run test:mutation`, ~4 Minuten) laufen auf jedem
+Pull Request, siehe
 [#194](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/194).
 
 ## Stack
