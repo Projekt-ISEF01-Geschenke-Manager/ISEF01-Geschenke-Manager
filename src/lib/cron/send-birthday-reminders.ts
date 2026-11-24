@@ -2,6 +2,7 @@ import "server-only";
 import { createServiceClient } from "@/lib/supabase/service";
 import { ACTIVE_GIFT_STATUSES } from "@/lib/gift-status";
 import { monthName } from "@/lib/format";
+import { EMAIL_COLORS, renderEmailLayout } from "@/lib/email-layout";
 
 const USERS_PER_PAGE = 200;
 
@@ -34,30 +35,61 @@ function runMonthKey(now: Date): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function renderBirthdayEmailHtml(targetMonth: number, people: PersonWithGifts[]): string {
-  const monthLabel = monthName(targetMonth);
-  const settingsUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/dashboard/einstellungen`;
+function renderGiftsHtml(gifts: GiftRow[]): string {
+  if (gifts.length === 0) {
+    return `<p style="margin:10px 0 0; font-size:14px; color:${EMAIL_COLORS.muted};">Noch keine Geschenkideen eingetragen.</p>`;
+  }
 
-  const peopleHtml = people
-    .map((person) => {
-      const giftsHtml = person.gifts.length
-        ? `<ul>${person.gifts
-            .map(
-              (gift) =>
-                `<li>${gift.title} (${gift.status === "idea" ? "offen" : "besorgt"})</li>`,
-            )
-            .join("")}</ul>`
-        : "";
-      return `<p>${person.name} – ${person.birthday_day}. ${monthLabel}</p>${giftsHtml}`;
+  const rows = gifts
+    .map((gift) => {
+      const isIdea = gift.status === "idea";
+      const statusColor = isIdea ? EMAIL_COLORS.accent : EMAIL_COLORS.success;
+      const statusBg = isIdea ? EMAIL_COLORS.accentSoft : EMAIL_COLORS.successSoft;
+      return `
+        <tr>
+          <td style="padding:4px 0; font-size:14px; color:${EMAIL_COLORS.heading};">
+            <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background-color:${EMAIL_COLORS.accent}; margin-right:10px;"></span>${gift.title}
+            <span style="display:inline-block; margin-left:8px; padding:2px 10px; font-size:11px; font-weight:600; color:${statusColor}; background-color:${statusBg}; border-radius:9999px;">${isIdea ? "offen" : "besorgt"}</span>
+          </td>
+        </tr>`;
     })
     .join("");
 
-  return [
-    "<p>Hallo,</p>",
-    `<p>im ${monthLabel} haben folgende Personen Geburtstag:</p>`,
-    peopleHtml,
-    `<p><a href="${settingsUrl}">Einstellungen ändern</a></p>`,
-  ].join("");
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px;">${rows}</table>`;
+}
+
+function renderPersonRow(person: PersonWithGifts, monthLabel: string): string {
+  return `
+    <tr>
+      <td style="padding-bottom:16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${EMAIL_COLORS.bg}; border-left:4px solid ${EMAIL_COLORS.accent}; border-radius:12px;">
+          <tr>
+            <td style="padding:16px 20px;">
+              <p style="margin:0; font-size:16px; font-weight:600; color:${EMAIL_COLORS.heading};">${person.name}<span style="font-weight:400; color:${EMAIL_COLORS.accent};"> – ${person.birthday_day}. ${monthLabel}</span></p>
+              ${renderGiftsHtml(person.gifts)}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>`;
+}
+
+function renderBirthdayEmailHtml(targetMonth: number, people: PersonWithGifts[]): string {
+  const monthLabel = monthName(targetMonth);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+  const peopleHtml = people.map((person) => renderPersonRow(person, monthLabel)).join("");
+
+  const bodyHtml = `
+    <p style="margin:0 0 4px; font-size:16px; color:${EMAIL_COLORS.heading};">Hallo,</p>
+    <p style="margin:0 0 24px; font-size:16px; color:${EMAIL_COLORS.heading};">im <strong>${monthLabel}</strong> haben folgende Personen Geburtstag:</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${peopleHtml}</table>`;
+
+  return renderEmailLayout({
+    siteUrl,
+    title: `Geburtstage im ${monthLabel}`,
+    bodyHtml,
+  });
 }
 
 async function processAccount(
