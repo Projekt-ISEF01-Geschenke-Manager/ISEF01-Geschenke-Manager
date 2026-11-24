@@ -49,7 +49,7 @@ function renderStatusRow(person: PersonStatus): string {
     <tr>
       <td style="padding:4px 0; font-size:14px; color:${EMAIL_COLORS.heading};">
         <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background-color:${EMAIL_COLORS.accent}; margin-right:10px;"></span>${person.name}
-        <span style="display:inline-block; margin-left:8px; padding:2px 10px; font-size:11px; font-weight:600; color:${statusColor}; background-color:${statusBg}; border-radius:9999px;">${person.purchased ? "besorgt" : "noch offen"}</span>
+        <span style="display:inline-block; margin-left:8px; padding:2px 10px; font-size:11px; font-weight:600; color:${statusColor}; background-color:${statusBg}; border-radius:9999px;">${person.purchased ? "Geschenk besorgt" : "noch kein Geschenk"}</span>
       </td>
     </tr>`;
 }
@@ -61,7 +61,7 @@ function renderChristmasStatusEmailHtml(people: PersonStatus[]): string {
 
   const bodyHtml = `
     <p style="margin:0 0 4px; font-size:16px; color:${EMAIL_COLORS.heading};">Hallo,</p>
-    <p style="margin:0 0 24px; font-size:16px; color:${EMAIL_COLORS.heading};"><strong>${purchasedCount} von ${people.length}</strong> Personen sind schon besorgt:</p>
+    <p style="margin:0 0 24px; font-size:16px; color:${EMAIL_COLORS.heading};">Für <strong>${purchasedCount} von ${people.length}</strong> Personen ist schon ein Geschenk besorgt:</p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}</table>`;
 
   return renderEmailLayout({
