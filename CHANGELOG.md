@@ -5,6 +5,9 @@ ergänzt der Workflow [`.github/workflows/changelog.yml`](.github/workflows/chan
 hier automatisch einen Eintrag mit PR-Titel und -Nummer. Kein manueller
 Schritt vor dem Merge nötig.
 
+## 2026-11-24
+- Docs: README auf aktuellen Projektstand gebracht (#213)
+
 ## 2026-11-22
 - Feature: Manueller Schalter zum Reduzieren von Bewegung in den Einstellungen (#212)
 - Fix: iOS-Statusleiste passt sich jetzt der gewählten Farbpalette an (#211)
