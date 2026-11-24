@@ -6,6 +6,7 @@ hier automatisch einen Eintrag mit PR-Titel und -Nummer. Kein manueller
 Schritt vor dem Merge nötig.
 
 ## 2026-11-24
+- Docs: README auf Weihnachts-Statusübersicht aktualisiert (#216)
 - Fix: Eindeutigerer Wortlaut in der Weihnachts-Statusübersicht (#215)
 - Feature: Weihnachts-Statusübersicht per E-Mail (#214)
 - Docs: README auf aktuellen Projektstand gebracht (#213)
