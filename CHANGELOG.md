@@ -6,6 +6,7 @@ hier automatisch einen Eintrag mit PR-Titel und -Nummer. Kein manueller
 Schritt vor dem Merge nötig.
 
 ## 2026-11-24
+- Feature: Weihnachts-Statusübersicht per E-Mail (#214)
 - Docs: README auf aktuellen Projektstand gebracht (#213)
 
 ## 2026-11-22
