@@ -19,7 +19,7 @@ vi.mock("@supabase/ssr", () => ({
 
 const getUserMock = vi.fn();
 
-const { requireUser } = await import("./server");
+const { requireUser, requireAdmin } = await import("./server");
 
 describe("requireUser", () => {
   beforeEach(() => {
@@ -41,6 +41,41 @@ describe("requireUser", () => {
 
     expect(redirectMock).not.toHaveBeenCalled();
     expect(result.user).toEqual({ id: "user-1" });
+    expect(result.supabase).toBeTruthy();
+  });
+});
+
+describe("requireAdmin", () => {
+  beforeEach(() => {
+    getUserMock.mockReset();
+    redirectMock.mockClear();
+  });
+
+  it("leitet zu / um, wenn eingeloggt aber kein Admin", async () => {
+    getUserMock.mockResolvedValue({
+      data: { user: { id: "user-1", app_metadata: {} } },
+    });
+
+    await expect(requireAdmin()).rejects.toThrow("NEXT_REDIRECT:/");
+    expect(redirectMock).toHaveBeenCalledWith("/");
+  });
+
+  it("leitet zu / um, wenn gar nicht eingeloggt", async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } });
+
+    await expect(requireAdmin()).rejects.toThrow("NEXT_REDIRECT:/");
+    expect(redirectMock).toHaveBeenCalledWith("/");
+  });
+
+  it("gibt supabase+user zurück, wenn app_metadata.is_admin === true", async () => {
+    getUserMock.mockResolvedValue({
+      data: { user: { id: "user-1", app_metadata: { is_admin: true } } },
+    });
+
+    const result = await requireAdmin();
+
+    expect(redirectMock).not.toHaveBeenCalled();
+    expect(result.user.app_metadata?.is_admin).toBe(true);
     expect(result.supabase).toBeTruthy();
   });
 });

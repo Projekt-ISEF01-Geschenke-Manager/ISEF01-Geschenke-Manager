@@ -56,3 +56,18 @@ export async function requireUser() {
 
   return { supabase, user };
 }
+
+// Admin-Pruefung (#90, ZA5): baut auf requireUser() auf und leitet zusaetzlich
+// zur Startseite weiter, wenn der app_metadata-Claim is_admin nicht exakt
+// true ist. app_metadata wird vom Auth-Server gesetzt und kann von
+// Nutzer:innen nicht selbst veraendert werden (anders als user_metadata) -
+// deshalb hier und nicht in user_metadata geprueft.
+export async function requireAdmin() {
+  const { supabase, user } = await requireUser();
+
+  if (user.app_metadata?.is_admin !== true) {
+    redirect("/");
+  }
+
+  return { supabase, user };
+}
