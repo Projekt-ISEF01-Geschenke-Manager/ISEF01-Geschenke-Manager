@@ -240,9 +240,9 @@ describe("sendChristmasStatusOverview", () => {
     const bertIndex = html.indexOf("Bert");
     expect(annaIndex).toBeGreaterThanOrEqual(0);
     expect(bertIndex).toBeGreaterThanOrEqual(0);
-    expect(html.slice(annaIndex, annaIndex + 300)).toContain(">besorgt<");
-    expect(html.slice(bertIndex, bertIndex + 300)).toContain(">noch offen<");
-    expect(html.slice(bertIndex, bertIndex + 300)).not.toContain(">besorgt<");
+    expect(html.slice(annaIndex, annaIndex + 300)).toContain(">Geschenk besorgt<");
+    expect(html.slice(bertIndex, bertIndex + 300)).toContain(">noch kein Geschenk<");
+    expect(html.slice(bertIndex, bertIndex + 300)).not.toContain(">Geschenk besorgt<");
   });
 
   it("setzt last_christmas_status_date und ueberspringt beim zweiten Lauf am selben Tag", async () => {
