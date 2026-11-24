@@ -5,10 +5,22 @@ vi.mock("next/cache", () => ({
   revalidatePath: (path: string, type?: string) => revalidatePathMock(path, type),
 }));
 
-const requireUserMock = vi.fn();
+// requireAdmin() wird hier als Ganzes gemockt (nicht nur auth.getUser()) -
+// sein eigenes Redirect-Verhalten bei fehlender Berechtigung ist bereits in
+// server.test.ts abgedeckt. assertAdmin() in admin.ts delegiert bewusst 1:1
+// an requireAdmin(), damit "nicht eingeloggt" und "eingeloggt, aber kein
+// Admin" ueber denselben redirect("/")-Pfad laufen und nie unterscheidbar
+// sind - der Mock bildet das nach, indem beide Nicht-Admin-Faelle denselben
+// NEXT_REDIRECT-Fehler werfen (wie es requireUser()/requireAdmin() in echt
+// per redirect("/") tun, siehe server.ts).
+const requireAdminMock = vi.fn();
 vi.mock("@/lib/supabase/server", () => ({
-  requireUser: (...args: unknown[]) => requireUserMock(...args),
+  requireAdmin: (...args: unknown[]) => requireAdminMock(...args),
 }));
+
+function rejectWithRedirect() {
+  return Promise.reject(new Error("NEXT_REDIRECT:/"));
+}
 
 const listUsersMock = vi.fn();
 const deleteUserMock = vi.fn();
@@ -25,12 +37,8 @@ vi.mock("@/lib/supabase/service", () => ({
 
 const { listAllAccounts, deleteAccount } = await import("./admin");
 
-function adminUser() {
-  return { id: "admin-1", app_metadata: { is_admin: true } };
-}
-
-function nonAdminUser() {
-  return { id: "user-1", app_metadata: {} };
+function adminResult() {
+  return { user: { id: "admin-1", app_metadata: { is_admin: true } }, supabase: {} };
 }
 
 function accountUser(overrides: Record<string, unknown> = {}) {
@@ -46,19 +54,19 @@ function accountUser(overrides: Record<string, unknown> = {}) {
 
 describe("listAllAccounts", () => {
   beforeEach(() => {
-    requireUserMock.mockReset();
+    requireAdminMock.mockReset();
     listUsersMock.mockReset();
   });
 
-  it("wirft, wenn kein Admin", async () => {
-    requireUserMock.mockResolvedValue({ user: nonAdminUser() });
+  it("wirft/redirectet, wenn kein Admin (gleicher Pfad fuer 'kein Admin' und 'nicht eingeloggt', siehe assertAdmin())", async () => {
+    requireAdminMock.mockImplementation(rejectWithRedirect);
 
-    await expect(listAllAccounts()).rejects.toThrow();
+    await expect(listAllAccounts()).rejects.toThrow(/NEXT_REDIRECT/);
     expect(listUsersMock).not.toHaveBeenCalled();
   });
 
   it("liefert bestaetigte, nicht-Test-Konten, Test-Accounts ausgefiltert", async () => {
-    requireUserMock.mockResolvedValue({ user: adminUser() });
+    requireAdminMock.mockResolvedValue(adminResult());
     listUsersMock
       .mockResolvedValueOnce({
         data: {
@@ -82,7 +90,7 @@ describe("listAllAccounts", () => {
   });
 
   it("confirmed=false bei email_confirmed_at=null", async () => {
-    requireUserMock.mockResolvedValue({ user: adminUser() });
+    requireAdminMock.mockResolvedValue(adminResult());
     listUsersMock
       .mockResolvedValueOnce({
         data: { users: [accountUser({ email_confirmed_at: null })] },
@@ -99,20 +107,20 @@ describe("listAllAccounts", () => {
 
 describe("deleteAccount", () => {
   beforeEach(() => {
-    requireUserMock.mockReset();
+    requireAdminMock.mockReset();
     deleteUserMock.mockReset();
     revalidatePathMock.mockClear();
   });
 
-  it("wirft/liefert Fehler, wenn kein Admin", async () => {
-    requireUserMock.mockResolvedValue({ user: nonAdminUser() });
+  it("wirft/redirectet, wenn kein Admin (gleicher Pfad fuer 'kein Admin' und 'nicht eingeloggt', siehe assertAdmin())", async () => {
+    requireAdminMock.mockImplementation(rejectWithRedirect);
 
-    await expect(deleteAccount("user-123")).rejects.toThrow();
+    await expect(deleteAccount("user-123")).rejects.toThrow(/NEXT_REDIRECT/);
     expect(deleteUserMock).not.toHaveBeenCalled();
   });
 
   it("ruft auth.admin.deleteUser mit der uebergebenen ID auf", async () => {
-    requireUserMock.mockResolvedValue({ user: adminUser() });
+    requireAdminMock.mockResolvedValue(adminResult());
     deleteUserMock.mockResolvedValueOnce({ error: null });
 
     await deleteAccount("user-123");
@@ -121,7 +129,7 @@ describe("deleteAccount", () => {
   });
 
   it("liefert Fehlertext bei Supabase-Fehler", async () => {
-    requireUserMock.mockResolvedValue({ user: adminUser() });
+    requireAdminMock.mockResolvedValue(adminResult());
     deleteUserMock.mockResolvedValueOnce({ error: { message: "kaputt" } });
 
     const result = await deleteAccount("user-123");

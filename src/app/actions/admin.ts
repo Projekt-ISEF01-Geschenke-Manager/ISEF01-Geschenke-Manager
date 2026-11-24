@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 
 const USERS_PER_PAGE = 200;
@@ -13,16 +13,17 @@ export type AdminAccountRow = {
   confirmed: boolean;
 };
 
-// Admin-Pruefung fuer beide Server Actions dieser Datei - requireUser()
-// statt requireAdmin() aus server.ts, weil requireAdmin() bei fehlender
-// Berechtigung redirect("/") aufruft (fuer Server Components gedacht) statt
-// einen Fehler zu werfen, den Server Actions sauber als Fehlertext
-// zurueckgeben koennen (siehe deleteAccount unten).
+// Admin-Pruefung fuer beide Server Actions dieser Datei - delegiert
+// bewusst an requireAdmin() aus server.ts (statt die Pruefung hier erneut
+// mit einem eigenen throw nachzubauen), damit Nicht-Admins IMMER identisch
+// behandelt werden, egal ob eingeloggt oder nicht: beide Faelle landen in
+// requireAdmin() -> requireUser() -> redirect("/") (NEXT_REDIRECT), nie in
+// einem unterscheidbaren Error. Ein eigener throw hier wuerde dagegen einen
+// "eingeloggt, aber kein Admin"-Fall vom "gar nicht eingeloggt"-Fall
+// unterscheidbar machen - genau das soll laut Plan (Global Constraint)
+// nicht passieren.
 async function assertAdmin(): Promise<void> {
-  const { user } = await requireUser();
-  if (user.app_metadata?.is_admin !== true) {
-    throw new Error("Kein Admin-Konto.");
-  }
+  await requireAdmin();
 }
 
 // Laedt alle Konten ueber die Supabase Admin API (Service-Role-Client,
