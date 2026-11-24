@@ -56,7 +56,8 @@ Geschwistern), damit niemand dasselbe Geschenk doppelt kauft.
 ### Sonstiges
 - Dark-/Light-Mode (Theme-Color folgt jetzt auch in der iOS-Statusleiste,
   [#208](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/208))
-- Impressum, Datenschutzerklärung
+- Datenschutzerklärung; Impressum existiert nur als Platzhalter-Seite
+  ([#76](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/76))
 - Responsive (Desktop, Tablet, Mobile)
 
 ## Stand des Projekts
