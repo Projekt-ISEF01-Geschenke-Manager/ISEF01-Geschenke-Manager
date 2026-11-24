@@ -3,14 +3,16 @@ import { runDailyJobs, type DailyJob } from "@/lib/cron/daily-jobs";
 import { deleteUnconfirmedAccounts } from "@/lib/cron/delete-unconfirmed-accounts";
 import { convertPastGifts } from "@/lib/cron/convert-past-gifts";
 import { sendBirthdayReminders } from "@/lib/cron/send-birthday-reminders";
+import { sendChristmasStatusOverview } from "@/lib/cron/send-christmas-status";
 
 // Taeglicher Zeitplaner (Vercel Cron, siehe vercel.json, #83). Einzelne
 // Aufgaben werden hier nacheinander eingehaengt, sobald die jeweiligen
-// Features umgesetzt sind. #2 (Weihnachts-Status) folgt.
+// Features umgesetzt sind.
 const DAILY_JOBS: DailyJob[] = [
   { name: "delete-unconfirmed-accounts", run: deleteUnconfirmedAccounts },
   { name: "convert-past-gifts", run: convertPastGifts },
   { name: "send-birthday-reminders", run: sendBirthdayReminders },
+  { name: "send-christmas-status", run: sendChristmasStatusOverview },
 ];
 
 export async function GET(request: NextRequest) {
