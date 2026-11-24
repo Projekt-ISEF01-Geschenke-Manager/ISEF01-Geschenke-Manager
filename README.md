@@ -41,8 +41,21 @@ Geschwistern), damit niemand dasselbe Geschenk doppelt kauft.
   Link freigegebenen Personen geändert werden können, und eigenem Rate-Limiting
 - Link jederzeit widerrufbar
 
+### Einstellungen
+- Eigene Seite (Desktop: Icon im Header neben "Abmelden"; Mobile: eigener Tab in der
+  unteren Navigation)
+- Kontoweite Schalter: Geburtstagserinnerung per E-Mail an/aus, Weihnachts-Status an/aus
+  (Schalter vorhanden, wird aber noch nicht ausgewertet, siehe
+  [#2](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/2))
+- Pro Person: "In Erinnerungen einschließen" (schließt einzelne Personen aus beiden
+  Mail-Typen aus)
+- "Bewegung reduzieren" – erzwingt reduzierte Animationen unabhängig von der
+  Betriebssystem-Einstellung
+  ([#209](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/209))
+
 ### Sonstiges
-- Dark-/Light-Mode
+- Dark-/Light-Mode (Theme-Color folgt jetzt auch in der iOS-Statusleiste,
+  [#208](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/208))
 - Impressum, Datenschutzerklärung
 - Responsive (Desktop, Tablet, Mobile)
 
@@ -55,14 +68,16 @@ MVP (IM-4.1) ist umgesetzt, Stufe 2 (IM-4.2) teilweise:
   (Geburtstag, Interessen, Notizen), feste Anlässe (Geburtstag/Weihnachten),
   Geschenkideen (Schnelleingabe mit Link/Anlass, Bearbeiten, Status offen/besorgt,
   Lösch-Bestätigung), Übersichtsseite und Personenseite nach Wireframe, Ideen per Link
-  teilen inkl. gemeinsamem Abhaken mit Namenszuordnung, Dark/Light-Mode
+  teilen inkl. gemeinsamem Abhaken mit Namenszuordnung, Dark/Light-Mode,
+  monatliche Geburtstagserinnerung per E-Mail inkl. Einstellungsseite
+  ([#3](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/3))
 - ⚠️ **Teilweise:** Status „given"/Geschenk-Historie (Datenmodell da, noch keine UI);
   Idee → Geschenk umwandeln (bisher nur Status-Toggle, keine Anlass/Datum-Übernahme,
   Platzhalter in der UI vorhanden, [#26](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/26))
-- ❌ **Geplant (Stufe 2/3):** E-Mail-Erinnerungen vor Geburtstagen/Weihnachten
+- ❌ **Geplant (Stufe 2/3):** Weihnachts-Statusübersicht per E-Mail
   ([#84](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/84),
-  [#2](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/2),
-  [#3](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/3)),
+  [#2](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/2)
+  – Einstellungsschalter existiert schon, wird aber noch nicht ausgewertet),
   Admin-Account ([#90](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/90)),
   frühere Geschenke dokumentieren ([#21](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/21)),
   eigene Anlässe, Bild-Upload, Aufgaben-Checkliste, regelbasierte Ideenvorschläge,
@@ -72,7 +87,7 @@ Siehe [CHANGELOG.md](CHANGELOG.md) für die chronologische Liste gemergter Ände
 und das [GitHub-Projekt](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/milestones)
 für den aktuellen Stand je Meilenstein.
 
-210 automatisierte Vitest-Tests (`npm test`), CI (Lint + Build), Codacy, CodeQL und
+270 automatisierte Vitest-Tests (`npm test`), CI (Lint + Build), Codacy, CodeQL und
 Mutation-Testing (Stryker, `npm run test:mutation`, ~4 Minuten) laufen auf jedem
 Pull Request, siehe
 [#194](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/194).
@@ -82,9 +97,10 @@ Pull Request, siehe
 - [Next.js](https://nextjs.org) (TypeScript, App Router, Server Actions) – Frontend + Backend
 - [Tailwind CSS](https://tailwindcss.com) – Styling
 - [Supabase](https://supabase.com) – Datenbank (PostgreSQL), Authentifizierung, Row Level Security
-- [Resend](https://resend.com) – Transaktions-E-Mails (Bestätigung, Passwort-Reset;
-  Erinnerungsmails für Anlässe noch nicht umgesetzt)
-- [Vercel](https://vercel.com) – Hosting, Cron Jobs (täglicher Konten-Cleanup)
+- [Resend](https://resend.com) – Transaktions-E-Mails (Bestätigung, Passwort-Reset,
+  monatliche Geburtstagserinnerung; Weihnachts-Status noch nicht umgesetzt)
+- [Vercel](https://vercel.com) – Hosting, Cron Jobs (täglicher Konten-Cleanup,
+  monatlicher Versand der Geburtstagserinnerungen)
 - [Vitest](https://vitest.dev) + [Testing Library](https://testing-library.com) – Tests
 
 ## Setup
