@@ -36,6 +36,20 @@ describe("AdminPage", () => {
     expect(screen.getByText("Bestätigt")).not.toBeNull();
   });
 
+  it("formatiert das Registrierungsdatum in der Zeitzone Europe/Berlin (nicht UTC)", async () => {
+    accounts = [
+      { id: "u1", email: "a@b.de", createdAt: "2026-01-15T23:30:00Z", confirmed: true },
+    ];
+
+    const element = await AdminPage();
+    render(element);
+
+    // 23:30 UTC am 15.1. ist bereits 00:30 CET am 16.1. - ohne explizite
+    // Zeitzone (Server laeuft in UTC) wuerde hier faelschlich der 15.1.
+    // angezeigt.
+    expect(screen.getByText("16.1.2026")).not.toBeNull();
+  });
+
   it("zeigt einen eindeutigen Hinweistext bei unbestaetigtem Konto (nicht nur Farbe)", async () => {
     accounts = [
       { id: "u1", email: "a@b.de", createdAt: "2026-01-15T10:00:00Z", confirmed: false },

@@ -22,8 +22,10 @@ export type AdminAccountRow = {
 // "eingeloggt, aber kein Admin"-Fall vom "gar nicht eingeloggt"-Fall
 // unterscheidbar machen - genau das soll laut Plan (Global Constraint)
 // nicht passieren.
-async function assertAdmin(): Promise<void> {
-  await requireAdmin();
+// Gibt (anders als frueher) das Ergebnis von requireAdmin() durch, damit
+// deleteAccount() an die eigene ID des aufrufenden Admins kommt (siehe dort).
+async function assertAdmin() {
+  return await requireAdmin();
 }
 
 // Laedt alle Konten ueber die Supabase Admin API (Service-Role-Client,
@@ -78,7 +80,16 @@ export async function deleteAccount(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   prevState?: DeleteAccountState,
 ): Promise<DeleteAccountState> {
-  await assertAdmin();
+  const { user } = await assertAdmin();
+
+  // Admins duerfen sich nicht selbst aus der Liste loeschen: das wuerde die
+  // eigenen people/occasions/gifts per Cascade mitloeschen, und waere der
+  // aufrufende Admin der einzige, haette danach niemand mehr Zugriff auf
+  // /admin (nur noch manuell behebbar ueber app_metadata.is_admin im
+  // Supabase-Dashboard).
+  if (userId === user.id) {
+    return { error: "Das eigene Konto kann hier nicht gelöscht werden." };
+  }
 
   const supabase = createServiceClient();
   const { error } = await supabase.auth.admin.deleteUser(userId);

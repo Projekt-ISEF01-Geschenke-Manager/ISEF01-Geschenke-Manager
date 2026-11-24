@@ -136,4 +136,13 @@ describe("deleteAccount", () => {
 
     expect(result?.error).toContain("kaputt");
   });
+
+  it("verweigert das Loeschen des eigenen Admin-Kontos", async () => {
+    requireAdminMock.mockResolvedValue(adminResult());
+
+    const result = await deleteAccount("admin-1");
+
+    expect(deleteUserMock).not.toHaveBeenCalled();
+    expect(result?.error).toBeTruthy();
+  });
 });

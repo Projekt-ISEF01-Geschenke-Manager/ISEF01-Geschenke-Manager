@@ -11,12 +11,21 @@ export const instant = false;
 // die Admin-Uebersicht ist kein Teil der normalen Dashboard-Navigation,
 // SiteHeader hier bewusst ohne nav-Prop.
 export default async function AdminPage() {
-  await requireAdmin();
+  const { user } = await requireAdmin();
   const accounts = await listAllAccounts();
+
+  // Gleiche Herleitung wie in dashboard/layout.tsx, damit SiteHeader hier
+  // (ohne DashboardNav, siehe Kommentar oben) trotzdem Abmelden-Button und
+  // Einstellungen-Link zeigt - vorher war die einzige Möglichkeit, die
+  // Admin-Seite zu verlassen, der Logo-Link zu "/".
+  const trimmedFullName = (user.user_metadata?.full_name as string | undefined)?.trim();
+  const firstName = trimmedFullName
+    ? trimmedFullName.split(/\s+/)[0]
+    : user.email?.split("@")[0];
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader userName={firstName} />
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10">
         <h1 className="text-2xl font-semibold text-heading">Konten verwalten</h1>
 
@@ -38,7 +47,9 @@ export default async function AdminPage() {
                   <tr key={account.id} className="border-b border-line last:border-0">
                     <td className="px-4 py-3">{account.email}</td>
                     <td className="px-4 py-3 text-muted">
-                      {new Date(account.createdAt).toLocaleDateString("de-DE")}
+                      {new Date(account.createdAt).toLocaleDateString("de-DE", {
+                        timeZone: "Europe/Berlin",
+                      })}
                     </td>
                     <td className="px-4 py-3">
                       {account.confirmed ? (
