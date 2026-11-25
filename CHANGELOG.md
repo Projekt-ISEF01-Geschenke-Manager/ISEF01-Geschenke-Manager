@@ -6,6 +6,7 @@ hier automatisch einen Eintrag mit PR-Titel und -Nummer. Kein manueller
 Schritt vor dem Merge nötig.
 
 ## 2026-11-25
+- Feature: Standard-Farbdesign auf Klassisch gesetzt und kontoweit gemerkt (#220)
 - Feature: Admin-Panel über die Einstellungsseite erreichbar machen (#219)
 
 ## 2026-11-24
