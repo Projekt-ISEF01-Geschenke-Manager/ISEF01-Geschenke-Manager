@@ -21,10 +21,16 @@ export function SiteHeader({
   badge,
   userName,
   nav,
+  accountPalette,
 }: {
   badge?: string;
   userName?: string;
   nav?: ReactNode;
+  // Zuletzt kontoweit gespeicherte Palette (#207) - nur gesetzt, wenn
+  // userName ebenfalls gesetzt ist (eingeloggte Seite). Wird an
+  // PalettePicker weitergegeben, damit ein neues Geraet nach dem Login die
+  // Konto-Palette statt des globalen Standards uebernimmt.
+  accountPalette?: string;
 }) {
   return (
     <header className="text-on-header" style={{ background: "var(--header-bg)" }}>
@@ -71,7 +77,7 @@ export function SiteHeader({
               </Link>
             </>
           )}
-          <PalettePicker />
+          <PalettePicker persist={!!userName} initialAccountPalette={accountPalette} />
           <ThemeToggle />
         </div>
       </div>

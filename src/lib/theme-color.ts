@@ -6,7 +6,7 @@
 // als repraesentative Volltonfarbe.
 export type PaletteId = "rose" | "klassisch" | "beere" | "ozean" | "salbei" | "graphit";
 
-export const DEFAULT_PALETTE: PaletteId = "rose";
+export const DEFAULT_PALETTE: PaletteId = "klassisch";
 
 export const THEME_COLORS: Record<PaletteId, { light: string; dark: string }> = {
   rose: { light: "#7a4a58", dark: "#2a1b21" },
