@@ -25,10 +25,11 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
   const firstName = trimmedFullName
     ? trimmedFullName.split(/\s+/)[0]
     : user.email?.split("@")[0];
+  const accountPalette = user.user_metadata?.palette as string | undefined;
 
   return (
     <>
-      <SiteHeader userName={firstName} nav={<DashboardNav />} />
+      <SiteHeader userName={firstName} nav={<DashboardNav />} accountPalette={accountPalette} />
       {children}
       <SiteFooter />
       {/* Platz fuer die feste Navigationsleiste am unteren Rand (nur Handy). */}

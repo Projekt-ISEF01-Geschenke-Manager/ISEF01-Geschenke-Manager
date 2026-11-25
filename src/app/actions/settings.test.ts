@@ -10,7 +10,7 @@ vi.mock("@/lib/supabase/server", () => ({
   }),
 }));
 
-const { updateReminderSettings } = await import("./settings");
+const { updateReminderSettings, savePalettePreference } = await import("./settings");
 
 describe("updateReminderSettings", () => {
   beforeEach(() => {
@@ -31,5 +31,21 @@ describe("updateReminderSettings", () => {
     updateUserMock.mockResolvedValue({ error: { message: "kaputt" } });
     const result = await updateReminderSettings(undefined, new FormData());
     expect(result?.error).toBe("kaputt");
+  });
+});
+
+describe("savePalettePreference", () => {
+  beforeEach(() => {
+    updateUserMock.mockReset().mockResolvedValue({ error: null });
+  });
+
+  it("speichert eine gueltige Palette kontoweit in user_metadata (#207)", async () => {
+    await savePalettePreference("ozean");
+    expect(updateUserMock).toHaveBeenCalledWith({ data: { palette: "ozean" } });
+  });
+
+  it("ignoriert unbekannte Paletten-IDs, statt sie zu speichern", async () => {
+    await savePalettePreference("nicht-vorhanden");
+    expect(updateUserMock).not.toHaveBeenCalled();
   });
 });

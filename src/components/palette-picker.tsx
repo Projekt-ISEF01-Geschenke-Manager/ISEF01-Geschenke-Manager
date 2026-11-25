@@ -3,10 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Palette } from "lucide-react";
 import { applyThemeColor } from "@/lib/theme-color";
+import { savePalettePreference } from "@/app/actions/settings";
 
 // Farbpaletten-Auswahl im Header. Setzt data-palette auf <html> (die Tokens
 // dazu stehen in globals.css) und merkt sich die Wahl in localStorage. Das
 // Inline-Script in layout.tsx setzt dasselbe Attribut vor dem ersten Paint.
+// Fuer eingeloggte Nutzer:innen (persist=true, siehe site-header.tsx) wird
+// die Wahl zusaetzlich kontoweit gespeichert (#207): initialAccountPalette
+// kommt vom Server (user_metadata.palette) und wird einmalig uebernommen,
+// falls dieses Geraet noch keine eigene localStorage-Wahl hat - danach
+// schreibt jede Auswahl per savePalettePreference() zurueck ins Konto.
 export const PALETTES = [
   { id: "klassisch", label: "Klassisch", swatch: "linear-gradient(110deg, #a57878, #d9b9ad, #86666d)" },
   { id: "rose", label: "Rosé", swatch: "#8a3552" },
@@ -20,14 +26,56 @@ type PaletteId = (typeof PALETTES)[number]["id"];
 
 function currentPalette(): PaletteId {
   const value = document.documentElement.getAttribute("data-palette");
-  return PALETTES.some((p) => p.id === value) ? (value as PaletteId) : "rose";
+  return PALETTES.some((p) => p.id === value) ? (value as PaletteId) : "klassisch";
 }
 
-export function PalettePicker() {
+function isPaletteId(value: string): value is PaletteId {
+  return PALETTES.some((p) => p.id === value);
+}
+
+export function PalettePicker({
+  persist = false,
+  initialAccountPalette,
+}: {
+  persist?: boolean;
+  initialAccountPalette?: string;
+} = {}) {
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState<PaletteId>("rose");
+  const [active, setActive] = useState<PaletteId>("klassisch");
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Einmaliger Abgleich nach dem Mount: hat dieses Geraet noch keine eigene
+  // localStorage-Wahl, aber das Konto eine gespeicherte Palette (z. B. nach
+  // Login auf neuem Geraet), dann diese uebernehmen statt beim Standard zu
+  // bleiben. Hat das Geraet bereits selbst eine Wahl getroffen, bleibt die
+  // bestehen - kein Ueberschreiben bei jedem Laden.
+  useEffect(() => {
+    if (!persist || !initialAccountPalette || !isPaletteId(initialAccountPalette)) return;
+    let storedLocally: string | null = null;
+    try {
+      storedLocally = localStorage.getItem("palette");
+    } catch {
+      // Private-Modus o. Ä.: dann auch kein Abgleich moeglich.
+    }
+    if (storedLocally) return;
+
+    // `active` selbst nicht hier synchronisieren: es wird nur fuer die
+    // Markierung im (noch geschlossenen) Menue gebraucht und beim Oeffnen
+    // frisch per currentPalette() aus dem DOM gelesen (siehe Button-Klick
+    // unten) - ein setState hier wuerde nur einen unnoetigen Re-Render
+    // auslösen.
+    document.documentElement.setAttribute("data-palette", initialAccountPalette);
+    applyThemeColor();
+    try {
+      localStorage.setItem("palette", initialAccountPalette);
+    } catch {
+      // Private-Modus o. Ä.: Palette gilt dann nur fuer diese Sitzung.
+    }
+    // persist/initialAccountPalette kommen vom Server und bleiben ueber die
+    // Lebensdauer dieser Komponente stabil - echte Abhaengigkeiten statt
+    // eines leeren Arrays, damit keine Regel unterdrueckt werden muss.
+  }, [persist, initialAccountPalette]);
 
   useEffect(() => {
     if (!open) return;
@@ -56,6 +104,12 @@ export function PalettePicker() {
       localStorage.setItem("palette", id);
     } catch {
       // Private-Modus o. Ä.: Palette gilt dann nur für diese Sitzung.
+    }
+    if (persist) {
+      // Fire-and-forget: die Palette gilt lokal unabhaengig vom Ergebnis;
+      // ein Fehler beim kontoweiten Speichern soll die Auswahl nicht
+      // blockieren oder eine Fehlermeldung auslösen.
+      savePalettePreference(id).catch(() => {});
     }
   }
 

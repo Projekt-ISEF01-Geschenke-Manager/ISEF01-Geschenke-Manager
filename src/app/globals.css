@@ -44,7 +44,7 @@
 }
 
 /* Palette: rose */
-:root, [data-palette="rose"] {
+[data-palette="rose"] {
   --bg: #f5eeed;
   --card: #ffffff;
   --card-border: #e4d3d1;
@@ -77,7 +77,7 @@
   --switch-thumb-icon: #7a4a58;
 }
 
-[data-theme="dark"], [data-theme="dark"][data-palette="rose"] {
+[data-theme="dark"][data-palette="rose"] {
   --bg: #141113;
   --card: #1f1b1d;
   --card-border: #3d3438;
@@ -378,8 +378,8 @@
   --switch-thumb-icon: #1a1a1f;
 }
 
-/* Palette: klassisch (frueheres Design, Farbverlauf im Header) */
-[data-palette="klassisch"] {
+/* Palette: klassisch (Standard, #207; frueheres Design, Farbverlauf im Header) */
+:root, [data-palette="klassisch"] {
   --bg: #faf6f4;
   --card: #ffffff;
   --card-border: #dccfca;
@@ -412,7 +412,7 @@
   --switch-thumb-icon: #6f5459;
 }
 
-[data-theme="dark"][data-palette="klassisch"] {
+[data-theme="dark"], [data-theme="dark"][data-palette="klassisch"] {
   --bg: #121113;
   --card: #221e1f;
   --card-border: #4a4244;

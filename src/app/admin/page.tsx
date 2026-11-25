@@ -22,10 +22,11 @@ export default async function AdminPage() {
   const firstName = trimmedFullName
     ? trimmedFullName.split(/\s+/)[0]
     : user.email?.split("@")[0];
+  const accountPalette = user.user_metadata?.palette as string | undefined;
 
   return (
     <>
-      <SiteHeader userName={firstName} />
+      <SiteHeader userName={firstName} accountPalette={accountPalette} />
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10">
         <h1 className="text-2xl font-semibold text-heading">Konten verwalten</h1>
 
