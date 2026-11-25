@@ -72,9 +72,10 @@ export function PalettePicker({
     } catch {
       // Private-Modus o. Ä.: Palette gilt dann nur fuer diese Sitzung.
     }
-    // Nur beim Mount abgleichen, nicht bei jeder Aenderung der Props.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // persist/initialAccountPalette kommen vom Server und bleiben ueber die
+    // Lebensdauer dieser Komponente stabil - echte Abhaengigkeiten statt
+    // eines leeren Arrays, damit keine Regel unterdrueckt werden muss.
+  }, [persist, initialAccountPalette]);
 
   useEffect(() => {
     if (!open) return;
