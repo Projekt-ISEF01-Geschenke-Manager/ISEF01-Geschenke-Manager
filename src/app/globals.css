@@ -43,6 +43,79 @@
   --elev-pop: 0 8px 24px rgba(0, 0, 0, 0.55);
 }
 
+/* Palette: klassisch (Standard, #207; frueheres Design, Farbverlauf im Header).
+   Muss vor den anderen Paletten-Bloecken stehen: der bare :root-Selektor
+   greift immer fuer <html>, gleiche Spezifitaet wie [data-palette="x"] -
+   bei einem Unentschieden gewinnt die spaeter im Stylesheet stehende Regel.
+   Stuende dieser Block hinter den anderen, wuerde er jede andere Palette
+   dauerhaft ueberschreiben, egal welches data-palette tatsaechlich gesetzt
+   ist (#207-Regression). */
+:root, [data-palette="klassisch"] {
+  --bg: #faf6f4;
+  --card: #ffffff;
+  --card-border: #dccfca;
+  --input-border: #a8979a;
+  --text: #2a2123;
+  --heading: #241b1d;
+  --lead: #4f4244;
+  --muted: #5f5254;
+  --accent: #8a5a66;
+  --btn-bg: #6f4a55;
+  --btn-hover: #5a3b45;
+  --btn-text: #ffffff;
+  --tag-text: #6b4d55;
+  --tag-border: #cdbab5;
+  --line: #ddcfca;
+  --hover: #f1e8e4;
+  --subtle: #f1e8e4;
+  --focus-ring: #c08a9a;
+  --avatar: #e6d5cf;
+  --header-bg: linear-gradient(110deg, #a57878 0%, #d9b9ad 50%, #86666d 100%);
+  --h1: #241b1d;
+  --tile: #ffffff;
+  --bg-fade-top: #eddfda;
+  --input-bg: #ffffff;
+  --rule: #dccfca;
+  --inner: #ffffff;
+  --inner-border: #dccfca;
+  --track: #ddcfca;
+  --accent-soft: rgba(138, 90, 102, 0.09);
+  --switch-thumb-icon: #6f5459;
+}
+
+[data-theme="dark"], [data-theme="dark"][data-palette="klassisch"] {
+  --bg: #121113;
+  --card: #221e1f;
+  --card-border: #4a4244;
+  --input-border: #6a6063;
+  --text: #f3eeed;
+  --heading: #f8f3f1;
+  --lead: #d0c4c1;
+  --muted: #c2b8b6;
+  --accent: #d5b9ac;
+  --btn-bg: #d5b9ac;
+  --btn-hover: #e3cbc0;
+  --btn-text: #231a1c;
+  --tag-text: #dcc6bc;
+  --tag-border: #5c5255;
+  --line: #3a3335;
+  --hover: #2b2527;
+  --subtle: #262122;
+  --focus-ring: #c08a9a;
+  --avatar: #2f282a;
+  --header-bg: linear-gradient(110deg, #a57878 0%, #d9b9ad 50%, #86666d 100%);
+  --h1: #f8f3f1;
+  --tile: #221e1f;
+  --bg-fade-top: #261f21;
+  --input-bg: #121113;
+  --rule: #4a4244;
+  --inner: #221e1f;
+  --inner-border: #4a4244;
+  --track: #3a3335;
+  --accent-soft: rgba(213, 185, 172, 0.16);
+  --switch-thumb-icon: #6f5459;
+}
+
 /* Palette: rose */
 [data-palette="rose"] {
   --bg: #f5eeed;
@@ -376,73 +449,6 @@
   --track: #3f3f47;
   --accent-soft: rgba(215, 215, 224, 0.16);
   --switch-thumb-icon: #1a1a1f;
-}
-
-/* Palette: klassisch (Standard, #207; frueheres Design, Farbverlauf im Header) */
-:root, [data-palette="klassisch"] {
-  --bg: #faf6f4;
-  --card: #ffffff;
-  --card-border: #dccfca;
-  --input-border: #a8979a;
-  --text: #2a2123;
-  --heading: #241b1d;
-  --lead: #4f4244;
-  --muted: #5f5254;
-  --accent: #8a5a66;
-  --btn-bg: #6f4a55;
-  --btn-hover: #5a3b45;
-  --btn-text: #ffffff;
-  --tag-text: #6b4d55;
-  --tag-border: #cdbab5;
-  --line: #ddcfca;
-  --hover: #f1e8e4;
-  --subtle: #f1e8e4;
-  --focus-ring: #c08a9a;
-  --avatar: #e6d5cf;
-  --header-bg: linear-gradient(110deg, #a57878 0%, #d9b9ad 50%, #86666d 100%);
-  --h1: #241b1d;
-  --tile: #ffffff;
-  --bg-fade-top: #eddfda;
-  --input-bg: #ffffff;
-  --rule: #dccfca;
-  --inner: #ffffff;
-  --inner-border: #dccfca;
-  --track: #ddcfca;
-  --accent-soft: rgba(138, 90, 102, 0.09);
-  --switch-thumb-icon: #6f5459;
-}
-
-[data-theme="dark"], [data-theme="dark"][data-palette="klassisch"] {
-  --bg: #121113;
-  --card: #221e1f;
-  --card-border: #4a4244;
-  --input-border: #6a6063;
-  --text: #f3eeed;
-  --heading: #f8f3f1;
-  --lead: #d0c4c1;
-  --muted: #c2b8b6;
-  --accent: #d5b9ac;
-  --btn-bg: #d5b9ac;
-  --btn-hover: #e3cbc0;
-  --btn-text: #231a1c;
-  --tag-text: #dcc6bc;
-  --tag-border: #5c5255;
-  --line: #3a3335;
-  --hover: #2b2527;
-  --subtle: #262122;
-  --focus-ring: #c08a9a;
-  --avatar: #2f282a;
-  --header-bg: linear-gradient(110deg, #a57878 0%, #d9b9ad 50%, #86666d 100%);
-  --h1: #f8f3f1;
-  --tile: #221e1f;
-  --bg-fade-top: #261f21;
-  --input-bg: #121113;
-  --rule: #4a4244;
-  --inner: #221e1f;
-  --inner-border: #4a4244;
-  --track: #3a3335;
-  --accent-soft: rgba(213, 185, 172, 0.16);
-  --switch-thumb-icon: #6f5459;
 }
 
 @theme inline {
