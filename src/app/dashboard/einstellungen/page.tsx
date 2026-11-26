@@ -53,6 +53,21 @@ export default async function EinstellungenPage() {
         </p>
         <ReduceMotionToggle />
       </section>
+
+      {user.app_metadata?.is_admin === true && (
+        <section
+          aria-labelledby="einstellungen-admin"
+          className="surface reveal flex min-w-0 max-w-[480px] flex-col gap-4 rounded-2xl p-6"
+        >
+          <h2 id="einstellungen-admin" className="text-xl font-bold text-heading">
+            Admin
+          </h2>
+          <p className="text-sm text-muted">Konten verwalten und bei Bedarf löschen.</p>
+          <Link href="/admin" className="btn btn-outline btn-sm w-fit">
+            Admin-Panel öffnen
+          </Link>
+        </section>
+      )}
     </main>
   );
 }

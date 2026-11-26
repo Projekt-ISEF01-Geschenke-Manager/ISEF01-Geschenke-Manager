@@ -5,6 +5,9 @@ ergänzt der Workflow [`.github/workflows/changelog.yml`](.github/workflows/chan
 hier automatisch einen Eintrag mit PR-Titel und -Nummer. Kein manueller
 Schritt vor dem Merge nötig.
 
+## 2026-11-25
+- Feature: Admin-Panel über die Einstellungsseite erreichbar machen (#219)
+
 ## 2026-11-24
 - Feature: Admin-Account mit Benutzerliste und Loeschfunktion (#217)
 - Docs: README auf Weihnachts-Statusübersicht aktualisiert (#216)
