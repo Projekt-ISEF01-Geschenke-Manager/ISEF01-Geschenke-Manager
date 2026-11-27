@@ -36,23 +36,48 @@ describe("extractOgImage", () => {
   });
 });
 
+// Simuliert einen ReadableStreamDefaultReader anhand vorgegebener Haeppchen -
+// fetchLinkPreview liest per response.body.getReader() statt response.text(),
+// damit das Groessenlimit schon waehrend des Empfangs greifen kann.
+function makeReader(chunks: Uint8Array[]) {
+  let index = 0;
+  return {
+    read: vi.fn(async () => {
+      if (index < chunks.length) {
+        return { done: false, value: chunks[index++] };
+      }
+      return { done: true, value: undefined };
+    }),
+    cancel: vi.fn(async () => {}),
+  };
+}
+
+function textReader(text: string) {
+  return makeReader([new TextEncoder().encode(text)]);
+}
+
 function mockResponse({
   status = 200,
   headers = {},
   url = "",
   text = "",
+  reader,
 }: {
   status?: number;
   headers?: Record<string, string>;
   url?: string;
   text?: string;
+  reader?: ReturnType<typeof makeReader> | { read: () => Promise<never>; cancel: ReturnType<typeof vi.fn> };
 }) {
   return {
     ok: status >= 200 && status < 300,
     status,
     url,
     headers: { get: (name: string) => headers[name.toLowerCase()] ?? null },
-    text: async () => text,
+    body: {
+      getReader: () => reader ?? textReader(text),
+      cancel: vi.fn(async () => {}),
+    },
   };
 }
 
@@ -70,6 +95,7 @@ describe("fetchLinkPreview", () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.useRealTimers();
   });
 
   it("lehnt eine nicht-http(s) URL ab, ohne DNS aufzulösen", async () => {
@@ -95,6 +121,20 @@ describe("fetchLinkPreview", () => {
   it("lehnt ab, wenn die Domain auf eine IPv4-in-IPv6-eingebettete private Adresse aufgelöst wird", async () => {
     lookupMock.mockResolvedValue([{ address: "::ffff:127.0.0.1", family: 6 }]);
     const result = await fetchLinkPreview("https://getarnt.example/");
+    expect(result).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("lehnt die unspezifische IPv6-Adresse :: ab", async () => {
+    lookupMock.mockResolvedValue([{ address: "::", family: 6 }]);
+    const result = await fetchLinkPreview("https://leere-adresse.example/");
+    expect(result).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("lehnt reservierte/Multicast-IPv4-Adressen ab (224.0.0.0/3, z. B. Broadcast)", async () => {
+    lookupMock.mockResolvedValue([{ address: "255.255.255.255", family: 4 }]);
+    const result = await fetchLinkPreview("https://broadcast.example/");
     expect(result).toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -158,14 +198,15 @@ describe("fetchLinkPreview", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("gibt null zurück, nach Überschreiten der maximalen Redirect-Anzahl", async () => {
+  it("gibt null zurück, nach genau Überschreiten der maximalen Redirect-Anzahl", async () => {
     fetchMock.mockResolvedValue(
       mockResponse({ status: 302, headers: { location: "https://start.example/naechste" } }),
     );
 
     const result = await fetchLinkPreview("https://start.example/");
     expect(result).toBeNull();
-    expect(fetchMock.mock.calls.length).toBeLessThanOrEqual(4);
+    // Erster Request + 3 erlaubte Redirects = genau 4 Aufrufe, kein fuenfter.
+    expect(fetchMock).toHaveBeenCalledTimes(4);
   });
 
   it("ignoriert Antworten, die kein HTML sind", async () => {
@@ -186,11 +227,54 @@ describe("fetchLinkPreview", () => {
     expect(result).toBeNull();
   });
 
+  it("bricht das Streamen ab, sobald die Antwort ohne content-length die Größenobergrenze überschreitet", async () => {
+    const oneMb = new Uint8Array(1024 * 1024);
+    const reader = makeReader([oneMb, oneMb, oneMb]); // 3 MB, kein content-length-Header gesetzt
+    fetchMock.mockResolvedValue(
+      mockResponse({ headers: { "content-type": "text/html" }, reader }),
+    );
+
+    const result = await fetchLinkPreview("https://riesiger-stream.example/");
+
+    expect(result).toBeNull();
+    expect(reader.cancel).toHaveBeenCalled();
+  });
+
+  it("bricht ab, wenn die Antwort beim Streamen nie fertig wird (Zeitlimit statt endlosem Warten)", async () => {
+    vi.useFakeTimers();
+    const neverEndingReader = {
+      read: vi.fn(() => new Promise<never>(() => {})),
+      cancel: vi.fn(async () => {}),
+    };
+    fetchMock.mockResolvedValue(
+      mockResponse({ headers: { "content-type": "text/html" }, reader: neverEndingReader }),
+    );
+
+    const resultPromise = fetchLinkPreview("https://haengt-fuer-immer.example/");
+    await vi.advanceTimersByTimeAsync(5000);
+    const result = await resultPromise;
+
+    expect(result).toBeNull();
+    expect(neverEndingReader.cancel).toHaveBeenCalled();
+  });
+
   it("gibt null zurück, wenn kein og:image im HTML gefunden wird", async () => {
     fetchMock.mockResolvedValue(
       mockResponse({ headers: { "content-type": "text/html" }, text: "<html></html>" }),
     );
     const result = await fetchLinkPreview("https://ohne-vorschau.example/");
+    expect(result).toBeNull();
+  });
+
+  it("gibt null zurück, wenn ein og:image-Wert kein gültiger http(s)-Link ist (z. B. javascript:)", async () => {
+    fetchMock.mockResolvedValue(
+      mockResponse({
+        headers: { "content-type": "text/html" },
+        url: "https://schadhaft.example/",
+        text: '<meta property="og:image" content="javascript:alert(1)">',
+      }),
+    );
+    const result = await fetchLinkPreview("https://schadhaft.example/");
     expect(result).toBeNull();
   });
 

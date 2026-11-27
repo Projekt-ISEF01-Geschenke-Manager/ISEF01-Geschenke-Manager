@@ -296,6 +296,17 @@ describe("updateGift", () => {
     );
   });
 
+  it("ruft keine Link-Vorschau ab und ändert nichts, wenn niemand eingeloggt ist", async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } });
+    selectSingleMock.mockResolvedValue({ data: { link: "https://alt-beispiel.de/" }, error: null });
+
+    const result = await updateGift("gift-1", undefined, formData(validFields));
+
+    expect(result?.error).toBe("Bitte melde dich erneut an.");
+    expect(fetchLinkPreviewMock).not.toHaveBeenCalled();
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
   it("löscht die gespeicherte Link-Vorschau, wenn der Link entfernt wird", async () => {
     updateMock.mockResolvedValue({ error: null });
     selectSingleMock.mockResolvedValue({ data: { link: validFields.link }, error: null });

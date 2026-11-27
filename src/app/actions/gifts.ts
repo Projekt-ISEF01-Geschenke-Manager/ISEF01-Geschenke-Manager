@@ -120,6 +120,18 @@ export async function updateGift(
 
   const supabase = await createClient();
 
+  // Vorher pruefen statt erst beim Bild-Upload (Review-Fund): sonst koennte
+  // auch ohne Login/Berechtigung schon der Link-Vorschau-Abruf unten
+  // ausgeloest werden, bevor das anschliessende update() per RLS ohnehin
+  // ins Leere liefe - das wuerde den Server fuer beliebig viele Netzwerk-
+  // Anfragen an fremde Seiten missbrauchbar machen, ganz ohne Login.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Bitte melde dich erneut an.", values };
+  }
+
   const { data: currentGift } = await supabase
     .from("gifts")
     .select("link")
@@ -150,13 +162,6 @@ export async function updateGift(
     }
     if (image.size > MAX_GIFT_IMAGE_BYTES) {
       return { error: "Das Bild darf höchstens 4 MB groß sein.", values };
-    }
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      return { error: "Bitte melde dich erneut an.", values };
     }
 
     const path = giftImagePath(user.id, giftId);
