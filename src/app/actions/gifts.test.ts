@@ -11,6 +11,9 @@ const deleteMock = vi.fn();
 const eqMockForUpdate = vi.fn((...args: unknown[]) => updateMock(...args));
 const eqMockForDelete = vi.fn((...args: unknown[]) => deleteMock(...args));
 const getUserMock = vi.fn();
+const uploadStorageMock = vi.fn();
+const removeStorageMock = vi.fn();
+const getPublicUrlMock = vi.fn();
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
@@ -26,6 +29,14 @@ vi.mock("@/lib/supabase/server", () => ({
           eqMockForDelete(table, column, value),
       }),
     }),
+    storage: {
+      from: (bucket: string) => ({
+        upload: (path: string, file: unknown, opts: unknown) =>
+          uploadStorageMock(bucket, path, file, opts),
+        remove: (paths: string[]) => removeStorageMock(bucket, paths),
+        getPublicUrl: (path: string) => getPublicUrlMock(bucket, path),
+      }),
+    },
   }),
 }));
 
@@ -119,10 +130,27 @@ describe("createGift", () => {
   });
 });
 
+function makeImageFile(bytes: number, type = "image/png", name = "bild.png") {
+  return new File([new Uint8Array(bytes)], name, { type });
+}
+
+function formDataWithImage(fields: Record<string, string>, image: File) {
+  const fd = formData(fields);
+  fd.set("image", image);
+  return fd;
+}
+
 describe("updateGift", () => {
   beforeEach(() => {
     revalidatePathMock.mockClear();
     updateMock.mockReset();
+    getUserMock.mockReset().mockResolvedValue({ data: { user: { id: "user-1" } } });
+    uploadStorageMock.mockReset().mockResolvedValue({ data: {}, error: null });
+    getPublicUrlMock.mockReset().mockReturnValue({
+      data: {
+        publicUrl: "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1",
+      },
+    });
   });
 
   it("lehnt einen fehlenden Titel ab, ohne die Datenbank anzufassen", async () => {
@@ -186,6 +214,92 @@ describe("updateGift", () => {
     const result = await updateGift("gift-1", undefined, formData(validFields));
     expect(result?.error).toBe("db down");
     expect(revalidatePathMock).not.toHaveBeenCalled();
+  });
+
+  it("lehnt einen falschen Dateityp ab, ohne hochzuladen", async () => {
+    const result = await updateGift(
+      "gift-1",
+      undefined,
+      formDataWithImage(validFields, makeImageFile(10, "text/plain", "datei.txt")),
+    );
+    expect(result?.error).toBe(
+      "Bitte lade ein Bild im Format JPEG, PNG, WebP oder GIF hoch.",
+    );
+    expect(uploadStorageMock).not.toHaveBeenCalled();
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it("lehnt ein zu großes Bild ab (> 4 MB), ohne hochzuladen", async () => {
+    const result = await updateGift(
+      "gift-1",
+      undefined,
+      formDataWithImage(validFields, makeImageFile(4 * 1024 * 1024 + 1)),
+    );
+    expect(result?.error).toBe("Das Bild darf höchstens 4 MB groß sein.");
+    expect(uploadStorageMock).not.toHaveBeenCalled();
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it("laedt ein gültiges Bild hoch und speichert die öffentliche URL", async () => {
+    updateMock.mockResolvedValue({ error: null });
+    const image = makeImageFile(1024, "image/jpeg");
+    const result = await updateGift("gift-1", undefined, formDataWithImage(validFields, image));
+
+    expect(result).toEqual({ success: true });
+    expect(uploadStorageMock).toHaveBeenCalledWith(
+      "gift-images",
+      "user-1/gift-1",
+      image,
+      { contentType: "image/jpeg", upsert: true },
+    );
+    expect(updateMock).toHaveBeenCalledWith(
+      "gifts",
+      expect.objectContaining({
+        image_url: "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1",
+      }),
+      "id",
+      "gift-1",
+    );
+  });
+
+  it("lässt image_url unverändert, wenn kein neues Bild ausgewählt wurde (leeres File-Input)", async () => {
+    updateMock.mockResolvedValue({ error: null });
+    const result = await updateGift(
+      "gift-1",
+      undefined,
+      formDataWithImage(validFields, makeImageFile(0)),
+    );
+
+    expect(result).toEqual({ success: true });
+    expect(uploadStorageMock).not.toHaveBeenCalled();
+    expect(updateMock).toHaveBeenCalledWith(
+      "gifts",
+      { title: "Kräutergarten-Set", link: "https://shop-beispiel.de/kraeutergarten", occasion_id: "occasion-1" },
+      "id",
+      "gift-1",
+    );
+  });
+
+  it("gibt einen Fehler zurück, wenn der Upload fehlschlägt", async () => {
+    uploadStorageMock.mockResolvedValue({ data: null, error: { message: "upload failed" } });
+    const result = await updateGift(
+      "gift-1",
+      undefined,
+      formDataWithImage(validFields, makeImageFile(1024, "image/jpeg")),
+    );
+    expect(result?.error).toBe("upload failed");
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it("gibt einen Fehler zurück, wenn niemand eingeloggt ist und ein Bild hochgeladen werden soll", async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } });
+    const result = await updateGift(
+      "gift-1",
+      undefined,
+      formDataWithImage(validFields, makeImageFile(1024, "image/jpeg")),
+    );
+    expect(result?.error).toBe("Bitte melde dich erneut an.");
+    expect(uploadStorageMock).not.toHaveBeenCalled();
   });
 });
 
