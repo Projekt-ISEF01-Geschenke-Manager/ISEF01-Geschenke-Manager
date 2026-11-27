@@ -42,7 +42,7 @@ export default async function PersonPage({
   const { data: giftsData } = await supabase
     .from("gifts")
     .select(
-      "id, title, link, image_url, status, occasion_id, gift_date, description, occasions(name)",
+      "id, title, link, image_url, link_preview_url, status, occasion_id, gift_date, description, occasions(name)",
     )
     .eq("person_id", id)
     .order("created_at", { ascending: false });
@@ -58,6 +58,7 @@ export default async function PersonPage({
       title: gift.title,
       link: gift.link,
       image_url: gift.image_url,
+      link_preview_url: gift.link_preview_url,
       status: gift.status,
       occasion_id: gift.occasion_id,
       occasion_name:

@@ -17,6 +17,7 @@ export type SharedGift = {
   title: string;
   link: string | null;
   image_url: string | null;
+  link_preview_url: string | null;
   status: string;
   purchased_by: string | null;
   occasion_name: string | null;
@@ -64,9 +65,9 @@ export function SharedGiftItem({
   return (
     <li className="surface reveal rounded-2xl p-4">
       <div className="flex items-start gap-3">
-        {gift.image_url ? (
+        {gift.image_url ?? gift.link_preview_url ? (
           <img
-            src={gift.image_url}
+            src={gift.image_url ?? gift.link_preview_url ?? undefined}
             alt={gift.title}
             className="h-14 w-14 shrink-0 rounded-lg border border-line object-cover"
           />

@@ -40,6 +40,7 @@ const offeneIdee = {
   title: "Hochbeet aus Holz",
   link: null,
   image_url: null,
+  link_preview_url: null,
   status: "idea",
   purchased_by: null,
   occasion_name: null,
@@ -250,5 +251,43 @@ describe("SharedGiftItem", () => {
 
     expect(screen.getByText("Bild")).not.toBeNull();
     expect(screen.queryByRole("img")).toBeNull();
+  });
+
+  it("zeigt die automatische Link-Vorschau, wenn kein eigenes Bild hochgeladen wurde", () => {
+    render(
+      <ul>
+        <SharedGiftItem
+          token="token-1"
+          gift={{
+            ...offeneIdee,
+            image_url: null,
+            link_preview_url: "https://cdn.example/vorschau.png",
+          }}
+        />
+      </ul>,
+    );
+
+    const image = screen.getByRole("img", { name: "Hochbeet aus Holz" });
+    expect(image.getAttribute("src")).toBe("https://cdn.example/vorschau.png");
+  });
+
+  it("zeigt das eigene Bild statt der Link-Vorschau, wenn beides vorhanden ist", () => {
+    render(
+      <ul>
+        <SharedGiftItem
+          token="token-1"
+          gift={{
+            ...offeneIdee,
+            image_url: "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1",
+            link_preview_url: "https://cdn.example/vorschau.png",
+          }}
+        />
+      </ul>,
+    );
+
+    const image = screen.getByRole("img", { name: "Hochbeet aus Holz" });
+    expect(image.getAttribute("src")).toBe(
+      "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1",
+    );
   });
 });

@@ -21,6 +21,7 @@ export type Gift = {
   title: string;
   link: string | null;
   image_url: string | null;
+  link_preview_url: string | null;
   status: string;
   occasion_id: string | null;
   occasion_name: string | null;
@@ -218,9 +219,9 @@ export function GiftItem({
           sich das sonst auf schmalen Bildschirmen mit dem Titel. */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
-          {gift.image_url ? (
+          {gift.image_url ?? gift.link_preview_url ? (
             <img
-              src={gift.image_url}
+              src={gift.image_url ?? gift.link_preview_url ?? undefined}
               alt={gift.title}
               className="h-14 w-14 shrink-0 rounded-lg border border-line object-cover"
             />

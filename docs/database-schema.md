@@ -107,8 +107,11 @@ erDiagram
 | `description` | text | Freitext-Notiz |
 | `link` | text | Link zur Idee (z. B. Produktseite) |
 | `image_url` | text | Öffentliche URL des Bilds im Storage-Bucket `gift-images` (siehe Abschnitt 3) |
+| `link_preview_url` | text | Automatisch ermitteltes Vorschaubild (`og:image`) der Link-Seite, nur Hotlink (#223) |
 | `status` | text | `idea` (= "offen") \| `purchased` (= "besorgt") \| `given` (= "überreicht", Stufe 2/A9) |
 | `gift_date` | date | Datum (geplant oder tatsächlich überreicht) |
+
+**`link_preview_url` (#223):** Wird beim Speichern einer Idee serverseitig SSRF-geschützt ermittelt (nur beim Anlegen/Ändern des Links, nicht bei jedem Seitenaufruf) – gespeichert wird ausschließlich die gefundene Bild-URL der fremden Seite, nie das Bild selbst (reiner Hotlink, kein Download/keine Kopie). Details zum SSRF-Schutz (DNS-Auflösung + Sperren privater IP-Bereiche, manuelles Prüfen jedes Redirects, Timeout, Größenlimit) siehe `src/lib/link-preview.ts`. Anzeige-Priorität bei der Idee: eigenes hochgeladenes Bild (`image_url`) > diese automatische Vorschau > Platzhalter.
 
 **Entscheidung:** Eine Tabelle statt getrennter Tabellen für "Ideen" und "Geschenke". Begründung: laut Themenbeschreibung soll eine Idee einfach in ein Geschenk "umwandelbar" sein – mit einer gemeinsamen Tabelle ist das ein reines Update (`status` ändern, `occasion_id`/`gift_date` setzen) statt eines Datensatz-Transfers zwischen zwei Tabellen. Das vereinfacht auch die geforderte "gemeinsame Ansicht: vergangene Geschenke + Ideen je Person" – ein einziges `select ... where person_id = ...` liefert beides, gefiltert über `status`.
 

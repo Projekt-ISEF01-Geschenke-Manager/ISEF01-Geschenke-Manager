@@ -60,7 +60,9 @@ export default async function SharedViewPage({
   // oeffentlichen Ansicht nicht auftauchen (QA6/Datensparsamkeit).
   const { data: giftsData } = await supabase
     .from("gifts")
-    .select("id, title, link, image_url, status, person_id, purchased_by, occasions(name)")
+    .select(
+      "id, title, link, image_url, link_preview_url, status, person_id, purchased_by, occasions(name)",
+    )
     .in("person_id", personIds)
     .in("status", ACTIVE_GIFT_STATUSES)
     .order("created_at", { ascending: false });
@@ -73,6 +75,7 @@ export default async function SharedViewPage({
       title: gift.title,
       link: gift.link,
       image_url: gift.image_url,
+      link_preview_url: gift.link_preview_url,
       status: gift.status,
       purchased_by: gift.purchased_by,
       occasion_name:
