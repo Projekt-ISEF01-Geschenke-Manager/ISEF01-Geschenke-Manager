@@ -46,6 +46,7 @@ supabase/.temp
 
 # claude code (lokale Tooling-Konfiguration, nicht projektrelevant)
 .claude
+.superpowers
 
 # IDE (lokale Tooling-Konfiguration, nicht projektrelevant)
 .idea
