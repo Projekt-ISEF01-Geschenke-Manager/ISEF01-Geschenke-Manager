@@ -13,15 +13,22 @@ vi.mock("next/navigation", () => ({
 const insertMock = vi.fn();
 const updateMock = vi.fn();
 const deleteMock = vi.fn();
+const selectMock = vi.fn();
 const eqMockForUpdate = vi.fn((...args: unknown[]) => updateMock(...args));
 const eqMockForDelete = vi.fn((...args: unknown[]) => deleteMock(...args));
+const eqMockForSelect = vi.fn((...args: unknown[]) => selectMock(...args));
 const getUserMock = vi.fn();
+const removeStorageMock = vi.fn();
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
     auth: { getUser: getUserMock },
     from: (table: string) => ({
       insert: (values: unknown) => insertMock(table, values),
+      select: (columns: string) => ({
+        eq: (column: string, value: unknown) =>
+          eqMockForSelect(table, columns, column, value),
+      }),
       update: (values: unknown) => ({
         eq: (column: string, value: unknown) =>
           eqMockForUpdate(table, values, column, value),
@@ -31,6 +38,11 @@ vi.mock("@/lib/supabase/server", () => ({
           eqMockForDelete(table, column, value),
       }),
     }),
+    storage: {
+      from: (bucket: string) => ({
+        remove: (paths: string[]) => removeStorageMock(bucket, paths),
+      }),
+    },
   }),
 }));
 
@@ -243,6 +255,12 @@ describe("updatePerson", () => {
 });
 
 describe("deletePerson", () => {
+  beforeEach(() => {
+    selectMock.mockReset().mockResolvedValue({ data: [], error: null });
+    getUserMock.mockReset().mockResolvedValue({ data: { user: { id: "user-1" } } });
+    removeStorageMock.mockReset().mockResolvedValue({ data: {}, error: null });
+  });
+
   it("löscht über die id und aktualisiert die Übersicht", async () => {
     revalidatePathMock.mockClear();
     deleteMock.mockReset().mockResolvedValue({ error: null });
@@ -282,5 +300,44 @@ describe("deletePerson", () => {
 
     expect(result).toEqual({ error: "db down" });
     expect(revalidatePathMock).not.toHaveBeenCalled();
+  });
+
+  it("räumt die Bild-Dateien aller Ideen dieser Person aus dem Storage mit auf", async () => {
+    revalidatePathMock.mockClear();
+    deleteMock.mockReset().mockResolvedValue({ error: null });
+    selectMock.mockResolvedValue({
+      data: [{ id: "gift-1" }, { id: "gift-2" }],
+      error: null,
+    });
+
+    await deletePerson("person-42");
+
+    expect(eqMockForSelect).toHaveBeenCalledWith("gifts", "id", "person_id", "person-42");
+    expect(removeStorageMock).toHaveBeenCalledWith("gift-images", [
+      "user-1/gift-1",
+      "user-1/gift-2",
+    ]);
+  });
+
+  it("ruft den Storage nicht auf, wenn die Person keine Ideen hatte", async () => {
+    revalidatePathMock.mockClear();
+    deleteMock.mockReset().mockResolvedValue({ error: null });
+    selectMock.mockResolvedValue({ data: [], error: null });
+
+    await deletePerson("person-42");
+
+    expect(removeStorageMock).not.toHaveBeenCalled();
+  });
+
+  it("löscht die Person trotzdem, wenn das Entfernen der Bild-Dateien fehlschlägt", async () => {
+    revalidatePathMock.mockClear();
+    deleteMock.mockReset().mockResolvedValue({ error: null });
+    selectMock.mockResolvedValue({ data: [{ id: "gift-1" }], error: null });
+    removeStorageMock.mockResolvedValue({ data: null, error: { message: "not found" } });
+
+    const result = await deletePerson("person-42");
+
+    expect(result).toEqual({ success: true });
+    expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard", "layout");
   });
 });

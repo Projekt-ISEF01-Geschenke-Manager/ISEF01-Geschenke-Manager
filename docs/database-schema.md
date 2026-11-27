@@ -106,7 +106,7 @@ erDiagram
 | `title` | text | Kurzbezeichnung der Idee/des Geschenks |
 | `description` | text | Freitext-Notiz |
 | `link` | text | Link zur Idee (z. B. Produktseite) |
-| `image_url` | text | Verweis auf Bild in Supabase Storage |
+| `image_url` | text | Öffentliche URL des Bilds im Storage-Bucket `gift-images` (siehe Abschnitt 3) |
 | `status` | text | `idea` (= "offen") \| `purchased` (= "besorgt") \| `given` (= "überreicht", Stufe 2/A9) |
 | `gift_date` | date | Datum (geplant oder tatsächlich überreicht) |
 
@@ -149,6 +149,8 @@ Alle fünf nutzer:innen-gebundenen Tabellen haben RLS aktiviert, mit Policies de
 - Selbst wenn im Frontend ein Fehler passiert (z. B. eine falsche Filterbedingung vergessen), kann ein:e Nutzer:in nie fremde Daten sehen oder verändern.
 - Relevant für die Qualitätsplanung (MS 3, "Maßnahmen zur Berücksichtigung von IT-Sicherheit und Datenschutz") – RLS ist die von Supabase empfohlene Standard-Absicherung für genau dieses Szenario (mehrere Nutzer:innen, gemeinsame Tabellen).
 
+**Storage-Bucket `gift-images` (A8, Stufe 3, #95):** `public = true`, damit einzelne Bilder per `<img src>` auch auf der Teilen-Seite ohne Login sichtbar sind (siehe `shared_links` unten) – der öffentliche Download-Endpunkt eines public-Buckets umgeht RLS für genau diesen Einzelabruf vollständig, braucht also keine eigene SELECT-Policy. Eine solche Policy würde zusätzlich erlauben, den ganzen Bucket per `list()` aufzulisten (Review-Fund, siehe Migration `20261127093000`) – deshalb ist SELECT auf `storage.objects` bewusst auf eingeloggte Nutzer:innen und den eigenen Pfad-Präfix beschränkt (nötig z. B. für `upsert: true` beim erneuten Hochladen eines eigenen Bilds). Schreiben/Ändern/Löschen laufen ebenso über RLS-Policies, analog zu den Tabellen-Policies oben: `auth.uid() = (storage.foldername(name))[1]`, also nur innerhalb des eigenen Pfad-Präfixes `{user_id}/...`. Pfadschema je Bild: `{user_id}/{gift_id}` (keine Dateiendung, Content-Type kommt beim Upload explizit mit) – ein erneuter Upload überschreibt denselben Pfad, es gibt also nie mehr als eine Datei pro Idee.
+
 Zugriff über den **Publishable Key** (clientseitig) ist damit sicher, weil RLS greift. Der **Secret Key** (umgeht RLS vollständig) wird ausschließlich serverseitig für die öffentliche Teilen-Route verwendet (siehe `shared_links` oben) – RLS kann "gehört dieser Token zu dieser Zeile" für anonyme, nicht eingeloggte Zugriffe nicht sauber abbilden, ohne den Token clientseitig als Session-Variable zu übergeben. Der Token selbst ist dabei das Zugriffsrecht (nicht erratbar, 122 Bit Zufall), die Route prüft ihn explizit und gibt gezielt nur die zugeordneten Personen/Ideen zurück.
 
 **Setup:** Der Secret Key muss als `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` (lokal) und in den Vercel-Umgebungsvariablen (alle drei Umgebungen) hinterlegt werden – zu finden im Supabase-Dashboard unter Project Settings → API → `service_role`-Key. Ohne diese Variable schlägt nur die Teilen-Route (`/teilen/<token>`) fehl, alles andere funktioniert weiter normal über den Publishable Key.
@@ -173,7 +175,7 @@ Zwei Datenbank-Trigger:
 | Abhakbare Aufgaben je Idee (A4, Stufe 3) | *noch nicht im Schema* – eigene Tabelle folgt mit Stufe 3 |
 | Gemeinsame Ansicht Geschenke + Ideen je Person (A5) | ein `gifts`-Select nach `person_id`, `status` unterscheidet |
 | Schnelles Speichern Text + Link (A8, MVP-Teil) | `gifts.title`, `gifts.link` |
-| Bild-Upload (A8, Stufe 3) | `gifts.image_url` vorbereitet, Storage-Bucket fehlt noch |
+| Bild-Upload (A8, Stufe 3) | `gifts.image_url` + Storage-Bucket `gift-images` (öffentlich lesbar, RLS auf eigene `user_id`) |
 | Umwandlung Idee → Geschenk (A9, Stufe 2) | Update von `status`, `occasion_id`, `gift_date` |
 | Teilen von Geschenkideen per Link, mehrere Personen/Links (A10, MVP) | `shared_links`, `shared_link_people` |
 | Automatische Erinnerungen (A6/A7, Stufe 2) | Pro-Person-Schalter `people.reminders_enabled` (boolean, Default `true`); der Versand selbst läuft über den geplanten Cron Job (Vercel) + Query auf `people.birthday_*`/`occasions` |
@@ -184,7 +186,6 @@ Zwei Datenbank-Trigger:
 
 - **Automatische Ideen-Generierung (A12, Stufe 3):** Keine eigene Tabelle/Logik im MVP. Erste sinnvolle Umsetzung: regelbasierter Vorschlag (z. B. "gleiche Tags wie bei früheren Geschenken dieser Person"), bewusst ohne KI-Anbindung (RB7).
 - **Rate-Limiting für Passwort-Reset (QA5, Stufe 2):** Die Helper-Funktionen (`src/lib/rate-limit.ts`) unterstützen bereits eine `"reset"`-Action, sie wird aber erst mit der Passwort-Reset-Funktion selbst verdrahtet (aktuell nur Platzhalter unter `/passwort-vergessen`).
-- **Bild-Uploads (A8, Stufe 3):** `gifts.image_url` ist vorbereitet, der Supabase-Storage-Bucket dafür muss noch angelegt werden.
 - **Abhakbare Aufgaben je Idee (A4, Stufe 3):** Eigene Tabelle (z. B. `gift_tasks`) noch zu entwerfen.
 
 ## 7. Migrationen anwenden

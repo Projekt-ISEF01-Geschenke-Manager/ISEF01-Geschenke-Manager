@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isValidHttpUrl } from "@/lib/url";
 import { GIFT_STATUSES, type GiftStatus } from "@/lib/gift-status";
+import {
+  GIFT_IMAGE_BUCKET,
+  MAX_GIFT_IMAGE_BYTES,
+  ALLOWED_GIFT_IMAGE_TYPES,
+  giftImagePath,
+} from "@/lib/gift-image";
 
 export type { GiftStatus };
 
@@ -91,6 +97,7 @@ export async function updateGift(
   const title = formString(formData.get("title"));
   const link = formString(formData.get("link"));
   const occasionId = formString(formData.get("occasionId"));
+  const image = formData.get("image");
 
   const values = { personId: "", title, link, occasionId };
 
@@ -105,16 +112,55 @@ export async function updateGift(
   }
 
   const supabase = await createClient();
+  const update: Record<string, unknown> = {
+    title,
+    link: link || null,
+    occasion_id: occasionId || null,
+  };
+
+  // Leeres <input type="file"> liefert ein File mit Groesse 0, nicht null -
+  // nur dann tatsaechlich hochladen, sonst bleibt image_url unveraendert.
+  if (image instanceof File && image.size > 0) {
+    if (!ALLOWED_GIFT_IMAGE_TYPES.includes(image.type as (typeof ALLOWED_GIFT_IMAGE_TYPES)[number])) {
+      return {
+        error: "Bitte lade ein Bild im Format JPEG, PNG, WebP oder GIF hoch.",
+        values,
+      };
+    }
+    if (image.size > MAX_GIFT_IMAGE_BYTES) {
+      return { error: "Das Bild darf höchstens 4 MB groß sein.", values };
+    }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return { error: "Bitte melde dich erneut an.", values };
+    }
+
+    const path = giftImagePath(user.id, giftId);
+    const { error: uploadError } = await supabase.storage
+      .from(GIFT_IMAGE_BUCKET)
+      .upload(path, image, { contentType: image.type, upsert: true });
+    if (uploadError) {
+      return { error: uploadError.message, values };
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(GIFT_IMAGE_BUCKET).getPublicUrl(path);
+    // Ein erneuter Upload ueberschreibt denselben Pfad (upsert) - die URL
+    // selbst bliebe sonst identisch, obwohl sich der Inhalt geaendert hat,
+    // und Browser/CDN wuerden weiter die alte Datei aus dem Cache zeigen
+    // (Review-Fund). Cache-Buster erzwingt einen frischen Abruf. crypto.
+    // randomUUID() statt Date.now(), damit zwei Uploads in derselben
+    // Millisekunde nie dieselbe URL ergeben.
+    update.image_url = `${publicUrl}?v=${crypto.randomUUID()}`;
+  }
+
   // RLS stellt sicher, dass nur die eigene Idee bearbeitet werden kann,
   // auch falls giftId manipuliert wird.
-  const { error } = await supabase
-    .from("gifts")
-    .update({
-      title,
-      link: link || null,
-      occasion_id: occasionId || null,
-    })
-    .eq("id", giftId);
+  const { error } = await supabase.from("gifts").update(update).eq("id", giftId);
 
   if (error) {
     return { error: error.message, values };
@@ -158,6 +204,15 @@ export async function deleteGift(
 
   if (error) {
     return { error: error.message };
+  }
+
+  // Best-effort: Bild-Datei mitloeschen, falls vorhanden. Schlaegt das fehl
+  // (oder gab es nie eine), blockiert das nicht das Loeschen der Idee selbst.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    await supabase.storage.from(GIFT_IMAGE_BUCKET).remove([giftImagePath(user.id, giftId)]);
   }
 
   revalidatePath("/dashboard", "layout");

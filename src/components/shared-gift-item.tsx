@@ -16,6 +16,7 @@ export type SharedGift = {
   id: string;
   title: string;
   link: string | null;
+  image_url: string | null;
   status: string;
   purchased_by: string | null;
   occasion_name: string | null;
@@ -63,11 +64,17 @@ export function SharedGiftItem({
   return (
     <li className="surface reveal rounded-2xl p-4">
       <div className="flex items-start gap-3">
-        {/* Bild-Platzhalter - Bild-Upload folgt erst in Stufe 3 (#95), wie
-            bei GiftItem auf der Personenseite. */}
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-line text-[11px] text-muted">
-          Bild
-        </span>
+        {gift.image_url ? (
+          <img
+            src={gift.image_url}
+            alt={gift.title}
+            className="h-14 w-14 shrink-0 rounded-lg border border-line object-cover"
+          />
+        ) : (
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-line text-[11px] text-muted">
+            Bild
+          </span>
+        )}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <p className="font-semibold">{gift.title}</p>

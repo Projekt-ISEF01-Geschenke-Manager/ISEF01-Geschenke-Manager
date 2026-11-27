@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { GIFT_IMAGE_BUCKET, giftImagePath } from "@/lib/gift-image";
 
 // Server Actions sind als Endpunkte aufrufbar, nicht nur ueber das eigene
 // Formular - formData.get() kann daher null oder eine File liefern statt
@@ -203,12 +204,34 @@ export async function deletePerson(
   prevState?: DeletePersonState,
 ): Promise<DeletePersonState> {
   const supabase = await createClient();
+
+  // Gift-IDs vorher einsammeln (wie bei deleteGift) - nach dem Loeschen der
+  // Person sind die Ideen durch den FK-Cascade bereits weg, deren Bild-
+  // Dateien im Storage aber nicht.
+  const { data: giftsData } = await supabase
+    .from("gifts")
+    .select("id")
+    .eq("person_id", personId);
+
   // RLS stellt sicher, dass nur die eigene Person geloescht werden kann,
   // auch falls personId manipuliert wird.
   const { error } = await supabase.from("people").delete().eq("id", personId);
 
   if (error) {
     return { error: error.message };
+  }
+
+  // Best-effort: Bild-Dateien der geloeschten Ideen mitraeumen. Schlaegt das
+  // fehl (oder gab es keine), blockiert das nicht das Loeschen der Person.
+  if (giftsData && giftsData.length > 0) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.storage
+        .from(GIFT_IMAGE_BUCKET)
+        .remove(giftsData.map((gift) => giftImagePath(user.id, gift.id)));
+    }
   }
 
   revalidatePath("/dashboard", "layout");

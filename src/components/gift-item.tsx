@@ -14,11 +14,13 @@ import {
   type GiftFormState,
 } from "@/app/actions/gifts";
 import { Modal } from "@/components/modal";
+import { MAX_GIFT_IMAGE_BYTES } from "@/lib/gift-image";
 
 export type Gift = {
   id: string;
   title: string;
   link: string | null;
+  image_url: string | null;
   status: string;
   occasion_id: string | null;
   occasion_name: string | null;
@@ -74,6 +76,12 @@ export function GiftItem({
   const [closing, setClosing] = useState(false);
   const [shake, setShake] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
+  // Clientseitige Vorab-Pruefung (Review-Fund): Dateien ueber dem Next.js-
+  // bodySizeLimit (next.config.ts) wuerden sonst schon vor updateGift() mit
+  // einem haesslichen Fehler abgelehnt, statt mit der gewohnten Meldung.
+  // Blockiert zusaetzlich das Abschicken, bis ein gueltiges Bild ausgewaehlt
+  // oder die Auswahl entfernt wird.
+  const [imageError, setImageError] = useState<string | null>(null);
   if (updateState !== lastUpdateState) {
     setLastUpdateState(updateState);
     if (updateState?.success && isEditing) {
@@ -96,6 +104,12 @@ export function GiftItem({
       <li className="surface reveal rounded-2xl p-4">
         <form
           action={updateAction}
+          encType="multipart/form-data"
+          onSubmit={(event) => {
+            if (imageError) {
+              event.preventDefault();
+            }
+          }}
           className={`form-stagger flex flex-col gap-2 ${closing ? "form-out" : ""} ${shake ? "form-shake" : ""}`}
           onAnimationEnd={(event) => {
             if (event.target !== event.currentTarget) return;
@@ -122,6 +136,27 @@ export function GiftItem({
             defaultValue={updateState?.values?.link}
             className="rounded-lg border border-input-border bg-input-bg focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-2.5 py-1.5 text-base sm:text-sm"
           />
+          <input
+            type="file"
+            name="image"
+            aria-label="Bild"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file && file.size > MAX_GIFT_IMAGE_BYTES) {
+                setImageError("Das Bild darf höchstens 4 MB groß sein.");
+                event.target.value = "";
+              } else {
+                setImageError(null);
+              }
+            }}
+            className="rounded-lg border border-input-border bg-input-bg text-sm focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-2.5 py-1.5"
+          />
+          {imageError ? (
+            <p className="anim-in text-xs text-danger">{imageError}</p>
+          ) : (
+            <p className="text-xs text-muted">JPEG, PNG, WebP oder GIF, max. 4 MB.</p>
+          )}
           <div className="relative">
             <select
               name="occasionId"
@@ -183,10 +218,17 @@ export function GiftItem({
           sich das sonst auf schmalen Bildschirmen mit dem Titel. */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
-          {/* Bild-Platzhalter - Bild-Upload folgt erst in Stufe 3 (#95). */}
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-line text-[11px] text-muted">
-            Bild
-          </span>
+          {gift.image_url ? (
+            <img
+              src={gift.image_url}
+              alt={gift.title}
+              className="h-14 w-14 shrink-0 rounded-lg border border-line object-cover"
+            />
+          ) : (
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-line text-[11px] text-muted">
+              Bild
+            </span>
+          )}
           <div className="min-w-0">
             <p className="font-semibold">{gift.title}</p>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
@@ -232,6 +274,7 @@ export function GiftItem({
               type="button"
               onClick={() => {
                 setIsEditing(true);
+                setImageError(null);
               }}
               className="btn btn-secondary btn-sm"
             >
