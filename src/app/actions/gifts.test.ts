@@ -205,7 +205,10 @@ describe("updateGift", () => {
         publicUrl: "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1",
       },
     });
-    selectSingleMock.mockReset().mockResolvedValue({ data: { link: validFields.link }, error: null });
+    selectSingleMock.mockReset().mockResolvedValue({
+      data: { link: validFields.link, link_preview_url: "https://cdn.example/vorhanden.png" },
+      error: null,
+    });
     fetchLinkPreviewMock.mockReset().mockResolvedValue(null);
   });
 
@@ -291,6 +294,25 @@ describe("updateGift", () => {
     expect(updateMock).toHaveBeenCalledWith(
       "gifts",
       { title: "Kräutergarten-Set", link: validFields.link, occasion_id: "occasion-1" },
+      "id",
+      "gift-1",
+    );
+  });
+
+  it("ermittelt die Link-Vorschau nachträglich, wenn sie trotz unverändertem Link noch fehlt", async () => {
+    updateMock.mockResolvedValue({ error: null });
+    selectSingleMock.mockResolvedValue({
+      data: { link: validFields.link, link_preview_url: null },
+      error: null,
+    });
+    fetchLinkPreviewMock.mockResolvedValue("https://cdn.example/nachgeholt.png");
+
+    await updateGift("gift-1", undefined, formData(validFields));
+
+    expect(fetchLinkPreviewMock).toHaveBeenCalledWith(validFields.link);
+    expect(updateMock).toHaveBeenCalledWith(
+      "gifts",
+      expect.objectContaining({ link_preview_url: "https://cdn.example/nachgeholt.png" }),
       "id",
       "gift-1",
     );
