@@ -134,7 +134,7 @@ export async function updateGift(
 
   const { data: currentGift } = await supabase
     .from("gifts")
-    .select("link")
+    .select("link, link_preview_url")
     .eq("id", giftId)
     .single();
 
@@ -144,10 +144,15 @@ export async function updateGift(
     occasion_id: occasionId || null,
   };
 
-  // Vorschaubild vom Link nur neu ermitteln, wenn sich der Link tatsaechlich
-  // geaendert hat - sonst wuerde jede Bearbeitung (auch nur Titel/Anlass)
-  // unnoetig einen Netzwerk-Request an die fremde Seite ausloesen.
-  if (link !== (currentGift?.link ?? "")) {
+  // Vorschaubild neu ermitteln, wenn sich der Link geaendert hat - oder,
+  // auch ohne Aenderung, wenn noch nie eine Vorschau da war (z. B. weil die
+  // Idee vor diesem Feature angelegt wurde, oder ein frueherer Abruf
+  // fehlschlug). Ohne Aenderung UND mit vorhandener Vorschau bleibt die
+  // Vorschau unangetastet - sonst wuerde jede Bearbeitung unnoetig einen
+  // Netzwerk-Request an die fremde Seite ausloesen.
+  const linkChanged = link !== (currentGift?.link ?? "");
+  const previewStillMissing = Boolean(link) && !currentGift?.link_preview_url;
+  if (linkChanged || previewStillMissing) {
     update.link_preview_url = link ? await fetchLinkPreview(link) : null;
   }
 
