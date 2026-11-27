@@ -39,6 +39,7 @@ const offeneIdee = {
   id: "gift-1",
   title: "Hochbeet aus Holz",
   link: null,
+  image_url: null,
   status: "idea",
   purchased_by: null,
   occasion_name: null,
@@ -219,5 +220,35 @@ describe("SharedGiftItem", () => {
     );
 
     expect(screen.queryByText(/hat das schon besorgt/i)).toBeNull();
+  });
+
+  it("zeigt ein Vorschaubild statt des Platzhalters, wenn gift.image_url gesetzt ist", () => {
+    render(
+      <ul>
+        <SharedGiftItem
+          token="token-1"
+          gift={{
+            ...offeneIdee,
+            image_url: "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1",
+          }}
+        />
+      </ul>,
+    );
+
+    const image = screen.getByRole("img", { name: "Hochbeet aus Holz" });
+    expect(image.getAttribute("src")).toBe(
+      "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1",
+    );
+  });
+
+  it("zeigt weiterhin den Platzhalter, wenn kein Bild vorhanden ist", () => {
+    render(
+      <ul>
+        <SharedGiftItem token="token-1" gift={{ ...offeneIdee, image_url: null }} />
+      </ul>,
+    );
+
+    expect(screen.getByText("Bild")).not.toBeNull();
+    expect(screen.queryByRole("img")).toBeNull();
   });
 });
