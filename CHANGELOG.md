@@ -6,6 +6,7 @@ hier automatisch einen Eintrag mit PR-Titel und -Nummer. Kein manueller
 Schritt vor dem Merge nötig.
 
 ## 2026-11-27
+- Fix: Link-Vorschau bei fehlendem Wert nachholen (#225)
 - Feature: Automatische Bild-Vorschau vom hinterlegten Link (#224)
 - Feature: Bild-Upload bei Ideen (#222)
 - Docs: README-Projektstand mit tatsächlichem Codestand abgeglichen (direkter Commit b3d495f, kein PR)
