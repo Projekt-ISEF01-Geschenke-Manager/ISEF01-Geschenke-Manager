@@ -16,54 +16,42 @@ Geschwistern), damit niemand dasselbe Geschenk doppelt kauft.
 ## Funktionen
 
 ### Konto
-- Registrierung mit E-Mail-Bestätigung, Login, Passwort zurücksetzen (neutrale
-  Fehlermeldungen, damit nicht erkennbar ist, ob eine E-Mail existiert)
-- Rate-Limiting bei Login/Registrierung/Reset (QA5)
-- Unbestätigte Konten werden nach 7 Tagen automatisch gelöscht (täglicher Cron-Job)
+| Feature | Details |
+| --- | --- |
+| Registrierung & Login | E-Mail-Bestätigung, Passwort zurücksetzen, neutrale Fehlermeldungen (nicht erkennbar, ob eine E-Mail existiert) |
+| Rate-Limiting | Bei Login/Registrierung/Reset (QA5) |
+| Konten-Bereinigung | Unbestätigte Konten werden nach 7 Tagen automatisch gelöscht (täglicher Cron-Job) |
 
 ### Personen & Geschenkideen
-- Personen anlegen mit Geburtstag (Tag/Monat Pflicht, Jahr optional), Interessen-Tags
-  und Notizen
-- Übersicht zeigt anstehende Anlässe (Geburtstage, Weihnachten) mit Countdown und
-  Fortschritt ("X von Y schon besorgt")
-- Personenseite pro Person: Ideen mit Titel, Link und Anlass anlegen (Schnelleingabe
-  oder ausführliches Formular), Status offen/besorgt per Klick umschalten, bearbeiten,
-  mit Sicherheitsabfrage löschen
-- Besorgte Geschenke zu Geburtstag/Weihnachten rutschen automatisch in die
-  „Frühere Geschenke"-Liste, sobald der Anlass vorbei ist; Geschenke ohne festes
-  Datum (eigene Anlässe, ohne Anlass) lassen sich manuell über „+ Geschenk
-  nachtragen" ergänzen ([#26](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/26),
-  [#21](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/21))
-- Platzhalter für geplante Erweiterungen (Vorschläge, Bild-Upload, Aufgaben-Checkliste)
-  sind in der UI schon vorgesehen, aber noch nicht funktional
+| Feature | Details |
+| --- | --- |
+| Personen anlegen | Geburtstag (Tag/Monat Pflicht, Jahr optional), Interessen-Tags, Notizen |
+| Übersicht | Anstehende Anlässe (Geburtstage, Weihnachten) mit Countdown und Fortschritt ("X von Y schon besorgt") |
+| Geschenkideen | Titel, Link und Anlass anlegen (Schnelleingabe oder ausführliches Formular), Status offen/besorgt per Klick umschalten, bearbeiten, mit Sicherheitsabfrage löschen |
+| Frühere Geschenke | Besorgte Geschenke zu Geburtstag/Weihnachten rutschen automatisch dorthin, sobald der Anlass vorbei ist; Geschenke ohne festes Datum lassen sich manuell über „+ Geschenk nachtragen" ergänzen ([#26](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/26), [#21](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/21)) |
+| Geplante Erweiterungen | Platzhalter für Vorschläge, Bild-Upload, Aufgaben-Checkliste schon in der UI vorgesehen, aber noch nicht funktional |
 
 ### Geteilte Ansicht
-- Ideen für eine oder mehrere Personen per Link teilen – ganz ohne Konto für die
-  andere Seite (Token-basiert, kein Login nötig)
-- Besucher:innen des Links können Ideen ebenfalls als besorgt markieren, optional mit
-  Namensangabe ("Max hat das schon besorgt"), damit sich mehrere Leute beim Schenken
-  abstimmen können – inklusive serverseitiger Prüfung, dass nur Ideen der über diesen
-  Link freigegebenen Personen geändert werden können, und eigenem Rate-Limiting
-- Link jederzeit widerrufbar
+| Feature | Details |
+| --- | --- |
+| Link-Teilen | Ideen für eine oder mehrere Personen teilen – ganz ohne Konto für die andere Seite (Token-basiert, kein Login nötig) |
+| Gemeinsames Abhaken | Besucher:innen können Ideen ebenfalls als besorgt markieren, optional mit Namensangabe ("Max hat das schon besorgt"); serverseitig geprüft, dass nur Ideen der freigegebenen Personen geändert werden können; eigenes Rate-Limiting |
+| Widerruf | Link jederzeit widerrufbar |
 
 ### Einstellungen
-- Eigene Seite (Desktop: Icon im Header neben "Abmelden"; Mobile: eigener Tab in der
-  unteren Navigation)
-- Kontoweite Schalter: Geburtstagserinnerung per E-Mail an/aus, Weihnachts-Status an/aus
-- Pro Person: "In Erinnerungen einschließen" (schließt einzelne Personen aus beiden
-  Mail-Typen aus)
-- "Bewegung reduzieren" – erzwingt reduzierte Animationen unabhängig von der
-  Betriebssystem-Einstellung
-  ([#209](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/209))
+| Feature | Details |
+| --- | --- |
+| Eigene Seite | Desktop: Icon im Header neben „Abmelden"; Mobile: eigener Tab in der unteren Navigation |
+| Erinnerungen | Kontoweite Schalter für Geburtstagserinnerung und Weihnachts-Status; pro Person „In Erinnerungen einschließen" (schließt einzelne Personen aus beiden Mail-Typen aus) |
+| Bewegung reduzieren | Erzwingt reduzierte Animationen unabhängig von der Betriebssystem-Einstellung ([#209](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/209)) |
 
 ### Sonstiges
-- Dark-/Light-Mode (Theme-Color folgt jetzt auch in der iOS-Statusleiste,
-  [#208](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/208))
-- Admin-Account: eigene Konten-Übersicht mit Lösch-Funktion, über die
-  Einstellungsseite erreichbar, nur für als Admin markierte Konten sichtbar
-  ([#90](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/90))
-- Impressum, Datenschutzerklärung
-- Responsive (Desktop, Tablet, Mobile)
+| Feature | Details |
+| --- | --- |
+| Dark-/Light-Mode | Theme-Color folgt auch der iOS-Statusleiste ([#208](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/208)) |
+| Admin-Account | Konten-Übersicht mit Lösch-Funktion, über die Einstellungsseite erreichbar, nur für als Admin markierte Konten sichtbar ([#90](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/90)) |
+| Rechtliches | Impressum, Datenschutzerklärung |
+| Responsive | Desktop, Tablet, Mobile |
 
 ## Stand des Projekts
 
