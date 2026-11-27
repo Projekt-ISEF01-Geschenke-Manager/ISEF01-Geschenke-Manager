@@ -200,6 +200,15 @@ export async function deleteGift(
     return { error: error.message };
   }
 
+  // Best-effort: Bild-Datei mitloeschen, falls vorhanden. Schlaegt das fehl
+  // (oder gab es nie eine), blockiert das nicht das Loeschen der Idee selbst.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    await supabase.storage.from(GIFT_IMAGE_BUCKET).remove([giftImagePath(user.id, giftId)]);
+  }
+
   revalidatePath("/dashboard", "layout");
   return { success: true };
 }

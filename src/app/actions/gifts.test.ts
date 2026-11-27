@@ -338,6 +338,11 @@ describe("setGiftStatus", () => {
 });
 
 describe("deleteGift", () => {
+  beforeEach(() => {
+    getUserMock.mockReset().mockResolvedValue({ data: { user: { id: "user-1" } } });
+    removeStorageMock.mockReset().mockResolvedValue({ data: {}, error: null });
+  });
+
   it("löscht über die id und aktualisiert die Übersicht", async () => {
     revalidatePathMock.mockClear();
     deleteMock.mockReset().mockResolvedValue({ error: null });
@@ -357,6 +362,26 @@ describe("deleteGift", () => {
 
     expect(result).toEqual({ error: "db down" });
     expect(revalidatePathMock).not.toHaveBeenCalled();
+  });
+
+  it("löscht die zugehörige Bild-Datei aus dem Storage mit", async () => {
+    revalidatePathMock.mockClear();
+    deleteMock.mockReset().mockResolvedValue({ error: null });
+
+    await deleteGift("gift-1");
+
+    expect(removeStorageMock).toHaveBeenCalledWith("gift-images", ["user-1/gift-1"]);
+  });
+
+  it("löscht die Idee trotzdem, wenn das Entfernen des Bildes fehlschlägt", async () => {
+    revalidatePathMock.mockClear();
+    deleteMock.mockReset().mockResolvedValue({ error: null });
+    removeStorageMock.mockResolvedValue({ data: null, error: { message: "not found" } });
+
+    const result = await deleteGift("gift-1");
+
+    expect(result).toEqual({ success: true });
+    expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard", "layout");
   });
 });
 

@@ -49,6 +49,7 @@ const gift: Gift = {
   id: "gift-1",
   title: "Kräutergarten-Set",
   link: "https://shop-beispiel.de/kraeutergarten",
+  image_url: null,
   status: "idea",
   occasion_id: "occasion-1",
   occasion_name: "Weihnachten",
@@ -184,5 +185,50 @@ describe("GiftItem – Bearbeiten (Issue #154)", () => {
 
     await waitFor(() => expect(screen.getByText("db down")).not.toBeNull());
     expect(screen.getByDisplayValue("Kräutergarten-Set")).not.toBeNull();
+  });
+
+  it("zeigt ein Vorschaubild statt des Platzhalters, wenn gift.image_url gesetzt ist", () => {
+    render(
+      <GiftItem
+        gift={{ ...gift, image_url: "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1" }}
+        occasions={occasions}
+      />,
+    );
+
+    const image = screen.getByRole("img", { name: "Kräutergarten-Set" });
+    expect(image.getAttribute("src")).toBe(
+      "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1",
+    );
+    expect(screen.queryByText("Bild")).toBeNull();
+  });
+
+  it("zeigt weiterhin den Platzhalter, wenn kein Bild vorhanden ist", () => {
+    render(<GiftItem gift={{ ...gift, image_url: null }} occasions={occasions} />);
+
+    expect(screen.getByText("Bild")).not.toBeNull();
+    expect(screen.queryByRole("img")).toBeNull();
+  });
+
+  it("nimmt ein ausgewähltes Bild im Datei-Feld des Bearbeiten-Formulars an", async () => {
+    // jsdom baut die FormData beim nativen Form-Submit nicht korrekt aus
+    // per fireEvent.change gesetzten Dateien zusammen (bekannte Grenze der
+    // Testumgebung, kein Verhalten der Komponente) - deshalb wird hier das
+    // Datei-Feld selbst geprueft statt der durchgereichten FormData.
+    updateGiftMock.mockResolvedValue({ success: true });
+    render(<GiftItem gift={{ ...gift, image_url: null }} occasions={occasions} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Bearbeiten" }));
+    const file = new File(["bild-inhalt"], "bild.png", { type: "image/png" });
+    const fileInput = screen.getByLabelText("Bild") as HTMLInputElement;
+    expect(fileInput.type).toBe("file");
+    expect(fileInput.name).toBe("image");
+
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    expect(fileInput.files?.[0]?.name).toBe("bild.png");
+    expect(fileInput.files?.[0]?.type).toBe("image/png");
+
+    fireEvent.click(screen.getByRole("button", { name: "Speichern" }));
+    await waitFor(() => expect(updateGiftMock).toHaveBeenCalled());
   });
 });
