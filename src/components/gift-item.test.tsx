@@ -220,14 +220,14 @@ describe("GiftItem – Bearbeiten (Issue #154)", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Bearbeiten" }));
     const file = new File(["bild-inhalt"], "bild.png", { type: "image/png" });
-    const fileInput = screen.getByLabelText("Bild") as HTMLInputElement;
-    expect(fileInput.type).toBe("file");
-    expect(fileInput.name).toBe("image");
+    const imagePicker = screen.getByLabelText("Bild") as HTMLInputElement;
+    expect(imagePicker.type).toBe("file");
+    expect(imagePicker.name).toBe("image");
 
-    fireEvent.change(fileInput, { target: { files: [file] } });
+    fireEvent.change(imagePicker, { target: { files: [file] } });
 
-    expect(fileInput.files?.[0]?.name).toBe("bild.png");
-    expect(fileInput.files?.[0]?.type).toBe("image/png");
+    expect(imagePicker.files?.[0]?.name).toBe("bild.png");
+    expect(imagePicker.files?.[0]?.type).toBe("image/png");
 
     fireEvent.click(screen.getByRole("button", { name: "Speichern" }));
     await waitFor(() => expect(updateGiftMock).toHaveBeenCalled());
@@ -242,8 +242,8 @@ describe("GiftItem – Bearbeiten (Issue #154)", () => {
       "zu-gross.png",
       { type: "image/png" },
     );
-    const fileInput = screen.getByLabelText("Bild") as HTMLInputElement;
-    fireEvent.change(fileInput, { target: { files: [oversizedFile] } });
+    const imagePicker = screen.getByLabelText("Bild") as HTMLInputElement;
+    fireEvent.change(imagePicker, { target: { files: [oversizedFile] } });
 
     expect(screen.getByText("Das Bild darf höchstens 4 MB groß sein.")).not.toBeNull();
 
