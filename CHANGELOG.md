@@ -6,6 +6,7 @@ hier automatisch einen Eintrag mit PR-Titel und -Nummer. Kein manueller
 Schritt vor dem Merge nötig.
 
 ## 2026-11-27
+- Feature: Bild-Upload bei Ideen (#222)
 - Docs: README-Projektstand mit tatsächlichem Codestand abgeglichen (direkter Commit b3d495f, kein PR)
 
 ## 2026-11-26
