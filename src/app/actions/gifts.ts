@@ -10,6 +10,7 @@ import {
   ALLOWED_GIFT_IMAGE_TYPES,
   giftImagePath,
 } from "@/lib/gift-image";
+import { fetchLinkPreview } from "@/lib/link-preview";
 
 export type { GiftStatus };
 
@@ -68,12 +69,18 @@ export async function createGift(
     return { error: "Bitte melde dich erneut an.", values };
   }
 
+  // Best-effort: Vorschaubild vom Link (og:image) ermitteln, falls ein Link
+  // angegeben ist - schlaegt das fehl (keine Seite, kein og:image, Timeout,
+  // SSRF-Block), bleibt die Idee trotzdem speicherbar, nur ohne Vorschau.
+  const linkPreviewUrl = link ? await fetchLinkPreview(link) : null;
+
   const { error } = await supabase.from("gifts").insert({
     user_id: user.id,
     person_id: personId,
     occasion_id: occasionId || null,
     title,
     link: link || null,
+    link_preview_url: linkPreviewUrl,
   });
 
   if (error) {
@@ -112,11 +119,25 @@ export async function updateGift(
   }
 
   const supabase = await createClient();
+
+  const { data: currentGift } = await supabase
+    .from("gifts")
+    .select("link")
+    .eq("id", giftId)
+    .single();
+
   const update: Record<string, unknown> = {
     title,
     link: link || null,
     occasion_id: occasionId || null,
   };
+
+  // Vorschaubild vom Link nur neu ermitteln, wenn sich der Link tatsaechlich
+  // geaendert hat - sonst wuerde jede Bearbeitung (auch nur Titel/Anlass)
+  // unnoetig einen Netzwerk-Request an die fremde Seite ausloesen.
+  if (link !== (currentGift?.link ?? "")) {
+    update.link_preview_url = link ? await fetchLinkPreview(link) : null;
+  }
 
   // Leeres <input type="file"> liefert ein File mit Groesse 0, nicht null -
   // nur dann tatsaechlich hochladen, sonst bleibt image_url unveraendert.

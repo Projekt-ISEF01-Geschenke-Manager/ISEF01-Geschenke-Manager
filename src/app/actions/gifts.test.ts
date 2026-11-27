@@ -8,18 +8,29 @@ vi.mock("next/cache", () => ({
 const insertMock = vi.fn();
 const updateMock = vi.fn();
 const deleteMock = vi.fn();
+const selectSingleMock = vi.fn();
 const eqMockForUpdate = vi.fn((...args: unknown[]) => updateMock(...args));
 const eqMockForDelete = vi.fn((...args: unknown[]) => deleteMock(...args));
 const getUserMock = vi.fn();
 const uploadStorageMock = vi.fn();
 const removeStorageMock = vi.fn();
 const getPublicUrlMock = vi.fn();
+const fetchLinkPreviewMock = vi.fn();
+
+vi.mock("@/lib/link-preview", () => ({
+  fetchLinkPreview: (link: string) => fetchLinkPreviewMock(link),
+}));
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
     auth: { getUser: getUserMock },
     from: (table: string) => ({
       insert: (values: unknown) => insertMock(table, values),
+      select: (columns: string) => ({
+        eq: (column: string, value: unknown) => ({
+          single: () => selectSingleMock(table, columns, column, value),
+        }),
+      }),
       update: (values: unknown) => ({
         eq: (column: string, value: unknown) =>
           eqMockForUpdate(table, values, column, value),
@@ -62,6 +73,7 @@ describe("createGift", () => {
     insertMock.mockReset();
     getUserMock.mockReset();
     getUserMock.mockResolvedValue({ data: { user: { id: "user-1" } } });
+    fetchLinkPreviewMock.mockReset().mockResolvedValue(null);
   });
 
   it("lehnt eine fehlende Person ab", async () => {
@@ -111,6 +123,7 @@ describe("createGift", () => {
       occasion_id: "occasion-1",
       title: "Kräutergarten-Set",
       link: "https://shop-beispiel.de/kraeutergarten",
+      link_preview_url: null,
     });
     expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard", "layout");
   });
@@ -127,6 +140,47 @@ describe("createGift", () => {
     const result = await createGift(undefined, formData(validFields));
     expect(result?.error).toBe("db down");
     expect(revalidatePathMock).not.toHaveBeenCalled();
+  });
+
+  it("ermittelt eine Link-Vorschau beim Anlegen, wenn ein Link angegeben ist", async () => {
+    insertMock.mockResolvedValue({ error: null });
+    fetchLinkPreviewMock.mockResolvedValue("https://cdn.example/bild.png");
+
+    await createGift(undefined, formData(validFields));
+
+    expect(fetchLinkPreviewMock).toHaveBeenCalledWith(validFields.link);
+    expect(insertMock).toHaveBeenCalledWith(
+      "gifts",
+      expect.objectContaining({ link_preview_url: "https://cdn.example/bild.png" }),
+    );
+  });
+
+  it("speichert link_preview_url als null, wenn kein Link angegeben ist", async () => {
+    insertMock.mockResolvedValue({ error: null });
+
+    await createGift(
+      undefined,
+      formData({ personId: "person-1", title: "Gutschein", link: "", occasionId: "" }),
+    );
+
+    expect(fetchLinkPreviewMock).not.toHaveBeenCalled();
+    expect(insertMock).toHaveBeenCalledWith(
+      "gifts",
+      expect.objectContaining({ link_preview_url: null }),
+    );
+  });
+
+  it("speichert link_preview_url als null, wenn keine Vorschau ermittelt werden konnte", async () => {
+    insertMock.mockResolvedValue({ error: null });
+    fetchLinkPreviewMock.mockResolvedValue(null);
+
+    const result = await createGift(undefined, formData(validFields));
+
+    expect(result).toEqual({ success: true });
+    expect(insertMock).toHaveBeenCalledWith(
+      "gifts",
+      expect.objectContaining({ link_preview_url: null }),
+    );
   });
 });
 
@@ -151,6 +205,8 @@ describe("updateGift", () => {
         publicUrl: "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1",
       },
     });
+    selectSingleMock.mockReset().mockResolvedValue({ data: { link: validFields.link }, error: null });
+    fetchLinkPreviewMock.mockReset().mockResolvedValue(null);
   });
 
   it("lehnt einen fehlenden Titel ab, ohne die Datenbank anzufassen", async () => {
@@ -203,7 +259,57 @@ describe("updateGift", () => {
     expect(result).toEqual({ success: true });
     expect(updateMock).toHaveBeenCalledWith(
       "gifts",
-      { title: "Gutschein", link: null, occasion_id: null },
+      { title: "Gutschein", link: null, occasion_id: null, link_preview_url: null },
+      "id",
+      "gift-1",
+    );
+  });
+
+  it("ermittelt die Link-Vorschau neu, wenn sich der Link ändert", async () => {
+    updateMock.mockResolvedValue({ error: null });
+    selectSingleMock.mockResolvedValue({ data: { link: "https://alt-beispiel.de/" }, error: null });
+    fetchLinkPreviewMock.mockResolvedValue("https://cdn.example/neu.png");
+
+    await updateGift("gift-1", undefined, formData(validFields));
+
+    expect(fetchLinkPreviewMock).toHaveBeenCalledWith(validFields.link);
+    expect(updateMock).toHaveBeenCalledWith(
+      "gifts",
+      expect.objectContaining({ link_preview_url: "https://cdn.example/neu.png" }),
+      "id",
+      "gift-1",
+    );
+  });
+
+  it("lässt die Link-Vorschau unverändert, wenn sich der Link nicht ändert", async () => {
+    updateMock.mockResolvedValue({ error: null });
+    // selectSingleMock-Default aus beforeEach entspricht bereits validFields.link
+
+    await updateGift("gift-1", undefined, formData(validFields));
+
+    expect(fetchLinkPreviewMock).not.toHaveBeenCalled();
+    expect(updateMock).toHaveBeenCalledWith(
+      "gifts",
+      { title: "Kräutergarten-Set", link: validFields.link, occasion_id: "occasion-1" },
+      "id",
+      "gift-1",
+    );
+  });
+
+  it("löscht die gespeicherte Link-Vorschau, wenn der Link entfernt wird", async () => {
+    updateMock.mockResolvedValue({ error: null });
+    selectSingleMock.mockResolvedValue({ data: { link: validFields.link }, error: null });
+
+    await updateGift(
+      "gift-1",
+      undefined,
+      formData({ personId: "person-1", title: "Gutschein", link: "", occasionId: "" }),
+    );
+
+    expect(fetchLinkPreviewMock).not.toHaveBeenCalled();
+    expect(updateMock).toHaveBeenCalledWith(
+      "gifts",
+      { title: "Gutschein", link: null, occasion_id: null, link_preview_url: null },
       "id",
       "gift-1",
     );
