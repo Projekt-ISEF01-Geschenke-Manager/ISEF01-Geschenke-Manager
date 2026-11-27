@@ -5,6 +5,9 @@ ergänzt der Workflow [`.github/workflows/changelog.yml`](.github/workflows/chan
 hier automatisch einen Eintrag mit PR-Titel und -Nummer. Kein manueller
 Schritt vor dem Merge nötig.
 
+## 2026-11-27
+- Docs: README-Projektstand mit tatsächlichem Codestand abgeglichen (direkter Commit b3d495f, kein PR)
+
 ## 2026-11-26
 - Fix: Palettenwahl liess sich nach #207 nicht mehr aendern (#221)
 
