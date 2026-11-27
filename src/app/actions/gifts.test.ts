@@ -255,11 +255,27 @@ describe("updateGift", () => {
     expect(updateMock).toHaveBeenCalledWith(
       "gifts",
       expect.objectContaining({
-        image_url: "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1",
+        image_url: expect.stringMatching(
+          /^https:\/\/example\.supabase\.co\/storage\/v1\/object\/public\/gift-images\/user-1\/gift-1\?v=[0-9a-f-]+$/,
+        ),
       }),
       "id",
       "gift-1",
     );
+  });
+
+  it("haengt einen Cache-Buster an die Bild-URL an, damit ein ersetztes Bild nicht veraltet aus dem Cache kommt", async () => {
+    updateMock.mockResolvedValue({ error: null });
+
+    await updateGift("gift-1", undefined, formDataWithImage(validFields, makeImageFile(1024, "image/jpeg")));
+    const firstUrl = (updateMock.mock.calls[0][1] as { image_url: string }).image_url;
+
+    updateMock.mockClear();
+    await updateGift("gift-1", undefined, formDataWithImage(validFields, makeImageFile(2048, "image/jpeg")));
+    const secondUrl = (updateMock.mock.calls[0][1] as { image_url: string }).image_url;
+
+    expect(firstUrl).not.toBe(secondUrl);
+    expect(secondUrl.split("?")[0]).toBe(firstUrl.split("?")[0]);
   });
 
   it("lässt image_url unverändert, wenn kein neues Bild ausgewählt wurde (leeres File-Input)", async () => {

@@ -14,6 +14,7 @@ import {
   type GiftFormState,
 } from "@/app/actions/gifts";
 import { Modal } from "@/components/modal";
+import { MAX_GIFT_IMAGE_BYTES } from "@/lib/gift-image";
 
 export type Gift = {
   id: string;
@@ -75,6 +76,12 @@ export function GiftItem({
   const [closing, setClosing] = useState(false);
   const [shake, setShake] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
+  // Clientseitige Vorab-Pruefung (Review-Fund): Dateien ueber dem Next.js-
+  // bodySizeLimit (next.config.ts) wuerden sonst schon vor updateGift() mit
+  // einem haesslichen Fehler abgelehnt, statt mit der gewohnten Meldung.
+  // Blockiert zusaetzlich das Abschicken, bis ein gueltiges Bild ausgewaehlt
+  // oder die Auswahl entfernt wird.
+  const [imageError, setImageError] = useState<string | null>(null);
   if (updateState !== lastUpdateState) {
     setLastUpdateState(updateState);
     if (updateState?.success && isEditing) {
@@ -98,6 +105,11 @@ export function GiftItem({
         <form
           action={updateAction}
           encType="multipart/form-data"
+          onSubmit={(event) => {
+            if (imageError) {
+              event.preventDefault();
+            }
+          }}
           className={`form-stagger flex flex-col gap-2 ${closing ? "form-out" : ""} ${shake ? "form-shake" : ""}`}
           onAnimationEnd={(event) => {
             if (event.target !== event.currentTarget) return;
@@ -129,9 +141,22 @@ export function GiftItem({
             name="image"
             aria-label="Bild"
             accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file && file.size > MAX_GIFT_IMAGE_BYTES) {
+                setImageError("Das Bild darf höchstens 4 MB groß sein.");
+                event.target.value = "";
+              } else {
+                setImageError(null);
+              }
+            }}
             className="rounded-lg border border-input-border bg-input-bg text-sm focus:border-focus-ring focus:ring-3 focus:ring-focus-ring/25 focus:outline-none px-2.5 py-1.5"
           />
-          <p className="text-xs text-muted">JPEG, PNG, WebP oder GIF, max. 4 MB.</p>
+          {imageError ? (
+            <p className="anim-in text-xs text-danger">{imageError}</p>
+          ) : (
+            <p className="text-xs text-muted">JPEG, PNG, WebP oder GIF, max. 4 MB.</p>
+          )}
           <div className="relative">
             <select
               name="occasionId"
@@ -249,6 +274,7 @@ export function GiftItem({
               type="button"
               onClick={() => {
                 setIsEditing(true);
+                setImageError(null);
               }}
               className="btn btn-secondary btn-sm"
             >

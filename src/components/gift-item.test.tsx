@@ -2,6 +2,7 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { cleanup, render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { GiftItem, type Gift } from "./gift-item";
+import { MAX_GIFT_IMAGE_BYTES } from "@/lib/gift-image";
 
 const setGiftStatusMock = vi.fn();
 const deleteGiftMock = vi.fn();
@@ -230,5 +231,23 @@ describe("GiftItem – Bearbeiten (Issue #154)", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Speichern" }));
     await waitFor(() => expect(updateGiftMock).toHaveBeenCalled());
+  });
+
+  it("lehnt ein zu großes Bild schon im Formular ab, ohne updateGift aufzurufen", () => {
+    render(<GiftItem gift={{ ...gift, image_url: null }} occasions={occasions} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Bearbeiten" }));
+    const oversizedFile = new File(
+      [new Uint8Array(MAX_GIFT_IMAGE_BYTES + 1)],
+      "zu-gross.png",
+      { type: "image/png" },
+    );
+    const fileInput = screen.getByLabelText("Bild") as HTMLInputElement;
+    fireEvent.change(fileInput, { target: { files: [oversizedFile] } });
+
+    expect(screen.getByText("Das Bild darf höchstens 4 MB groß sein.")).not.toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Speichern" }));
+    expect(updateGiftMock).not.toHaveBeenCalled();
   });
 });

@@ -149,7 +149,13 @@ export async function updateGift(
     const {
       data: { publicUrl },
     } = supabase.storage.from(GIFT_IMAGE_BUCKET).getPublicUrl(path);
-    update.image_url = publicUrl;
+    // Ein erneuter Upload ueberschreibt denselben Pfad (upsert) - die URL
+    // selbst bliebe sonst identisch, obwohl sich der Inhalt geaendert hat,
+    // und Browser/CDN wuerden weiter die alte Datei aus dem Cache zeigen
+    // (Review-Fund). Cache-Buster erzwingt einen frischen Abruf. crypto.
+    // randomUUID() statt Date.now(), damit zwei Uploads in derselben
+    // Millisekunde nie dieselbe URL ergeben.
+    update.image_url = `${publicUrl}?v=${crypto.randomUUID()}`;
   }
 
   // RLS stellt sicher, dass nur die eigene Idee bearbeitet werden kann,
