@@ -69,25 +69,17 @@ Geschwistern), damit niemand dasselbe Geschenk doppelt kauft.
 
 MVP (IM-4.1) ist umgesetzt, Stufe 2 (IM-4.2) teilweise:
 
-- ✅ **Fertig:** Registrierung/Login mit Rate-Limiting, E-Mail-Bestätigung, Passwort
-  zurücksetzen, automatische Löschung unbestätigter Konten, Personen verwalten
-  (Geburtstag, Interessen, Notizen), feste Anlässe (Geburtstag/Weihnachten),
-  Geschenkideen (Schnelleingabe mit Link/Anlass, Bearbeiten, Status offen/besorgt,
-  Lösch-Bestätigung), Übersichtsseite und Personenseite nach Wireframe, Ideen per Link
-  teilen inkl. gemeinsamem Abhaken mit Namenszuordnung, Dark/Light-Mode,
-  monatliche Geburtstagserinnerung per E-Mail inkl. Einstellungsseite
-  ([#3](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/3)),
-  Weihnachts-Statusübersicht per E-Mail an drei festen Terminen
-  ([#2](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/2)),
-  Idee → Geschenk umwandeln inkl. automatischem Übergang zu „Frühere Geschenke"
-  nach dem Anlass und manuellem Nachtragen
-  ([#26](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/26),
-  [#21](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/21)),
-  Admin-Account mit Konten-Übersicht und Lösch-Funktion
-  ([#90](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/90))
-- ❌ **Geplant (Stufe 2/3):**
-  eigene Anlässe, Bild-Upload, Aufgaben-Checkliste, regelbasierte Ideenvorschläge,
-  Wichtel-Funktion ([#178](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/178))
+|     | Bereich | Details |
+| --- | --- | --- |
+| ✅ | Konto | Registrierung/Login mit Rate-Limiting, E-Mail-Bestätigung, Passwort zurücksetzen, automatische Löschung unbestätigter Konten |
+| ✅ | Personen & Anlässe | Personen verwalten (Geburtstag, Interessen, Notizen), feste Anlässe (Geburtstag/Weihnachten) |
+| ✅ | Geschenkideen | Schnelleingabe mit Link/Anlass, Bearbeiten, Status offen/besorgt, Lösch-Bestätigung, Übersichts- und Personenseite nach Wireframe |
+| ✅ | Frühere Geschenke | Idee → Geschenk umwandeln inkl. automatischem Übergang nach dem Anlass und manuellem Nachtragen ([#26](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/26), [#21](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/21)) |
+| ✅ | Teilen | Ideen per Link teilen inkl. gemeinsamem Abhaken mit Namenszuordnung |
+| ✅ | E-Mail-Erinnerungen | Monatliche Geburtstagserinnerung inkl. Einstellungsseite ([#3](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/3)), Weihnachts-Statusübersicht an drei festen Terminen ([#2](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/2)) |
+| ✅ | Admin | Konten-Übersicht mit Lösch-Funktion ([#90](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/90)) |
+| ✅ | Design | Dark-/Light-Mode, wählbare Farbpaletten |
+| ❌ | Geplant (Stufe 2/3) | eigene Anlässe, Bild-Upload, Aufgaben-Checkliste, regelbasierte Ideenvorschläge, Wichtel-Funktion ([#178](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/178)) |
 
 Siehe [CHANGELOG.md](CHANGELOG.md) für die chronologische Liste gemergter Änderungen
 und das [GitHub-Projekt](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/milestones)
