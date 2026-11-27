@@ -242,14 +242,14 @@ describe("SharedGiftItem", () => {
     );
   });
 
-  it("zeigt weiterhin den Platzhalter, wenn kein Bild vorhanden ist", () => {
+  it("zeigt keinen Platzhalter mehr, wenn kein Bild vorhanden ist", () => {
     render(
       <ul>
         <SharedGiftItem token="token-1" gift={{ ...offeneIdee, image_url: null }} />
       </ul>,
     );
 
-    expect(screen.getByText("Bild")).not.toBeNull();
+    expect(screen.queryByText("Bild")).toBeNull();
     expect(screen.queryByRole("img")).toBeNull();
   });
 

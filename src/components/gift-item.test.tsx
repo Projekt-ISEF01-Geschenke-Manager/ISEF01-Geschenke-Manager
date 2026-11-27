@@ -204,10 +204,10 @@ describe("GiftItem – Bearbeiten (Issue #154)", () => {
     expect(screen.queryByText("Bild")).toBeNull();
   });
 
-  it("zeigt weiterhin den Platzhalter, wenn kein Bild vorhanden ist", () => {
+  it("zeigt keinen Platzhalter mehr, wenn kein Bild vorhanden ist", () => {
     render(<GiftItem gift={{ ...gift, image_url: null }} occasions={occasions} />);
 
-    expect(screen.getByText("Bild")).not.toBeNull();
+    expect(screen.queryByText("Bild")).toBeNull();
     expect(screen.queryByRole("img")).toBeNull();
   });
 
