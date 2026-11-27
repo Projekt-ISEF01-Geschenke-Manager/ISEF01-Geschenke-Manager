@@ -51,6 +51,7 @@ const gift: Gift = {
   title: "Kräutergarten-Set",
   link: "https://shop-beispiel.de/kraeutergarten",
   image_url: null,
+  link_preview_url: null,
   status: "idea",
   occasion_id: "occasion-1",
   occasion_name: "Weihnachten",
@@ -250,5 +251,35 @@ describe("GiftItem – Bearbeiten (Issue #154)", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Speichern" }));
     expect(updateGiftMock).not.toHaveBeenCalled();
+  });
+
+  it("zeigt die automatische Link-Vorschau, wenn kein eigenes Bild hochgeladen wurde", () => {
+    render(
+      <GiftItem
+        gift={{ ...gift, image_url: null, link_preview_url: "https://cdn.example/vorschau.png" }}
+        occasions={occasions}
+      />,
+    );
+
+    const image = screen.getByRole("img", { name: "Kräutergarten-Set" });
+    expect(image.getAttribute("src")).toBe("https://cdn.example/vorschau.png");
+  });
+
+  it("zeigt das eigene Bild statt der Link-Vorschau, wenn beides vorhanden ist", () => {
+    render(
+      <GiftItem
+        gift={{
+          ...gift,
+          image_url: "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1",
+          link_preview_url: "https://cdn.example/vorschau.png",
+        }}
+        occasions={occasions}
+      />,
+    );
+
+    const image = screen.getByRole("img", { name: "Kräutergarten-Set" });
+    expect(image.getAttribute("src")).toBe(
+      "https://example.supabase.co/storage/v1/object/public/gift-images/user-1/gift-1",
+    );
   });
 });
