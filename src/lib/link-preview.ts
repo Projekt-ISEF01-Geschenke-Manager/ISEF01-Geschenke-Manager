@@ -1,5 +1,7 @@
 import "server-only";
-import { BlockList } from "node:net";
+import { BlockList, isIP } from "node:net";
+import { request as httpRequest, type IncomingMessage } from "node:http";
+import { request as httpsRequest } from "node:https";
 import { lookup } from "node:dns/promises";
 import { isValidHttpUrl } from "@/lib/url";
 
@@ -45,30 +47,45 @@ function buildPrivateIpBlockList(): BlockList {
 
 const PRIVATE_IP_BLOCK_LIST = buildPrivateIpBlockList();
 
-// Bekannte Luecke (Review-Fund): isPublicHostname() loest den Hostnamen per
-// DNS auf und prueft DIESE Antwort, fetch() loest denselben Hostnamen aber
-// intern noch einmal selbst auf - zwischen beiden Aufloesungen koennte ein
-// DNS-Rebinding-Angriff (TTL 0, zweite Antwort zeigt auf eine private IP)
-// theoretisch durchschlupfen. Ein Fix dafuer braeuchte einen eigenen
-// Connector, der die Ziel-IP fuer den Socket fixiert, aber per SNI/Hostname
-// weiter TLS-validiert (z. B. ueber undici's Agent({connect})) - das liess
-// sich beim Recherchieren nicht zuverlaessig aus der Doku verifizieren,
-// deshalb hier bewusst nicht umgesetzt. Mindert bereits: fehlerhafte DNS-
-// Antworten werden abgelehnt, nicht nur eine von mehreren IPs pro Antwort,
-// und auf Vercel (Serverless-Funktionen ohne nennenswertes internes Netz)
-// ist die Angriffsflaeche dafuer gering.
-async function isPublicHostname(hostname: string): Promise<boolean> {
-  if (hostname.toLowerCase().replace(/\.$/, "") === "localhost") return false;
-  let records;
-  try {
-    records = await lookup(hostname, { all: true });
-  } catch {
-    return false;
-  }
-  if (records.length === 0) return false;
-  return records.every(
-    (record) => !PRIVATE_IP_BLOCK_LIST.check(record.address, record.family === 6 ? "ipv6" : "ipv4"),
-  );
+async function resolvePublicAddress(hostname: string): Promise<string | null> {
+  if (hostname.toLowerCase().replace(/\.$/, "") === "localhost") return null;
+  const family = isIP(hostname);
+  const records = family ? [{ address: hostname, family }] : await lookup(hostname, { all: true });
+
+  if (records.some(
+    (record) => PRIVATE_IP_BLOCK_LIST.check(record.address, record.family === 6 ? "ipv6" : "ipv4"),
+  )) return null;
+
+  return records[0]?.address ?? null;
+}
+
+function requestHtml(
+  parsed: URL,
+  hostname: string,
+  address: string,
+  signal: AbortSignal,
+): Promise<IncomingMessage> {
+  const request = parsed.protocol === "https:" ? httpsRequest : httpRequest;
+
+  return new Promise((resolve, reject) => {
+    // Der Socket verbindet sich direkt mit der geprüften IP. Host-Header
+    // und TLS-Zertifikatsprüfung verwenden weiterhin den Namen aus der URL.
+    const outgoing = request({
+      hostname: address,
+      port: parsed.port,
+      path: parsed.pathname + parsed.search,
+      servername: isIP(hostname) ? "" : hostname,
+      agent: false,
+      signal,
+      headers: {
+        host: parsed.host,
+        "accept-encoding": "identity",
+        "user-agent": "GeschenkeManagerLinkPreview/1.0",
+      },
+    }, resolve);
+    outgoing.on("error", reject);
+    outgoing.end();
+  });
 }
 
 export function extractOgImage(html: string): string | null {
@@ -81,35 +98,6 @@ export function extractOgImage(html: string): string | null {
   return null;
 }
 
-// Wartet auf reader.read(), gibt aber sofort auf, sobald signal abbricht -
-// verlaesst sich nicht blind darauf, dass der zugrunde liegende Stream das
-// AbortSignal selbst respektiert (liess sich aus der undici-Doku nicht
-// zweifelsfrei verifizieren, siehe Review-Fund zum fehlenden Zeitlimit beim
-// Streamen).
-function readRespectingAbort(
-  reader: ReadableStreamDefaultReader<Uint8Array>,
-  signal: AbortSignal,
-): Promise<ReadableStreamReadResult<Uint8Array>> {
-  return new Promise((resolve, reject) => {
-    if (signal.aborted) {
-      reject(new Error("aborted"));
-      return;
-    }
-    const onAbort = () => reject(new Error("aborted"));
-    signal.addEventListener("abort", onAbort, { once: true });
-    reader.read().then(
-      (result) => {
-        signal.removeEventListener("abort", onAbort);
-        resolve(result);
-      },
-      (err: unknown) => {
-        signal.removeEventListener("abort", onAbort);
-        reject(err);
-      },
-    );
-  });
-}
-
 async function fetchHtmlSafely(
   url: string,
   redirectsLeft: number,
@@ -117,63 +105,36 @@ async function fetchHtmlSafely(
 ): Promise<{ html: string; finalUrl: string } | null> {
   const parsed = new URL(url);
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
-  if (!(await isPublicHostname(parsed.hostname))) return null;
+  if (parsed.username || parsed.password) return null;
+  const hostname = parsed.hostname.replace(/^\[|\]$/g, "");
+  const address = await resolvePublicAddress(hostname);
+  if (!address || signal.aborted) return null;
 
-  let response: Response;
+  const response = await requestHtml(parsed, hostname, address, signal);
   try {
-    response = await fetch(parsed.toString(), {
-      signal,
-      redirect: "manual",
-      headers: { "user-agent": "GeschenkeManagerLinkPreview/1.0" },
-    });
-  } catch {
-    return null;
-  }
-
-  if (response.status >= 300 && response.status < 400) {
-    // Redirect-Antworten werden nicht gelesen, nur die Verbindung freigeben.
-    await response.body?.cancel().catch(() => {});
-    const location = response.headers.get("location");
-    if (!location || redirectsLeft <= 0) return null;
-    return fetchHtmlSafely(new URL(location, parsed).toString(), redirectsLeft - 1, signal);
-  }
-
-  if (!response.ok) return null;
-
-  const contentType = response.headers.get("content-type") ?? "";
-  if (!contentType.includes("text/html")) return null;
-
-  const contentLength = Number(response.headers.get("content-length") ?? "0");
-  if (contentLength > MAX_RESPONSE_BYTES) return null;
-
-  const reader = response.body?.getReader();
-  if (!reader) return null;
-
-  // Streamt statt response.text() zu nutzen (Review-Fund): so kann die
-  // Groessenobergrenze schon waehrend des Empfangs greifen statt erst nach
-  // einer vollstaendig eingelesenen (potenziell riesigen oder nie
-  // endenden) Antwort, und das AbortSignal bricht auch waehrend des Lesens
-  // ab, nicht nur beim anfaenglichen fetch()-Aufruf.
-  const decoder = new TextDecoder();
-  let html = "";
-  let received = 0;
-  try {
-    while (true) {
-      const { done, value } = await readRespectingAbort(reader, signal);
-      if (done) break;
-      received += value.byteLength;
-      if (received > MAX_RESPONSE_BYTES) {
-        await reader.cancel().catch(() => {});
-        return null;
-      }
-      html += decoder.decode(value, { stream: true });
+    const status = response.statusCode ?? 0;
+    if (status >= 300 && status < 400) {
+      const location = response.headers.location;
+      if (!location || redirectsLeft <= 0) return null;
+      return fetchHtmlSafely(new URL(location, parsed).toString(), redirectsLeft - 1, signal);
     }
-  } catch {
-    await reader.cancel().catch(() => {});
-    return null;
-  }
+    if (status < 200 || status >= 300) return null;
+    if (!response.headers["content-type"]?.includes("text/html")) return null;
+    if (Number(response.headers["content-length"]) > MAX_RESPONSE_BYTES) return null;
 
-  return { html, finalUrl: response.url || parsed.toString() };
+    const decoder = new TextDecoder();
+    let html = "";
+    let received = 0;
+    for await (const chunk of response) {
+      received += chunk.byteLength;
+      if (received > MAX_RESPONSE_BYTES) return null;
+      html += decoder.decode(chunk, { stream: true });
+    }
+
+    return { html: html + decoder.decode(), finalUrl: parsed.toString() };
+  } finally {
+    response.destroy();
+  }
 }
 
 // Best-effort: liefert bei jedem Fehler/jeder Ablehnung null statt zu
