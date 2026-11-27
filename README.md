@@ -29,8 +29,13 @@ Geschwistern), damit niemand dasselbe Geschenk doppelt kauft.
 - Personenseite pro Person: Ideen mit Titel, Link und Anlass anlegen (Schnelleingabe
   oder ausführliches Formular), Status offen/besorgt per Klick umschalten, bearbeiten,
   mit Sicherheitsabfrage löschen
-- Platzhalter für geplante Erweiterungen (frühere Geschenke, Vorschläge, Bild-Upload,
-  Aufgaben-Checkliste) sind in der UI schon vorgesehen, aber noch nicht funktional
+- Besorgte Geschenke zu Geburtstag/Weihnachten rutschen automatisch in die
+  „Frühere Geschenke"-Liste, sobald der Anlass vorbei ist; Geschenke ohne festes
+  Datum (eigene Anlässe, ohne Anlass) lassen sich manuell über „+ Geschenk
+  nachtragen" ergänzen ([#26](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/26),
+  [#21](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/21))
+- Platzhalter für geplante Erweiterungen (Vorschläge, Bild-Upload, Aufgaben-Checkliste)
+  sind in der UI schon vorgesehen, aber noch nicht funktional
 
 ### Geteilte Ansicht
 - Ideen für eine oder mehrere Personen per Link teilen – ganz ohne Konto für die
@@ -54,6 +59,9 @@ Geschwistern), damit niemand dasselbe Geschenk doppelt kauft.
 ### Sonstiges
 - Dark-/Light-Mode (Theme-Color folgt jetzt auch in der iOS-Statusleiste,
   [#208](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/208))
+- Admin-Account: eigene Konten-Übersicht mit Lösch-Funktion, über die
+  Einstellungsseite erreichbar, nur für als Admin markierte Konten sichtbar
+  ([#90](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/90))
 - Impressum, Datenschutzerklärung
 - Responsive (Desktop, Tablet, Mobile)
 
@@ -70,13 +78,14 @@ MVP (IM-4.1) ist umgesetzt, Stufe 2 (IM-4.2) teilweise:
   monatliche Geburtstagserinnerung per E-Mail inkl. Einstellungsseite
   ([#3](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/3)),
   Weihnachts-Statusübersicht per E-Mail an drei festen Terminen
-  ([#2](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/2))
-- ⚠️ **Teilweise:** Status „given"/Geschenk-Historie (Datenmodell da, noch keine UI);
-  Idee → Geschenk umwandeln (bisher nur Status-Toggle, keine Anlass/Datum-Übernahme,
-  Platzhalter in der UI vorhanden, [#26](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/26))
+  ([#2](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/2)),
+  Idee → Geschenk umwandeln inkl. automatischem Übergang zu „Frühere Geschenke"
+  nach dem Anlass und manuellem Nachtragen
+  ([#26](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/26),
+  [#21](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/21)),
+  Admin-Account mit Konten-Übersicht und Lösch-Funktion
+  ([#90](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/90))
 - ❌ **Geplant (Stufe 2/3):**
-  Admin-Account ([#90](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/90)),
-  frühere Geschenke dokumentieren ([#21](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/21)),
   eigene Anlässe, Bild-Upload, Aufgaben-Checkliste, regelbasierte Ideenvorschläge,
   Wichtel-Funktion ([#178](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/178))
 
@@ -84,7 +93,7 @@ Siehe [CHANGELOG.md](CHANGELOG.md) für die chronologische Liste gemergter Ände
 und das [GitHub-Projekt](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/milestones)
 für den aktuellen Stand je Meilenstein.
 
-283 automatisierte Vitest-Tests (`npm test`), CI (Lint + Build), Codacy, CodeQL und
+1128 automatisierte Vitest-Tests (`npm test`), CI (Lint + Build), Codacy, CodeQL und
 Mutation-Testing (Stryker, `npm run test:mutation`, ~4 Minuten) laufen auf jedem
 Pull Request, siehe
 [#194](https://github.com/Projekt-ISEF01-Geschenke-Manager/ISEF01-Geschenke-Manager/issues/194).
